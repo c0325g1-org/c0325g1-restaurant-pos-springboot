@@ -1,0 +1,4 @@
+<div th:fragment="header" class="bg-dark text-white px-3 py-2 d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-person-circle"></i> <span th:text="${user != null ? user.name : 'Username'}">User Name</span></span>
+    <a th:href="@{/logout}" class="btn btn-sm btn-outline-light">Đăng xuất</a>
+</div>

@@ -1,0 +1,27 @@
+<th:block th:fragment="head (pageTitle)">
+    <th:block th:replace="~{fragments/shared/head :: head (${pageTitle})}"></th:block>
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 240px;
+            background-color: #343a40;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+        }
+
+        .main-content {
+            margin-left: 240px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+    </style>
+</th:block>

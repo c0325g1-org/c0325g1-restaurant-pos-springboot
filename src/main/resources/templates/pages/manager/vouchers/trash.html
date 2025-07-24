@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/manager/head :: head ('Thùng rác mã giảm giá')"></th:block>
+</head>
+<body>
+<div class="sidebar" th:replace="~{fragments/manager/sidebar :: sidebar}"></div>
+<div class="main-content">
+    <div th:replace="~{fragments/manager/header :: header}"></div>
+
+    <main class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Thùng rác mã giảm giá</h2>
+            <a class="btn btn-outline-primary" th:href="@{/manager/vouchers}">
+                <i class="bi bi-arrow-left-circle"></i> Quay lại danh sách
+            </a>
+        </div>
+
+        <div th:if="${vouchers.content.size() == 0}" class="alert alert-info text-center">
+            Hiện không có mã giảm giá nào trong thùng rác.
+        </div>
+
+        <table th:if="${vouchers.content.size() > 0}" class="table table-hover table-striped shadow-sm rounded bg-white">
+            <thead class="table-dark text-center">
+            <tr>
+                <th>STT</th>
+                <th>Mã</th>
+                <th>Mô tả</th>
+                <th>Giảm (%)</th>
+                <th>Hiệu lực từ</th>
+                <th>Hiệu lực đến</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody class="align-middle text-center">
+            <tr th:each="v, status : ${vouchers}">
+                <td th:text="${status.count}">1</td>
+                <td th:text="${v.code}">ABC123</td>
+                <td th:text="${v.description}">Mô tả</td>
+                <td th:text="${v.discountPercent + '%'}">10%</td>
+                <td th:text="${#temporals.format(v.validFrom, 'dd/MM/yyyy HH:mm')}">01/08/2025</td>
+                <td th:text="${#temporals.format(v.validTo, 'dd/MM/yyyy HH:mm')}">15/08/2025</td>
+                <td>
+                    <span th:text="${v.isActive ? 'Đang hoạt động' : 'Ngưng sử dụng'}"
+                          th:classappend="${v.isActive} ? 'badge bg-success' : 'badge bg-secondary'"></span>
+                </td>
+                <td>
+                    <form th:action="@{/manager/vouchers/{id}/restore(id=${v.id})}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-success btn-sm me-1"
+                                title="Khôi phục"
+                                th:attr="data-bs-title='Khôi phục voucher ' + ${v.code}"
+                        >
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </button>
+                    </form>
+                    <button type="button"
+                            class="btn btn-outline-danger btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"
+                            title="Xoá vĩnh viễn"
+                            th:attr="data-id=${v.id}, data-title=${v.code}, data-bs-title='Xóa vĩnh viễn voucher ' + ${v.code}">
+                        <i class="bi bi-trash3"></i>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <nav th:if="${vouchers.totalPages > 1}" aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${vouchers.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/manager/vouchers/trash(page=${vouchers.number - 1})}">Trước</a>
+                </li>
+                <li th:each="pageNum : ${#numbers.sequence(0, vouchers.totalPages - 1)}"
+                    class="page-item"
+                    th:classappend="${pageNum == vouchers.number} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{/manager/vouchers/trash(page=${pageNum})}"
+                       th:text="${pageNum + 1}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${vouchers.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/manager/vouchers/trash(page=${vouchers.number + 1})}">Sau</a>
+                </li>
+            </ul>
+        </nav>
+    </main>
+
+    <div th:replace="~{fragments/manager/footer :: footer}"></div>
+</div>
+
+<!-- Toast + Modal -->
+<div th:replace="~{fragments/shared/toast :: toast}"></div>
+<div th:replace="~{fragments/shared/delete_modal :: deleteModal ('mã giảm giá')}"></div>
+<th:block th:replace="fragments/manager/script :: script"></th:block>
+
+<!-- Modal Binding Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            const title = button.getAttribute('data-title');
+            deleteModal.querySelector('#modalTitle').textContent = title;
+            deleteModal.querySelector('#deleteForm').setAttribute('action', '/manager/vouchers/' + id + '/destroy');
+        });
+    });
+</script>
+</body>
+</html>

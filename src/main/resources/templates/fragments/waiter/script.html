@@ -1,0 +1,25 @@
+<th:block th:fragment="script">
+    <th:block th:replace="~{fragments/shared/script :: script}"></th:block>
+    <script>
+        function fetchNotifications() {
+            $.get("/api/waiter/notifications", function (data) {
+                data.forEach(n => showToast(n.message));
+            });
+        }
+        function showToast(message) {
+            const toastHtml = `
+        <div class="toast align-items-center text-bg-info border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>`;
+            const container = $(".toast-container");
+            const toastElement = $(toastHtml);
+            container.append(toastElement);
+            const toast = new bootstrap.Toast(toastElement[0]);
+            toast.show();
+        }
+        setInterval(fetchNotifications, 5000); // every 5s
+    </script>
+</th:block>

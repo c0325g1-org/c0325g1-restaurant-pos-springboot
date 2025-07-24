@@ -1,0 +1,6 @@
+<div th:fragment="header">
+    <header class="bg-light py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="mb-0" th:text="${pageTitle}">Dashboard</h5>
+        <span><i class="bi bi-person-circle"></i> <span th:text="${user != null ? user.name : 'Username'}">User Name</span></span>
+    </header>
+</div>

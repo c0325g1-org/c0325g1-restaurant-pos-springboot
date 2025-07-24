@@ -1,0 +1,18 @@
+<div th:fragment="sidebar" class="sidebar">
+    <h5 class="text-center py-3 border-bottom">Manager</h5>
+    <a th:href="@{/manager}" class="d-block text-white px-3 py-2 text-decoration-none">
+        <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+    <a th:href="@{/manager/menu_items}" class="d-block text-white px-3 py-2 text-decoration-none">
+        <i class="bi bi-card-list"></i> Quản lý Món
+    </a>
+    <a th:href="@{/manager/menu_item_categories}" class="d-block text-white px-3 py-2 text-decoration-none">
+        <i class="bi bi-tags"></i> Danh mục Món
+    </a>
+    <a th:href="@{/manager/vouchers}" class="d-block text-white px-3 py-2 text-decoration-none">
+        <i class="bi bi-percent"></i> Voucher
+    </a>
+    <a th:href="@{/logout}" class="d-block text-white px-3 py-2 text-decoration-none">
+        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+    </a>
+</div>

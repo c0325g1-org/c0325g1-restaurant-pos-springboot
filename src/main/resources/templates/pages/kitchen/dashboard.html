@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/kitchen/head :: head ('Kitchen - POS')"></th:block>
+</head>
+<body>
+
+<!-- Header -->
+<div th:replace="~{fragments/kitchen/header :: header}"></div>
+
+<!-- Nội dung chính -->
+<main class="container-fluid py-3">
+
+    <h4 class="mb-4"><i class="bi bi-fire"></i> Món cần chế biến</h4>
+
+    <!-- Tabs lọc trạng thái -->
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item"><a class="nav-link active" href="#">Tất cả</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Chưa bắt đầu</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Đang chế biến</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Đã sẵn sàng</a></li>
+    </ul>
+
+    <!-- Đơn hàng 1 -->
+    <div class="order-card late-order">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div><strong>Bàn 03</strong> | <small>12:05 22/07/2025</small></div>
+            <span class="badge bg-warning text-dark badge-status">Đang chế biến</span>
+        </div>
+        <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    <strong>Phở bò</strong> <span class="badge bg-primary rounded-pill">x2</span><br>
+                    <small class="text-muted">Ghi chú: Không hành</small>
+                </div>
+                <button class="btn btn-outline-success btn-sm">Sẵn sàng</button>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    <strong>Bánh mì trứng</strong> <span class="badge bg-primary rounded-pill">x1</span>
+                </div>
+                <button class="btn btn-outline-success btn-sm">Sẵn sàng</button>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Đơn hàng 2 -->
+    <div class="order-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div><strong>Bàn 04</strong> | <small>12:10 22/07/2025</small></div>
+            <span class="badge bg-secondary badge-status">Chưa bắt đầu</span>
+        </div>
+        <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    <strong>Trà sữa</strong> <span class="badge bg-primary rounded-pill">x3</span><br>
+                    <small class="text-muted">Ghi chú: Ít ngọt</small>
+                </div>
+                <button class="btn btn-outline-warning btn-sm">Bắt đầu</button>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Đơn huỷ -->
+    <div class="order-card border-danger">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div><strong>Bàn 02</strong> | <small>12:20 22/07/2025</small></div>
+            <span class="badge bg-danger">Đã huỷ</span>
+        </div>
+        <p class="text-danger small mb-0">* Món Bánh xèo bị huỷ lúc 12:21</p>
+    </div>
+
+</main>
+<th:block th:replace="fragments/kitchen/script :: script"></th:block>
+<audio id="notifySound" src="https://www.myinstants.com/media/sounds/notification_o14egLP.mp3" preload="auto"></audio>
+<script>
+    function setupPlayOnceOnInteraction() {
+        const handler = () => {
+            document.getElementById("notifySound").play();
+            console.log("Âm thanh đã phát sau click!");
+            window.removeEventListener("click", handler);
+        };
+        window.addEventListener("click", handler);
+    }
+
+    window.onload = setupPlayOnceOnInteraction;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/cashier/head :: head ('Cashier - POS')"></th:block>
+</head>
+<body>
+<div th:replace="~{fragments/cashier/sidebar :: sidebar}"></div>
+<div class="main-content">
+    <div th:replace="~{fragments/cashier/header :: header}"></div>
+    <!-- Nội dung chính -->
+    <main class="container-fluid py-3">
+        <h2 class="mb-4">Tổng quan thu ngân</h2>
+        <div class="row g-3">
+            <div class="col-md-6 col-xl-3">
+                <div class="card text-bg-primary shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Tổng hóa đơn hôm nay</h5>
+                        <p class="card-text display-6">38</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="card text-bg-success shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Doanh thu hôm nay</h5>
+                        <p class="card-text display-6">12.300.000đ</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="card text-bg-warning shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Đang thanh toán</h5>
+                        <p class="card-text display-6">5</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="card text-bg-danger shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">Đơn hủy</h5>
+                        <p class="card-text display-6">2</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{fragments/cashier/footer :: footer}"></div>
+</div>
+<th:block th:replace="fragments/cashier/script :: script"></th:block>
+</body>
+</html>

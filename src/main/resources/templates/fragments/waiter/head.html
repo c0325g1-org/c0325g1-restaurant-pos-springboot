@@ -1,0 +1,31 @@
+<th:block th:fragment="head (pageTitle)">
+    <th:block th:replace="~{fragments/shared/head :: head (${pageTitle})}"></th:block>
+    <style>
+        .table-card {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        .table-card:hover {
+            transform: scale(1.03);
+        }
+        .status-badge {
+            font-size: 0.85rem;
+            padding: 0.35em 0.6em;
+            border-radius: 0.25rem;
+        }
+        .status-EMPTY {
+            background-color: #6c757d;
+            color: #fff;
+        }
+
+        .status-SERVING {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+
+        .status-RESERVED {
+            background-color: #ffc107;
+            color: #212529;
+        }
+    </style>
+</th:block>

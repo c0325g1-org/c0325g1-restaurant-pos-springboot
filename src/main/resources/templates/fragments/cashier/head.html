@@ -1,0 +1,8 @@
+<th:block th:fragment="head (pageTitle)">
+    <th:block th:replace="~{fragments/shared/head :: head (${pageTitle})}"></th:block>
+    <style>
+        .main-content {
+            margin-left: 250px;
+        }
+    </style>
+</th:block>

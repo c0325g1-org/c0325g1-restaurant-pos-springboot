@@ -1,0 +1,4 @@
+<header class="bg-dark text-white p-3 d-flex justify-content-between align-items-center" th:fragment="header">
+    <span><i class="bi bi-person-circle"></i> <span th:text="${user != null ? user.name : 'Username'}">User Name</span></span>
+    <a th:href="@{/logout}" class="btn btn-sm btn-outline-light">Logout</a>
+</header>
