@@ -1,0 +1,33 @@
+<div th:fragment="fragment">
+    <div th:if="${cart.items.isEmpty()}">
+        <p class="text-muted">Giỏ món hiện đang trống.</p>
+    </div>
+
+    <ul class="list-group" th:if="${!cart.items.isEmpty()}">
+        <li class="list-group-item d-flex justify-content-between align-items-center"
+            th:each="item : ${cart.items}">
+            <div style="width: 70%;">
+                <strong th:text="${item.menuItemName}"></strong>
+                <div class="text-muted small">
+                    <span class="me-2">Giá:
+                        <span class="item-price" th:attr="data-total=${item.price * item.quantity}"
+                              th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                    </span>
+                    <div class="input-group input-group-sm mt-1">
+                        <button class="btn btn-outline-secondary" type="button"
+                                th:onclick="'updateQuantity(' + ${cart.tableId} + ', ' + ${item.menuItemId} + ', -1)'">−</button>
+
+                        <input type="text" readonly class="form-control text-center"
+                               th:value="${item.quantity}" style="max-width: 40px;">
+
+                        <button class="btn btn-outline-secondary" type="button"
+                                th:onclick="'updateQuantity(' + ${cart.tableId} + ', ' + ${item.menuItemId} + ', 1)'">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-sm btn-outline-danger"
+                    th:onclick="'removeFromCart(' + ${cart.tableId} + ',' + ${item.menuItemId} + ')'">🗑</button>
+        </li>
+    </ul>
+</div>
