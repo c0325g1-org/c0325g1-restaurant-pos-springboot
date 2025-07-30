@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
@@ -24,15 +25,22 @@ public class Order extends AuditMetadata {
     @ManyToOne
     private Employee employee;
 
-    @ManyToOne
-    private Reservation reservation;
-
     private LocalDateTime orderTime;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.OPEN;
 
+    @Column(nullable = false, unique = true, updatable = false, length = 36)
+    private String feedbackToken;
+
+    @PrePersist
+    public void generateFeedbackToken() {
+        if (feedbackToken == null) {
+            feedbackToken = UUID.randomUUID().toString();
+        }
+    }
+
     public enum OrderStatus {
-        OPEN, CLOSED
+        OPEN, CLOSED, CANCELED
     }
 }

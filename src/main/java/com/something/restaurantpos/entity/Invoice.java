@@ -26,4 +26,7 @@ public class Invoice extends AuditMetadata {
     private Voucher voucher;
 
     private BigDecimal totalAmount;
+
+    @Column(name = "paid")
+    private boolean paid = false;
 }
