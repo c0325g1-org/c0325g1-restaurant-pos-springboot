@@ -8,11 +8,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface IMenuItemRepository extends JpaRepository<MenuItem,Integer> {
+import java.util.List;
+
+public interface IMenuItemRepository extends JpaRepository<MenuItem, Integer> {
+    List<MenuItem> findByIsAvailableTrue();
+
     @Query("SELECT m FROM MenuItem m WHERE (m.category.id = :idCategory OR :idCategory = 0) AND (m.name LIKE CONCAT('%', :name, '%')) and (m.deleted=false)")
     Page<MenuItem> search(@Param("name") String name,
-                      @Param("idCategory") Integer idCategory,
-                      Pageable pageable);
+                          @Param("idCategory") Integer idCategory,
+                          Pageable pageable);
+
     long countByDeletedTrue();
+
     Page<MenuItem> findByDeletedTrue(Pageable pageable);
 }
