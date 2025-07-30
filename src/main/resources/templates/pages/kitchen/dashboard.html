@@ -73,6 +73,8 @@
 </main>
 <th:block th:replace="fragments/kitchen/script :: script"></th:block>
 <audio id="notifySound" src="https://www.myinstants.com/media/sounds/notification_o14egLP.mp3" preload="auto"></audio>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 <script>
     function setupPlayOnceOnInteraction() {
         const handler = () => {
@@ -84,6 +86,17 @@
     }
 
     window.onload = setupPlayOnceOnInteraction;
+
+    const empId = 4;
+    const socket = new SockJS('/ws');
+    const stompClient = Stomp.over(socket);
+    stompClient.connect({}, function () {
+        stompClient.subscribe(`/topic/user.${empId}`, function (message) {
+            console.log(message);
+            const noti = JSON.parse(message.body);
+            console.log("📩 Notification nhận:", noti);
+        });
+    });
 </script>
 
 </body>

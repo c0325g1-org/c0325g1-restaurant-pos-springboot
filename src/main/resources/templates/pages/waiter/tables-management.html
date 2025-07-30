@@ -9,10 +9,6 @@
 <body>
 <div class="container py-4">
     <h2 class="mb-4">Quản lý Bàn</h2>
-
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-
     <div class="row mb-3 gap-3">
         <div class="col-md-6">
             <input id="tableSearch" type="text" class="form-control" placeholder="Tìm bàn..." oninput="filterTables()" />
@@ -40,9 +36,9 @@
 
                     <form th:action="@{/waiter/tables/{id}/change-status(id=${table.id})}" method="post" class="mt-2">
                         <select name="status" class="form-select form-select-sm mb-2">
-                            <option value="EMPTY">Trống</option>
-                            <option value="RESERVED">Đặt trước</option>
-                            <option value="SERVING">Đang phục vụ</option>
+                            <option value="EMPTY" th:if="${table.status.name() != 'EMPTY'}">Trống</option>
+                            <option value="RESERVED" th:if="${table.status.name() != 'RESERVED'}">Đặt trước</option>
+                            <option value="SERVING" th:if="${table.status.name() != 'SERVING'}">Đang phục vụ</option>
                         </select>
                         <button class="btn btn-sm btn-outline-primary w-100">Cập nhật</button>
                     </form>
@@ -76,6 +72,7 @@
         </div>
     </div>
 </div>
+<div th:replace="~{fragments/shared/toast :: toast}"></div>
 
 <script>
     function filterTables() {
@@ -104,6 +101,6 @@
         }
     }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<th:block th:replace="fragments/waiter/script :: script"></th:block>
 </body>
 </html>

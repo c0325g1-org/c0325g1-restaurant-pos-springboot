@@ -11,9 +11,7 @@ import java.util.Optional;
 public interface IOrderService {
     Order placeOrder(OrderCartDTO cartDTO, Integer employeeId);
 
-    boolean existsOpenOrderByTableId(Integer id);
-
-    Optional<Order> findOpenOrderByTableId(Integer tableId);
+    Optional<Order> findLastedOpenOrderByTableId(Integer tableId);
 
     Order createNewOrderForTable(DiningTable table);
 
@@ -24,4 +22,10 @@ public interface IOrderService {
     List<OrderItem> getOrderItemsByTableAndStatuses(Integer tableId, List<OrderItem.ItemStatus> statuses);
 
     void updateItemStatus(Integer id, OrderItem.ItemStatus itemStatus);
+
+    boolean existsOrderItemByOrderIdAndTableId(Integer orderId, Integer tableId);
+
+    Optional<Order> findLastedOrderByTableId(Integer tableId);
+
+    void remove(Integer id);
 }

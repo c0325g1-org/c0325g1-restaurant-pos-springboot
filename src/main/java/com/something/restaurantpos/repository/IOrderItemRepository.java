@@ -10,4 +10,6 @@ public interface IOrderItemRepository extends JpaRepository<OrderItem, Integer> 
     List<OrderItem> findByOrder(Order order);
 
     List<OrderItem> findByOrder_Table_IdAndStatusIn(Integer tableId, List<OrderItem.ItemStatus> statuses);
+
+    boolean existsOrderItemByOrderIdAndOrder_Table_Id(Integer orderId, Integer tableId);
 }

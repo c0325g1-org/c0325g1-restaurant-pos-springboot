@@ -3,8 +3,6 @@ import { initCategoryFilters } from './menu-filter.js';
 import { updateCartView, removeFromCart, updateQuantity, addToCart } from './cart.js';
 import { loadCalledItems, loadServedItems, setupCancelHandler } from './order-status.js';
 
-let tableId = document.querySelector('[name="tableId"]')?.value;
-
 window.updateQuantity = (tableId, menuItemId, delta) => updateQuantity(tableId, menuItemId, delta);
 window.removeFromCart = (tableIdFromView, menuItemId) => removeFromCart(tableIdFromView, menuItemId);
 

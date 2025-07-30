@@ -25,23 +25,32 @@ export function loadCalledItems(tableId) {
         .then(data => {
             const container = document.getElementById("called-items");
             container.innerHTML = "";
-            data.forEach(item => {
-                const div = document.createElement("div");
-                div.classList.add("border-bottom", "py-2");
+            if (data.length > 0) {
+                data.forEach(item => {
+                    const div = document.createElement("div");
+                    div.classList.add("border-bottom", "py-2");
 
-                let statusBadge = getStatusBadge(item.status);
-                let actions = getActionButtons(item);
+                    let statusBadge = getStatusBadge(item.status);
+                    let actions = getActionButtons(item);
 
-                div.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>${item.menuItem.name}</strong> - ${item.quantity} × ${item.price.toLocaleString()}đ
-                        ${statusBadge}
-                    </div>
-                    <div>${actions}</div>
-                </div>`;
-                container.appendChild(div);
-            });
+                    div.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="col-10 gap-3 d-flex">
+                                <div class="d-flex flex-column">
+                                    <strong>${item.menuItem.name}</strong>
+                                    <i>SL: ${item.quantity} × ${item.price.toLocaleString()}đ</i>
+                                </div>
+                                <div>
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                            <div class="col-2">${actions}</div>
+                    </div>`;
+                    container.appendChild(div);
+                });
+            } else {
+                container.innerHTML = "<p>Danh sách món đã gọi đang trống!</p>";
+            }
         });
 }
 
@@ -51,12 +60,17 @@ export function loadServedItems(tableId) {
         .then(data => {
             const container = document.getElementById("served-items");
             container.innerHTML = "";
-            data.forEach(item => {
-                const div = document.createElement("div");
-                div.classList.add("d-flex", "justify-content-between", "border-bottom", "py-1");
-                div.innerHTML = `<span>${item.menuItem.name}</span><span>${item.quantity} × ${item.price.toLocaleString()}đ</span>`;
-                container.appendChild(div);
-            });
+            if (data.length > 0) {
+                data.forEach(item => {
+                    const div = document.createElement("div");
+                    div.classList.add("d-flex", "justify-content-between", "border-bottom", "py-1");
+                    div.innerHTML = `<span>${item.menuItem.name}</span><span>${item.quantity} × ${item.price.toLocaleString()}đ</span>`;
+                    container.appendChild(div);
+                });
+            } else {
+                container.innerHTML = "<p>Danh sách món đã phục vụ đang trống!</p>";
+            }
+
         });
 }
 
@@ -66,16 +80,16 @@ function getStatusBadge(status) {
         case "COOKING": return '<span class="badge bg-warning">Đang chế biến</span>';
         case "READY": return '<span class="badge bg-success">Sẵn sàng</span>';
         case "SERVED": return '<span class="badge bg-info">Đã phục vụ</span>';
-        case "CANCELLED": return '<span class="badge bg-secondary">Đã huỷ</span>';
+        case "CANCELED": return '<span class="badge bg-secondary">Đã huỷ</span>';
         default: return '';
     }
 }
 
 function getActionButtons(item) {
     if (item.status === "NEW" || item.status === "COOKING") {
-        return `<button class="btn btn-sm btn-outline-danger ms-2" onclick="window.confirmCancel(${item.id})">Huỷ</button>`;
+        return `<button class="btn btn-sm btn-outline-danger ms-2" onclick="window.confirmCancel(${item.id})" title="Huỷ món"><i class="bi bi-x"></i> Huỷ món</button>`;
     } else if (item.status === "READY") {
-        return `<button class="btn btn-sm btn-success ms-2" onclick="markAsServed(${item.id})">Đã phục vụ</button>`;
+        return `<button class="btn btn-sm btn-success ms-2" onclick="markAsServed(${item.id})" title="Đã phục vụ"><i class="bi bi-bag-check"></i> Đã phục vụ</button>`;
     }
     return '';
 }
@@ -90,3 +104,5 @@ function markAsServed(itemId) {
             loadServedItems(tableId);
         });
 }
+
+window.markAsServed = markAsServed;

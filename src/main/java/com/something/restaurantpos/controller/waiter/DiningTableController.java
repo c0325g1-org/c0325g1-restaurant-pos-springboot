@@ -33,15 +33,21 @@ public class DiningTableController {
                                @RequestParam DiningTable.TableStatus status,
                                RedirectAttributes redirect) {
         DiningTable table = diningTableService.findById(id);
-        boolean hasUnpaidOrder = orderService.existsOpenOrderByTableId(id);
-
-        if (table.getStatus() == DiningTable.TableStatus.SERVING && hasUnpaidOrder) {
-            redirect.addFlashAttribute("error", "Bàn đang phục vụ và có món chưa thanh toán. Không thể đổi trạng thái.");
-        } else {
-            table.setStatus(status);
-            diningTableService.save(table);
-            redirect.addFlashAttribute("success", "Cập nhật trạng thái thành công.");
+        if (table.getStatus() == DiningTable.TableStatus.SERVING) {
+            Order order = orderService.findLastedOrderByTableId(id).orElse(null);
+            if (order != null) {
+                boolean hasUnpaidOrder = orderService.existsOrderItemByOrderIdAndTableId(order.getId(), id);
+                if (hasUnpaidOrder && order.getStatus() == Order.OrderStatus.OPEN) {
+                    redirect.addFlashAttribute("error", "Bàn đang phục vụ và có món chưa thanh toán. Không thể đổi trạng thái.");
+                    return "redirect:/waiter/tables";
+                } else if (!hasUnpaidOrder && order.getStatus() == Order.OrderStatus.OPEN) {
+                    orderService.remove(order.getId());
+                }
+            }
         }
+        table.setStatus(status);
+        diningTableService.save(table);
+        redirect.addFlashAttribute("successMessage", "Cập nhật trạng thái thành công.");
 
         return "redirect:/waiter/tables";
     }
@@ -54,7 +60,7 @@ public class DiningTableController {
             diningTableService.save(table);
         }
 
-        Optional<Order> openOrder = orderService.findOpenOrderByTableId(id);
+        Optional<Order> openOrder = orderService.findLastedOpenOrderByTableId(id);
         if (openOrder.isEmpty()) {
             orderService.createNewOrderForTable(table);
         }
@@ -66,15 +72,15 @@ public class DiningTableController {
     public String goToOrder(@RequestParam Integer tableId, RedirectAttributes redirect) {
         DiningTable table = diningTableService.findById(tableId);
         if (table == null) {
-            redirect.addFlashAttribute("error", "Không tìm thấy bàn.");
+            redirect.addFlashAttribute("errorMessage", "Không tìm thấy bàn.");
             return "redirect:/waiter/tables";
         }
         if (table.getStatus() != DiningTable.TableStatus.SERVING) {
-            redirect.addFlashAttribute("error", "Bàn chưa ở trạng thái Đang phục vụ.");
+            redirect.addFlashAttribute("errorMessage", "Bàn chưa ở trạng thái Đang phục vụ.");
             return "redirect:/waiter/tables";
         }
 
-        Optional<Order> openOrder = orderService.findOpenOrderByTableId(tableId);
+        Optional<Order> openOrder = orderService.findLastedOpenOrderByTableId(tableId);
         if (openOrder.isEmpty()) {
             orderService.createNewOrderForTable(table);
         }

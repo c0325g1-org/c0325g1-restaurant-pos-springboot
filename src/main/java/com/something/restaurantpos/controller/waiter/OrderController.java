@@ -3,14 +3,9 @@ package com.something.restaurantpos.controller.waiter;
 import com.something.restaurantpos.dto.MenuItemDTO;
 import com.something.restaurantpos.dto.OrderCartDTO;
 import com.something.restaurantpos.dto.OrderItemDTO;
-import com.something.restaurantpos.entity.MenuItem;
-import com.something.restaurantpos.entity.Order;
-import com.something.restaurantpos.entity.OrderItem;
+import com.something.restaurantpos.entity.*;
 import com.something.restaurantpos.mapper.MenuItemMapper;
-import com.something.restaurantpos.service.IDiningTableService;
-import com.something.restaurantpos.service.IMenuCategoryService;
-import com.something.restaurantpos.service.IMenuItemService;
-import com.something.restaurantpos.service.IOrderService;
+import com.something.restaurantpos.service.*;
 import com.something.restaurantpos.util.OrderCartUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/waiter/order")
@@ -44,18 +36,20 @@ public class OrderController {
     @GetMapping
     public String showOrderPage(@RequestParam Integer tableId,
                                 @ModelAttribute("cartMap") Map<Integer, OrderCartDTO> cartMap,
-                                Model model) {
+                                Model model, RedirectAttributes redirectAttributes) {
+        DiningTable table = diningTableService.findById(tableId);
+        if (table == null || table.getStatus() != DiningTable.TableStatus.SERVING) {
+            redirectAttributes.addFlashAttribute("errorMessage", table == null ?
+                    "Không tìm thấy bàn." : "Bàn chưa ở trạng thái Đang phục vụ.");
+            return "redirect:/waiter/tables";
+        }
+
         cartMap.putIfAbsent(tableId, new OrderCartDTO(tableId));
-        OrderCartDTO cart = cartMap.get(tableId);
 
-        List<MenuItemDTO> menuItemDTOs = menuItemService.getAvailableItems().stream()
-                .map(menuItemMapper::toDto)
-                .toList();
-
-        model.addAttribute("menuItems", menuItemDTOs);
+        model.addAttribute("menuItems", getAvailableMenuItems());
         model.addAttribute("categories", menuCategoryService.findAll());
         model.addAttribute("tables", diningTableService.findAvailableTables());
-        model.addAttribute("cart", cart);
+        model.addAttribute("cart", cartMap.get(tableId));
         model.addAttribute("tableId", tableId);
 
         return "pages/waiter/order-page";
@@ -67,14 +61,13 @@ public class OrderController {
                                        @RequestParam Integer menuItemId,
                                        @RequestParam Integer quantity,
                                        @ModelAttribute("cartMap") Map<Integer, OrderCartDTO> cartMap) {
-        cartMap.putIfAbsent(tableId, new OrderCartDTO(tableId));
-        OrderCartDTO cart = cartMap.get(tableId);
-        if (cart == null) return ResponseEntity.badRequest().body(Map.of("error", "Bàn không hợp lệ"));
+        OrderCartDTO cart = cartMap.computeIfAbsent(tableId, OrderCartDTO::new);
 
         MenuItem menu = menuItemService.getById(menuItemId);
+        if (menu == null) return ResponseEntity.badRequest().body(Map.of("error", "Món không tồn tại"));
+
         OrderItemDTO item = new OrderItemDTO(menu.getId(), menu.getName(), quantity, menu.getPrice());
         OrderCartUtils.addItem(cart, item);
-
         return ResponseEntity.ok(cart);
     }
 
@@ -87,12 +80,11 @@ public class OrderController {
         OrderCartDTO cart = cartMap.get(tableId);
         if (cart == null) return ResponseEntity.badRequest().body(Map.of("error", "Bàn không hợp lệ"));
 
-        for (OrderItemDTO item : cart.getItems()) {
-            if (item.getMenuItemId().equals(menuItemId)) {
-                item.setQuantity(Math.max(1, item.getQuantity() + delta));
-                break;
-            }
-        }
+        cart.getItems().stream()
+                .filter(item -> item.getMenuItemId().equals(menuItemId))
+                .findFirst()
+                .ifPresent(item -> item.setQuantity(Math.max(1, item.getQuantity() + delta)));
+
         return ResponseEntity.ok(cart);
     }
 
@@ -101,10 +93,8 @@ public class OrderController {
     public ResponseEntity<?> removeItemFromCart(@RequestParam Integer tableId,
                                                 @RequestParam Integer menuItemId,
                                                 @ModelAttribute("cartMap") Map<Integer, OrderCartDTO> cartMap) {
-        OrderCartDTO cart = cartMap.get(tableId);
-        if (cart != null) {
-            OrderCartUtils.removeItem(cart, menuItemId);
-        }
+        Optional.ofNullable(cartMap.get(tableId))
+                .ifPresent(cart -> OrderCartUtils.removeItem(cart, menuItemId));
         return ResponseEntity.ok().build();
     }
 
@@ -112,7 +102,8 @@ public class OrderController {
     public String viewCartFragment(@RequestParam Integer tableId,
                                    @ModelAttribute("cartMap") Map<Integer, OrderCartDTO> cartMap,
                                    Model model) {
-        OrderCartDTO cart = cartMap.get(tableId);
+        OrderCartDTO cart = cartMap.getOrDefault(tableId, new OrderCartDTO(tableId));
+        cart.setTableId(tableId);
         model.addAttribute("cart", cart);
         return "fragments/waiter/cart-fragment :: fragment";
     }
@@ -123,43 +114,38 @@ public class OrderController {
                               RedirectAttributes redirect) {
         OrderCartDTO cart = cartMap.get(tableId);
         if (cart == null || cart.getItems().isEmpty()) {
-            redirect.addFlashAttribute("error", "Không có món nào để gửi.");
+            redirect.addFlashAttribute("errorMessage", "Không có món nào để gửi.");
             return "redirect:/waiter/order?tableId=" + tableId;
         }
 
         Integer employeeId = 1; // TODO: Replace with logged-in employee
 
-        Optional<Order> existingOrderOpt = orderService.findOpenOrderByTableId(tableId);
-        Order order;
-        if (existingOrderOpt.isPresent()) {
-            order = orderService.appendItemsToExistingOrder(existingOrderOpt.get(), cart);
-        } else {
-            order = orderService.placeOrder(cart, employeeId);
-        }
+        Order order = orderService.findLastedOpenOrderByTableId(tableId)
+                .map(existing -> orderService.appendItemsToExistingOrder(existing, cart))
+                .orElseGet(() -> orderService.placeOrder(cart, employeeId));
 
         OrderCartUtils.clear(cart);
-
-        redirect.addFlashAttribute("success", "Đã gửi món cho bàn " + order.getTable().getName());
+        redirect.addFlashAttribute("successMessage", "Gọi món thành công!");
         return "redirect:/waiter/order?tableId=" + tableId;
     }
 
     @GetMapping("/called-items")
     public ResponseEntity<List<OrderItem>> getCalledItems(@RequestParam Integer tableId) {
-        return ResponseEntity.ok(orderService.getOrderItemsByTableAndStatuses(
-                tableId, List.of(OrderItem.ItemStatus.NEW, OrderItem.ItemStatus.COOKING, OrderItem.ItemStatus.READY, OrderItem.ItemStatus.CANCELLED)
-        ));
+        List<OrderItem.ItemStatus> statuses = List.of(
+                OrderItem.ItemStatus.NEW, OrderItem.ItemStatus.COOKING,
+                OrderItem.ItemStatus.READY, OrderItem.ItemStatus.CANCELED);
+        return ResponseEntity.ok(orderService.getOrderItemsByTableAndStatuses(tableId, statuses));
     }
 
     @GetMapping("/served-items")
     public ResponseEntity<List<OrderItem>> getServedItems(@RequestParam Integer tableId) {
         return ResponseEntity.ok(orderService.getOrderItemsByTableAndStatuses(
-                tableId, List.of(OrderItem.ItemStatus.SERVED)
-        ));
+                tableId, List.of(OrderItem.ItemStatus.SERVED)));
     }
 
     @PostMapping("/cancel-item")
     public ResponseEntity<Void> cancelOrderItem(@RequestParam Integer id) {
-        orderService.updateItemStatus(id, OrderItem.ItemStatus.CANCELLED);
+        orderService.updateItemStatus(id, OrderItem.ItemStatus.CANCELED);
         return ResponseEntity.ok().build();
     }
 
@@ -167,5 +153,11 @@ public class OrderController {
     public ResponseEntity<Void> serveOrderItem(@RequestParam Integer id) {
         orderService.updateItemStatus(id, OrderItem.ItemStatus.SERVED);
         return ResponseEntity.ok().build();
+    }
+
+    private List<MenuItemDTO> getAvailableMenuItems() {
+        return menuItemService.getAvailableItems().stream()
+                .map(menuItemMapper::toDto)
+                .toList();
     }
 }
