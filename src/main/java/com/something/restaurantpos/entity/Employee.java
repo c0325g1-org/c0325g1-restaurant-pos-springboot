@@ -22,6 +22,8 @@ public class Employee extends AuditMetadata {
     private String username;
 
     private String password;
+    @Column(unique = true)
+    private String email;
 
     @ManyToOne
     @JoinColumn(name = "role_id")

@@ -24,6 +24,8 @@ public class CustomErrorController implements ErrorController {
                 return "errors/500";
             } else if (statusCode == HttpStatus.BAD_REQUEST.value()) {
                 return "errors/400";
+            } else if (statusCode == HttpStatus.FORBIDDEN.value()) {
+                return "errors/403";
             }
         }
         model.addAttribute("statusCode", statusCode);
