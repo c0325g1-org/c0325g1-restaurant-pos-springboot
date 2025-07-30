@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/manager/head :: head ('Danh sách loại món ăn')"></th:block>
+    <style>
+        .form-wrapper {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .form-title {
+            border-left: 4px solid #0d6efd;
+            padding-left: 12px;
+            font-weight: bold;
+        }
+
+        .form-control {
+            border-radius: 0.375rem;
+            border: 1px solid #ced4da;
+            transition: box-shadow 0.2s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar" th:replace="~{fragments/manager/sidebar :: sidebar}"></div>
+<div class="main-content">
+    <div th:replace="~{fragments/manager/header :: header}"></div>
+
+
+    <main class="container py-4">
+        <div class="form-wrapper bg-white p-4 rounded shadow-sm">
+            <h2 class="form-title mb-4"> Chỉnh sửa loại </h2>
+            <form th:action="@{/manager/menu_category/{id}/edit(id=${menuCategoryDTO.id})}"
+                  th:object="${menuCategoryDTO}" method="post" enctype="multipart/form-data" novalidate>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Tên</label>
+                    <input type="text" class="form-control" th:field="*{name}" placeholder="Nhập loại">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <a class="btn btn-secondary" th:href="@{/manager/menu_category}">Quay lại</a>
+                    <button class="btn btn-primary" type="submit">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    <div th:replace="~{fragments/manager/footer :: footer}"></div>
+</div>
+<th:block th:replace="fragments/manager/script :: script"></th:block>
+</body>
+</html>
