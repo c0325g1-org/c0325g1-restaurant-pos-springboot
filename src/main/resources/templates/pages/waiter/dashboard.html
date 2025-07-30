@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:replace="fragments/waiter/head :: head ('Waiter - POS')"></th:block>
+    <th:block th:replace="~{fragments/waiter/head :: head ('Waiter - POS')}"></th:block>
 </head>
 <body>
-<div th:replace="fragments/waiter/header :: header"></div>
+<div th:replace="~{fragments/waiter/header :: header}"></div>
 <main class="container pt-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">Quản lý bàn ăn</h4>
@@ -51,6 +51,6 @@
     </div>
 </main>
 </body>
-<div th:replace="fragments/waiter/footer :: footer"></div>
-<th:block th:replace="fragments/waiter/script :: script"></th:block>
+<div th:replace="~{fragments/waiter/footer :: footer}"></div>
+<th:block th:replace="~{fragments/waiter/script :: script}"></th:block>
 </html>

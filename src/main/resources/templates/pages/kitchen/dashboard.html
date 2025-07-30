@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:replace="fragments/kitchen/head :: head ('Kitchen - POS')"></th:block>
+    <th:block th:replace="~{fragments/kitchen/head :: head ('Kitchen - POS')}"></th:block>
 </head>
 <body>
 
@@ -71,7 +71,7 @@
     </div>
 
 </main>
-<th:block th:replace="fragments/kitchen/script :: script"></th:block>
+<th:block th:replace="~{fragments/kitchen/script :: script}"></th:block>
 <audio id="notifySound" src="https://www.myinstants.com/media/sounds/notification_o14egLP.mp3" preload="auto"></audio>
 <script>
     function setupPlayOnceOnInteraction() {
