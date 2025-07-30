@@ -45,37 +45,28 @@
             cropModal.hide();
             cropper.destroy();
         });
+
     </script>
         <script>
-
-                const priceInput = document.getElementById("priceInput");
-
-                priceInput.addEventListener("input", function (e) {
-                const input = e.target;
-                const selectionStart = input.selectionStart;
-
-                // Giá trị chưa format
-                const rawValue = input.value.replace(/\D/g, "");
-
-                // Nếu không có số thì không làm gì
-                if (!rawValue) {
-                input.value = "";
-                return;
-            }
-
-                // Format với dấu chấm ngăn cách
-                const formattedValue = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-
-                // Tính độ lệch chiều dài sau khi format
-                const oldLength = input.value.length;
-                input.value = formattedValue;
-                const newLength = formattedValue.length;
-                const lengthDiff = newLength - oldLength;
-
-                // Cập nhật lại vị trí con trỏ phù hợp
-                input.setSelectionRange(selectionStart + lengthDiff, selectionStart + lengthDiff);
-            });
-        </script>
+            document.addEventListener('DOMContentLoaded', function () {
+            const priceInput = document.getElementById('priceInput');
+            priceInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+            e.preventDefault(); // tránh submit form
+            formatCurrency();
+        }
+        });
+            function formatCurrency() {
+            let value = priceInput.value.replace(/\D/g, ''); // loại bỏ ký tự không phải số
+            if (value) {
+            priceInput.value = Number(value).toLocaleString('vi-VN'); // format theo tiền tệ VN
+        }
+        }
+        });
+    </script>
 
 
-</th:block>
+
+
+
+        </th:block>
