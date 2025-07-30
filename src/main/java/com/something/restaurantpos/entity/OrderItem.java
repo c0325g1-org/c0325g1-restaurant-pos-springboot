@@ -22,6 +22,7 @@ public class OrderItem extends AuditMetadata {
     private Order order;
 
     @ManyToOne
+
     private MenuItem menuItem;
 
     private Integer quantity;
@@ -31,6 +32,6 @@ public class OrderItem extends AuditMetadata {
     private ItemStatus status = ItemStatus.NEW;
 
     public enum ItemStatus {
-        NEW, COOKING, READY, SERVED
+        NEW, COOKING, READY, SERVED,CANCELED;
     }
 }
