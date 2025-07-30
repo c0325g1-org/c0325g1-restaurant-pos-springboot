@@ -1,3 +1,81 @@
 <th:block th:fragment="script">
     <th:block th:replace="~{fragments/shared/script :: script}"></th:block>
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
+    <!--crop ảnh-->
+    <script>
+        let cropper;
+        const imageInput = document.getElementById('imageInput');
+        const previewImage = document.getElementById('previewImage');
+        const imageToCrop = document.getElementById('imageToCrop');
+        const cropModal = new bootstrap.Modal(document.getElementById('cropModal'));
+        const cropBtn = document.getElementById('cropBtn');
+        const croppedImageInput = document.getElementById('croppedImage');
+
+        imageInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                imageToCrop.src = event.target.result;
+                cropModal.show();
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Khi modal hiện ra, khởi tạo cropper
+        document.getElementById('cropModal').addEventListener('shown.bs.modal', function () {
+            cropper = new Cropper(imageToCrop, {
+                aspectRatio: 1, // hoặc tỷ lệ bạn muốn
+                viewMode: 1,
+            });
+        });
+
+        // Khi crop xong
+        cropBtn.addEventListener('click', function () {
+            const canvas = cropper.getCroppedCanvas({
+                width: 400,
+                height: 400,
+            });
+
+            const croppedDataUrl = canvas.toDataURL('image/jpeg');
+            previewImage.src = croppedDataUrl;
+            croppedImageInput.value = croppedDataUrl;
+
+            cropModal.hide();
+            cropper.destroy();
+        });
+    </script>
+        <script>
+
+                const priceInput = document.getElementById("priceInput");
+
+                priceInput.addEventListener("input", function (e) {
+                const input = e.target;
+                const selectionStart = input.selectionStart;
+
+                // Giá trị chưa format
+                const rawValue = input.value.replace(/\D/g, "");
+
+                // Nếu không có số thì không làm gì
+                if (!rawValue) {
+                input.value = "";
+                return;
+            }
+
+                // Format với dấu chấm ngăn cách
+                const formattedValue = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+                // Tính độ lệch chiều dài sau khi format
+                const oldLength = input.value.length;
+                input.value = formattedValue;
+                const newLength = formattedValue.length;
+                const lengthDiff = newLength - oldLength;
+
+                // Cập nhật lại vị trí con trỏ phù hợp
+                input.setSelectionRange(selectionStart + lengthDiff, selectionStart + lengthDiff);
+            });
+        </script>
+
+
 </th:block>
