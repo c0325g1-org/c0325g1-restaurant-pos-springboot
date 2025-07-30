@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Hóa đơn tạm tính</title>
+  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+  <style>
+    @media print {
+      .no-print { display: none; }
+      body {
+        font-size: 14pt;
+      }
+    }
+
+    body {
+      background-color: #f8f9fa;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    .invoice-container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .qr-code {
+      width: 180px;
+      height: 180px;
+      margin-top: 20px;
+    }
+
+    .table th, .table td {
+      vertical-align: middle;
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="p-4">
+
+<div class="container invoice-container">
+  <h2 class="text-center text-uppercase fw-bold">HÓA ĐƠN TẠM TÍNH</h2>
+  <hr/>
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <p><strong>Bàn:</strong> <span th:text="${invoice.tableName}"></span></p>
+      <p><strong>Nhân viên:</strong> <span th:text="${invoice.employeeName}"></span></p>
+    </div>
+    <div class="col-md-6 text-end">
+      <p><strong>Thời gian:</strong>
+        <span th:text="${#temporals.format(invoice.orderTime, 'dd/MM/yyyy HH:mm')}"></span>
+      </p>
+    </div>
+  </div>
+
+  <table class="table table-bordered mt-3">
+    <thead class="table-light">
+    <tr>
+      <th>Tên món</th>
+      <th>Số lượng</th>
+      <th>Đơn giá (VND)</th>
+      <th>Thành tiền (VND)</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${invoice.orderItems}">
+      <td th:text="${item.itemName}"></td>
+      <td th:text="${item.quantity}"></td>
+      <td th:text="${#numbers.formatDecimal(item.price, 1, 'COMMA', 2, 'POINT')}"></td>
+      <td th:text="${#numbers.formatDecimal(item.total, 1, 'COMMA', 2, 'POINT')}"></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="text-end fs-5 fw-bold mt-3">
+    Tổng cộng:
+    <span th:text="${#numbers.formatDecimal(invoice.totalAmount, 1, 'POINT', 2, 'COMMA')} + ' VND'"></span>
+  </div>
+
+  <div class="text-center mt-4">
+    <p class="fw-semibold">Vui lòng quét mã QR để thanh toán:</p>
+    <img th:src="@{/qr-code(text=${'Ngân hàng: MBank, STK: 615892, Nội dung: Thanh toán HD ' + invoice.id})}"
+         alt="QR Thanh toán" class="qr-code"/>
+  </div>
+
+  <div class="text-center mt-4 no-print">
+    <button class="btn btn-success me-2" onclick="window.print()">🖨️ In hóa đơn</button>
+    <a th:href="@{/cashier/invoices}" class="btn btn-outline-secondary">← Quay lại</a>
+  </div>
+</div>
+
+</body>
+</html>
