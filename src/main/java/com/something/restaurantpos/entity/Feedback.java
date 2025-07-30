@@ -13,16 +13,19 @@ import lombok.*;
 public class Feedback extends AuditMetadata {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @ManyToOne
-    @JoinColumn(name = "reservation_id")
-    private Reservation reservation;
+    @Column(columnDefinition = "CHAR(36)")
+    private String id;
 
     @Column(nullable = false)
     private Integer rating;
 
     @Column(columnDefinition = "TEXT")
     private String content;
+
+    @Column(nullable = false, length = 100)
+    private String customerName;  
+
+    @Column(nullable = false, length = 15)
+    private String customerPhone; 
 }
+

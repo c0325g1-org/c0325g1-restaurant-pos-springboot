@@ -31,6 +31,6 @@ public class OrderItem extends AuditMetadata {
     private ItemStatus status = ItemStatus.NEW;
 
     public enum ItemStatus {
-        NEW, COOKING, READY, SERVED
+        NEW, COOKING, READY, SERVED, CANCELED
     }
 }
