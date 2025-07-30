@@ -3,7 +3,11 @@ package com.something.restaurantpos.entity;
 import com.something.restaurantpos.entity.base.AuditMetadata;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DialectOverride;
+import org.hibernate.annotations.Where;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,6 +17,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Where(clause = "deleted = false")
 public class Order extends AuditMetadata {
 
     @Id
@@ -25,9 +30,6 @@ public class Order extends AuditMetadata {
     @ManyToOne
     private Employee employee;
 
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status = OrderStatus.OPEN;
-
     @Column(nullable = false, unique = true, updatable = false, length = 36)
     private String feedbackToken;
 
@@ -38,10 +40,14 @@ public class Order extends AuditMetadata {
         }
     }
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<OrderItem> orderItems;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status = OrderStatus.OPEN;
 
     public enum OrderStatus {
-        OPEN, CLOSED, CANCELED
+        OPEN, CLOSED, CANCELED;
     }
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    private List<OrderItem> items = new ArrayList<>();
+
 }
