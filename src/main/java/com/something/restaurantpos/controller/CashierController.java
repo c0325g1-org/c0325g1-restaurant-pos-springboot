@@ -8,12 +8,14 @@ import com.something.restaurantpos.mapper.InvoiceMapper;
 import com.something.restaurantpos.repository.IMenuItemRepository;
 import com.something.restaurantpos.service.IInvoiceService;
 import com.something.restaurantpos.service.IPaymentService;
+import com.something.restaurantpos.service.impl.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -32,11 +34,8 @@ import static com.something.restaurantpos.config.VNPayConfig.vnp_Version;
 @RequestMapping("/cashier")
 public class CashierController {
 
-    @GetMapping
-    public String dashboard() {
-
-        return "pages/cashier/dashboard";
-    }
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
 
     @Autowired
     private IInvoiceService invoiceService;
@@ -44,6 +43,14 @@ public class CashierController {
     private IPaymentService paymentService;
     @Autowired
     private IMenuItemRepository menuItemRepository;
+
+    @GetMapping("/dashboard")
+    public String dashboard(Model model, Authentication authentication) {
+        String username = authentication.getName();
+        String employeeName = userDetailsService.getEmployeeNameByUsername(username);
+        model.addAttribute("employeeName", employeeName);
+        return "pages/cashier/dashboard";
+    }
 
     @GetMapping("/invoices")
     public String listInvoices(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, Model model) {

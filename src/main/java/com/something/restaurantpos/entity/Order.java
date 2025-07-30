@@ -4,8 +4,8 @@ import com.something.restaurantpos.entity.base.AuditMetadata;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
@@ -25,16 +25,23 @@ public class Order extends AuditMetadata {
     @ManyToOne
     private Employee employee;
 
-    @ManyToOne
-    private Reservation reservation;
-
-    private LocalDateTime orderTime;
-
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.OPEN;
+
+    @Column(nullable = false, unique = true, updatable = false, length = 36)
+    private String feedbackToken;
+
+    @PrePersist
+    public void generateFeedbackToken() {
+        if (feedbackToken == null) {
+            feedbackToken = UUID.randomUUID().toString();
+        }
+    }
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderItem> orderItems;
+
     public enum OrderStatus {
-        OPEN, CLOSED
+        OPEN, CLOSED, CANCELED
     }
 }
