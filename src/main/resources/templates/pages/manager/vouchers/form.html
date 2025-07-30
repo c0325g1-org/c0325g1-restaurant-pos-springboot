@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:replace="fragments/manager/head :: head ('Danh sách mã giảm giá')"></th:block>
+    <th:block th:replace="~{fragments/manager/head :: head ('Danh sách mã giảm giá')}"></th:block>
     <style>
         .form-wrapper {
             max-width: 700px;
@@ -35,9 +35,10 @@
         <div class="form-wrapper bg-white p-4 rounded shadow-sm">
             <h2 class="form-title mb-4" th:text="${voucher.id == null ? 'Thêm voucher mới' : 'Chỉnh sửa voucher'}"></h2>
 
-            <form th:action="@{${voucher.id != null} ? '/manager/vouchers/' + ${voucher.id} + '/edit' : '/manager/vouchers/create'}"
+            <form th:with="actionUrl=${voucher.id != null} ? '/manager/vouchers/' + voucher.id + '/edit' : '/manager/vouchers/create'"
+                  th:action="@{${actionUrl}}"
                   th:object="${voucher}" method="post" novalidate>
-                <div class="mb-3">
+            <div class="mb-3">
                     <label class="form-label fw-semibold">Mã voucher</label>
                     <input type="text" class="form-control" th:field="*{code}" placeholder="Nhập mã giảm giá">
                     <div class="text-danger small" th:if="${#fields.hasErrors('code')}" th:errors="*{code}"></div>
@@ -81,6 +82,6 @@
     </main>
     <div th:replace="~{fragments/manager/footer :: footer}"></div>
 </div>
-<th:block th:replace="fragments/manager/script :: script"></th:block>
+    <th:block th:replace="~{fragments/manager/script :: script}"></th:block>
 </body>
 </html>

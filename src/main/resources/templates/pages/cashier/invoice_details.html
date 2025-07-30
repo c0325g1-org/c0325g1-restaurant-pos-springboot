@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Hóa đơn tạm tính</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <style>
+        @media print {
+            .no-print { display: none; }
+            body {
+                font-size: 10pt;
+                background: white;
+            }
+            .invoice-container {
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                padding: 0;
+                width: 78mm;
+            }
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: "Courier New", monospace;
+            font-size: 10pt;
+        }
+
+        .invoice-container {
+            background: white;
+            padding: 10px;
+            max-width: 65mm;
+            margin: 0 auto;
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+
+        .qr-code {
+            width: 100px;
+            height: 100px;
+            margin-top: 10px;
+        }
+
+        .table {
+            font-size: 9pt;
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+            padding: 4px;
+            word-wrap: break-word;
+        }
+
+        .col-item-name {
+            width: 50%;
+            text-align: left;
+        }
+
+        .col-qty {
+            width: 15%;
+            font-size: 8pt;
+        }
+
+        .col-price, .col-total {
+            width: 17.5%;
+            font-size: 8pt;
+        }
+
+        .header-title {
+            font-size: 13pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .invoice-summary {
+            font-size: 11pt;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-end {
+            text-align: right;
+        }
+    </style>
+</head>
+<body class="p-4">
+
+<div class="invoice-container">
+    <div class="header-title text-uppercase">HÓA ĐƠN TẠM TÍNH</div>
+    <hr/>
+
+    <div class="row">
+        <p class="text-center m-0"><strong>Bàn:</strong> <span th:text="${invoice.tableName}"></span></p>
+        <p class="m-0"><strong>Nhân viên:</strong> <span th:text="${invoice.employeeName}"></span></p>
+        <p><strong>Thời gian:</strong>
+            <span th:text="${#temporals.format(invoice.orderTime, 'dd/MM/yyyy HH:mm')}"></span>
+        </p>
+    </div>
+
+    <table class="table table-bordered m-0">
+        <thead class="table-light">
+        <tr>
+            <th class="col-item-name">Tên món</th>
+            <th class="col-qty">SL</th>
+            <th class="col-price">Đ.Giá</th>
+            <th class="col-total">T.Tiền</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${invoice.orderItems}">
+            <td class="col-item-name" th:text="${item.itemName}"></td>
+            <td class="col-qty" th:text="${item.quantity}"></td>
+            <td class="col-price" th:text="${#numbers.formatDecimal(item.price, 1, 'COMMA', 0, 'POINT')}"></td>
+            <td class="col-total" th:text="${#numbers.formatDecimal(item.total, 1, 'COMMA', 0, 'POINT')}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="invoice-summary mt-1">
+        Tổng cộng:
+        <span th:text="${#numbers.formatDecimal(invoice.totalAmount, 1, 'POINT', 0, 'COMMA')} + ' VND'"></span>
+    </div>
+
+    <div class="text-center mt-2">
+        <p class="m-0">Quét mã QR để thanh toán:</p>
+        <img th:src="@{/qr-code(text=${'STK: 615892, Nội dung: Thanh toán HD ' + invoice.id})}"
+             alt="QR Thanh toán" class="qr-code"/>
+        <p class="m-0">STK: 615892</p>
+        <p>Nội dung: Thanh toán HD <span th:text="${invoice.id}"></span></p>
+    </div>
+
+    <div class="text-center mt-2 no-print">
+        <button class="btn btn-success btn-sm me-2" onclick="window.print()">🖨️ In hóa đơn</button>
+        <a th:href="@{/cashier/invoices}" class="btn btn-outline-secondary btn-sm">← Quay lại</a>
+    </div>
+</div>
+
+</body>
+</html>

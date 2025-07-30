@@ -1,5 +1,6 @@
 package com.something.restaurantpos.service;
 
+import com.something.restaurantpos.dto.InvoiceDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,4 +16,5 @@ public interface IService <T> {
     void softDelete(Integer id);
     void restore(Integer id);
     long countDeleted();
+
 }

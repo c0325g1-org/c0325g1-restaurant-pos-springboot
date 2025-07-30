@@ -99,7 +99,7 @@
                         <td th:text="${iterStat.count}">1</td>
                         <td th:text="${order.employee.name}"></td>
                         <td th:text="${order.table.name}"></td>
-                        <td th:text="${order.orderTime}"></td>
+                        <td th:text="${order.createdAt}"></td>
                         <td th:text="${order.status}"></td>
                         <td>
                             <a th:href="@{/invoices/view/{id}(id=${order.id})}">In hóa đơn</a>

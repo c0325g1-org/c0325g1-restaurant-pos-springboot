@@ -21,4 +21,15 @@ public class QrCodeService {
             throw new RuntimeException("Failed to generate QR Code", e);
         }
     }
+
+    public byte[] generateQRCode(String text, int width, int height) {
+        try {
+            BitMatrix bitMatrix = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, height);
+            ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
+            return pngOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi tạo mã QR", e);
+        }
+    }
 }

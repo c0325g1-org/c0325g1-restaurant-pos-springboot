@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Thanh toán hóa đơn</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .qr-code {
+            max-width: 200px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #0d6efd;
+        }
+
+        .invoice-summary {
+            font-size: 1.1rem;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+<div class="container py-5">
+    <div class="mb-4 text-center">
+        <h2 class="text-primary fw-bold">Thanh toán hóa đơn #<span th:text="${invoice.id}"></span></h2>
+    </div>
+
+    <!-- Thông tin hóa đơn -->
+    <div class="card mb-4 p-4">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Bàn:</strong> <span th:text="${invoice.tableName}"></span></p>
+                <p><strong>Nhân viên:</strong> <span th:text="${invoice.employeeName}"></span></p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p><strong>Thời gian:</strong> <span th:text="${#temporals.format(invoice.orderTime, 'dd/MM/yyyy HH:mm')}"></span></p>
+                <p class="text-danger fw-bold">
+                    <strong>Tổng tiền:</strong>
+                    <span th:text="${#numbers.formatDecimal(invoice.totalAmount, 1, 'POINT', 2, 'COMMA')} + ' VND'"></span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách món ăn -->
+    <div class="card mb-4">
+        <div class="card-header bg-light section-title">Danh sách món ăn</div>
+        <div class="card-body p-0">
+            <table class="table table-bordered m-0">
+                <thead class="table-light">
+                <tr class="text-center">
+                    <th>Tên món</th>
+                    <th>Số lượng</th>
+                    <th>Đơn giá</th>
+                    <th>Thành tiền</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${invoice.orderItems}">
+                    <td th:text="${item.itemName}"></td>
+                    <td class="text-center" th:text="${item.quantity}"></td>
+                    <td class="text-end" th:text="${#numbers.formatDecimal(item.price, 1, 'POINT', 2, 'COMMA')}"></td>
+                    <td class="text-end fw-semibold text-danger" th:text="${#numbers.formatDecimal(item.total, 1, 'POINT', 2, 'COMMA')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- QR + Form thanh toán -->
+    <div class="row ">
+        <div class="">
+            <div class="card h-100 p-4">
+                <p class="section-title">Xác nhận thanh toán</p>
+                <form th:action="@{'/cashier/invoices/'+${invoice.id}+'/checkout'}" th:object="${payment}" method="post">
+                    <input type="hidden" th:field="*{invoiceId}" th:value="${invoice.id}" />
+                    <div class="mb-3">
+                        <label class="form-label">Phương thức thanh toán</label>
+                        <select class="form-select" th:field="*{method}" required>
+                            <option value="">-- Chọn phương thức --</option>
+                            <option value="CASH">Tiền mặt</option>
+                            <option value="TRANSFER">Chuyển khoản</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Số tiền thanh toán</label>
+                        <input type="number" step="0.01" th:field="*{amount}" class="form-control" required readonly/>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a th:href="@{/cashier/invoices}" class="btn btn-outline-secondary">← Quay lại</a>
+                        <button type="submit"
+                                class="btn"
+                                th:classappend="${invoice.paid} ? 'btn-success' : 'btn-success'"
+                                th:text="${invoice.paid} ? 'Cập nhật' : 'Thanh toán'">
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

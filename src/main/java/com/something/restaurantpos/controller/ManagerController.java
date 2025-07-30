@@ -22,7 +22,7 @@ public class ManagerController {
     @Autowired
     private IInvoiceService invoiceService;
     
-    @GetMapping
+    @GetMapping("/dashboard")
     public String dashboard(Model model) {
         model.addAttribute("feedbacks", feedbackService.findAll());
         model.addAttribute("invoices", invoiceService.findAll());
