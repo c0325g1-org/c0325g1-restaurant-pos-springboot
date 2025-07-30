@@ -1,7 +1,7 @@
 package com.something.restaurantpos.mapper;
 
 import com.something.restaurantpos.dto.InvoiceDto;
-import com.something.restaurantpos.dto.OrderItemDto;
+import com.something.restaurantpos.dto.OrderItemDTO;
 import com.something.restaurantpos.entity.Invoice;
 import com.something.restaurantpos.entity.OrderItem;
 import org.modelmapper.ModelMapper;
@@ -23,9 +23,9 @@ public class InvoiceMapper {
         dto.setOrderId(invoice.getOrder().getId());
         dto.setTableName(invoice.getOrder().getTable().getName());
         dto.setEmployeeName(invoice.getOrder().getEmployee().getName());
-        dto.setOrderTime(invoice.getOrder().getOrderTime());
+        dto.setOrderTime(invoice.getOrder().getCreatedAt());
 
-        List<OrderItemDto> itemDtos = invoice.getOrder().getOrderItems()
+        List<OrderItemDTO> itemDtos = invoice.getOrder().getItems()
                 .stream()
                 .map(this::mapOrderItem)
                 .collect(Collectors.toList());
@@ -34,12 +34,11 @@ public class InvoiceMapper {
         return dto;
     }
 
-    private OrderItemDto mapOrderItem(OrderItem item) {
-        OrderItemDto dto = new OrderItemDto();
-        dto.setItemName(item.getMenuItem().getName());
+    private OrderItemDTO mapOrderItem(OrderItem item) {
+        OrderItemDTO dto = new OrderItemDTO();
+        dto.setMenuItemName(item.getMenuItem().getName());
         dto.setQuantity(item.getQuantity());
         dto.setPrice(item.getPrice());
-        dto.setTotal(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
         return dto;
     }
 }

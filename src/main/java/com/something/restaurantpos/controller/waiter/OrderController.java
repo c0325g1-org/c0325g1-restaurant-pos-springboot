@@ -155,9 +155,7 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
-    private List<MenuItemDTO> getAvailableMenuItems() {
-        return menuItemService.getAvailableItems().stream()
-                .map(menuItemMapper::toDto)
-                .toList();
+    private List<MenuItem> getAvailableMenuItems() {
+        return menuItemService.getAvailableItems();
     }
 }

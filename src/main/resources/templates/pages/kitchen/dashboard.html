@@ -61,7 +61,7 @@
                 <ul class="list-group"  >
                     <li class="list-group-item"
                         th:each="item : ${group.orderItems}"
-                        th:if="${item.status != T(com.something.restaurantpos.entity.OrderItem.ItemStatus).CANCELED}"
+                        th:if="${item.status.name() != 'CANCELED'}"
                         th:classappend="' list-group-item-' + (${item.status.name().toLowerCase()})">
 
 

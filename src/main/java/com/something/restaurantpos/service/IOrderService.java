@@ -8,7 +8,7 @@ import com.something.restaurantpos.entity.OrderItem;
 import java.util.List;
 import java.util.Optional;
 
-public interface IOrderService {
+public interface IOrderService extends IService<Order>{
     Order placeOrder(OrderCartDTO cartDTO, Integer employeeId);
 
     Optional<Order> findLastedOpenOrderByTableId(Integer tableId);

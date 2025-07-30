@@ -1,7 +1,7 @@
 package com.something.restaurantpos.service.impl;
 
 import com.something.restaurantpos.dto.InvoiceDto;
-import com.something.restaurantpos.dto.OrderItemDto;
+import com.something.restaurantpos.dto.OrderItemDTO;
 import com.something.restaurantpos.dto.PaymentDto;
 import com.something.restaurantpos.entity.Invoice;
 import com.something.restaurantpos.entity.Order;
@@ -36,12 +36,14 @@ public class InvoiceServiceImpl implements IInvoiceService {
     private IIPaymentRepository paymentRepository;
     @Autowired
     private ModelMapper modelMapper;
+
     @Override
     public List<InvoiceDto> findAllDto() {
         return invoiceRepository.findAll().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
+
     @Override
     @Transactional
     public void updateInvoiceWithItems(Integer id, InvoiceDto dto) {
@@ -56,15 +58,15 @@ public class InvoiceServiceImpl implements IInvoiceService {
             throw new RuntimeException("Invoice has no associated order");
         }
 
-        List<OrderItem> existingItems = order.getOrderItems();
+        List<OrderItem> existingItems = order.getItems();
         List<OrderItem> updatedItems = new ArrayList<>();
         List<Integer> updatedItemIds = new ArrayList<>();
 
-        for (OrderItemDto itemDto : dto.getOrderItems()) {
+        for (OrderItemDTO itemDto : dto.getOrderItems()) {
             OrderItem item;
-            if (itemDto.getId() != null) {
+            if (itemDto.getMenuItemId() != null) {
                 item = existingItems.stream()
-                        .filter(i -> i.getId().equals(itemDto.getId()))
+                        .filter(i -> i.getId().equals(itemDto.getMenuItemId()))
                         .findFirst()
                         .orElse(null);
                 if (item != null) {
@@ -77,8 +79,8 @@ public class InvoiceServiceImpl implements IInvoiceService {
             } else {
                 item = new OrderItem();
                 item.setOrder(order);
-                item.setMenuItem(menuItemRepository.findByName(itemDto.getItemName())
-                        .orElseThrow(() -> new RuntimeException("Item not found: " + itemDto.getItemName())));
+                item.setMenuItem(menuItemRepository.findByName(itemDto.getMenuItemName())
+                        .orElseThrow(() -> new RuntimeException("Item not found: " + itemDto.getMenuItemName())));
                 item.setPrice(itemDto.getPrice());
                 item.setQuantity(itemDto.getQuantity());
                 item.setStatus(OrderItem.ItemStatus.NEW);
@@ -91,7 +93,7 @@ public class InvoiceServiceImpl implements IInvoiceService {
                 .collect(Collectors.toList());
 
         orderItemRepository.deleteAll(itemsToDelete);
-        order.setOrderItems(updatedItems);
+        order.setItems(updatedItems);
 
         // Lưu đơn hàng trước
         orderRepository.save(order); // 🔥 THÊM DÒNG NÀY
@@ -189,33 +191,43 @@ public class InvoiceServiceImpl implements IInvoiceService {
     public long countDeleted() {
         return 0;
     }
+
     private InvoiceDto convertToDto(Invoice invoice) {
         InvoiceDto dto = modelMapper.map(invoice, InvoiceDto.class);
         dto.setOrderId(invoice.getOrder().getId());
         dto.setTableName(invoice.getOrder().getTable().getName());
         dto.setEmployeeName(invoice.getOrder().getEmployee().getName());
-        dto.setOrderTime(invoice.getOrder().getOrderTime());
+        dto.setOrderTime(invoice.getOrder().getCreatedAt());
 
-        List<OrderItemDto> itemDtos = invoice.getOrder().getOrderItems().stream()
+        List<OrderItemDTO> itemDtos = invoice.getOrder().getItems().stream()
                 .filter(orderItem -> "SERVED".equals(orderItem.getStatus().name())) // 🔥 Chỉ lấy món SERVED
                 .map(orderItem -> {
-                    OrderItemDto itemDto = new OrderItemDto();
-                    itemDto.setItemName(orderItem.getMenuItem().getName());
+                    OrderItemDTO itemDto = new OrderItemDTO();
+                    itemDto.setMenuItemName(orderItem.getMenuItem().getName());
                     itemDto.setQuantity(orderItem.getQuantity());
                     itemDto.setPrice(orderItem.getPrice());
-                    itemDto.setTotal(orderItem.getPrice().multiply(
-                            java.math.BigDecimal.valueOf(orderItem.getQuantity())
-                    ));
                     return itemDto;
                 }).collect(Collectors.toList());
 
         dto.setOrderItems(itemDtos);
 
-        // Tổng tiền = tổng các món đã SERVED
-        dto.setTotalAmount(itemDtos.stream()
-                .map(OrderItemDto::getTotal)
-                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add));
-
         return dto;
     }
+
+    @Override
+    public Invoice findById(String id) {
+        return null;
+    }
+
+    @Override
+    public Invoice findByIdOrThrow(String id) {
+        return invoiceRepository.findById(Integer.valueOf(id)).orElseThrow(() -> new RuntimeException("Invoice not found"));
+    }
+
+    @Override
+    public Invoice findByOrderId(Integer orderId) {
+        return invoiceRepository.findByOrder_Id(orderId);
+    }
+
 }
+    

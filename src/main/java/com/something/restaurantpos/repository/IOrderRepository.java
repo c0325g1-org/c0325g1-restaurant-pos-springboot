@@ -6,7 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 @Repository
-public interface IOrderRepository extends JpaRepository<Order,Integer> {
+public interface IOrderRepository extends JpaRepository<Order, Integer>{
+    Order findByFeedbackToken(String feedbackToken);
     List<Order> findByStatusNot(Order.OrderStatus status);
 
     List<Order> findByTableIdAndStatusOrderByCreatedAtDesc(Integer tableId, Order.OrderStatus status);

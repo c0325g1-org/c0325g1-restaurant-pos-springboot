@@ -13,6 +13,7 @@ import java.util.List;
 
 @Repository
 public interface IInvoiceRepository extends JpaRepository<Invoice, Integer> {
+    Invoice findByOrder_Id(Integer orderId);
 
     @Query("SELECT i FROM Invoice i " +
             "LEFT JOIN Payment p ON p.invoice = i " +

@@ -1,5 +1,6 @@
 package com.something.restaurantpos.dto;
 
+import com.something.restaurantpos.entity.OrderItem;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +19,7 @@ public class InvoiceDto {
     private String employeeName;
     private LocalDateTime orderTime;
     private BigDecimal totalAmount;
-    private List<OrderItemDto> orderItems;  // ✅ Danh sách món
+    private List<OrderItemDTO> orderItems;  // ✅ Danh sách món
     private Boolean paid;
     private String note;
     // ✅ Ghi chú
