@@ -24,4 +24,5 @@ public class Inventory extends AuditMetadata {
 
     private String unit;
     private BigDecimal quantity;
+
 }

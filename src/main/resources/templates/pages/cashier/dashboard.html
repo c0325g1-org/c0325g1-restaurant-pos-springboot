@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:replace="fragments/cashier/head :: head ('Cashier - POS')"></th:block>
+    <th:block th:replace="~{fragments/cashier/head :: head ('Cashier - POS')}"></th:block>
 </head>
 <body>
 <div th:replace="~{fragments/cashier/sidebar :: sidebar}"></div>
@@ -47,6 +47,6 @@
     </main>
     <div th:replace="~{fragments/cashier/footer :: footer}"></div>
 </div>
-<th:block th:replace="fragments/cashier/script :: script"></th:block>
+<th:block th:replace="~{fragments/cashier/script :: script}"></th:block>
 </body>
 </html>

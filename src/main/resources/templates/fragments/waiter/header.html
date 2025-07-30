@@ -1,4 +1,11 @@
-<header class="bg-dark text-white p-3 d-flex justify-content-between align-items-center" th:fragment="header">
-    <span><i class="bi bi-person-circle"></i> <span th:text="${user != null ? user.name : 'Username'}">User Name</span></span>
-    <a th:href="@{/logout}" class="btn btn-sm btn-outline-light">Logout</a>
+<header th:fragment="header" class="bg-dark text-white px-3 py-2 d-flex justify-content-between align-items-center">
+    <span>
+        <i class="bi bi-person-circle me-1"></i>
+        <span th:text="${employeeName}">User Name</span>
+    </span>
+    <form th:action="@{/logout}" method="post" class="mb-0">
+        <button type="submit" class="btn btn-sm btn-outline-light">
+            <i class="bi bi-box-arrow-right me-1"></i> Đăng xuất
+        </button>
+    </form>
 </header>

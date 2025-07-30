@@ -1,10 +1,9 @@
 package com.something.restaurantpos.service.impl;
 
 import com.something.restaurantpos.entity.MenuCategory;
-import com.something.restaurantpos.entity.MenuItem;
 import com.something.restaurantpos.repository.IMenuCategoryRepository;
 import com.something.restaurantpos.service.IMenuCategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,9 +11,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class MenuCategoryService implements IMenuCategoryService {
-    @Autowired
-    private IMenuCategoryRepository menuCategoryRepository;
+
+    private final IMenuCategoryRepository menuCategoryRepository;
 
     @Override
     public List<MenuCategory> findAll() {

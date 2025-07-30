@@ -1,10 +1,9 @@
 package com.something.restaurantpos.service.impl;
 
 import com.something.restaurantpos.entity.MenuItem;
-import com.something.restaurantpos.entity.Voucher;
 import com.something.restaurantpos.repository.IMenuItemRepository;
 import com.something.restaurantpos.service.IMenuItemService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,9 +12,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class MenuItemService implements IMenuItemService {
-    @Autowired
-    private IMenuItemRepository menuItemRepository;
+
+    private final IMenuItemRepository menuItemRepository;
 
     @Override
     public List<MenuItem> findAll() {
@@ -75,5 +75,16 @@ public class MenuItemService implements IMenuItemService {
     @Override
     public long countDeleted() {
         return menuItemRepository.countByDeletedTrue();
+    }
+
+    @Override
+    public List<MenuItem> getAvailableItems() {
+        return menuItemRepository.findByIsAvailableTrue();
+    }
+
+    @Override
+    public MenuItem getById(Integer id) {
+        return menuItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy món ăn"));
     }
 }

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gọi món</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .menu-item {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            background-color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: all 0.2s ease-in-out;
+        }
+        .menu-item:hover {
+            background-color: #e9f5ff;
+            transform: translateY(-2px);
+        }
+        .order-summary {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .category-filter button.active {
+            background-color: #0d6efd !important;
+            color: white !important;
+        }
+
+        @media (max-width: 992px) {
+            .order-summary {
+                max-height: unset;
+            }
+            #tab-menu[data-tab]:not([data-tab="menu"]) {
+                display: none !important;
+                padding-bottom: 80px;
+            }
+            #tab-menu[data-tab]:not([data-tab="menu"]).active {
+                display: block !important;
+                opacity: 1 !important;
+            }
+            #mobile-view-tabs {
+                z-index: 1030;
+            }
+            [data-tab="menu"].active .content{
+                display: block !important;
+                opacity: 1 !important;
+            }
+            [data-tab="menu"] .content{
+                display: none !important;
+                padding-bottom: 80px;
+            }
+            #mobile-view-tabs button.active {
+                color: #0d6efd;
+                font-weight: 600;
+            }
+            #mobile-view-tabs button.active i {
+                color: #0d6efd;
+            }
+
+            .tab-pane.active {
+                opacity: 1 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container py-4">
+    <a href="/waiter/tables" class="btn btn-outline-secondary mb-3">&larr; Trở về danh sách bàn</a>
+    <h2 class="mb-3">Gọi món - Bàn <span th:text="${tableId}">?</span></h2>
+
+    <!-- Tab "Món" -->
+    <div class="row" data-tab="menu">
+        <div class="col-12 col-lg-8 content">
+            <div class="mb-3">
+                <input type="text" class="form-control" placeholder="Tìm món..." oninput="filterMenu(this.value)">
+            </div>
+            <div class="category-filter mb-3 d-flex flex-wrap">
+                <button class="btn btn-outline-primary btn-sm mb-2 me-2 active" data-category="">Tất cả</button>
+                <button class="btn btn-outline-primary btn-sm mb-2 me-2"
+                        th:each="cat : ${categories}"
+                        th:text="${cat.name}"
+                        th:attr="data-category=${cat.name}">
+                </button>
+            </div>
+            <div class="row g-3" id="menuContainer">
+                <div class="col-6 col-md-4" th:each="m : ${menuItems}" th:attr="data-category=${m.category.name}">
+                    <div class="menu-item card h-100"
+                         th:attr="data-menu-id=${m.id}, data-menu-name=${m.name}, data-menu-price=${m.price}">
+                        <div class="position-relative w-100 h-0" style="padding-bottom: 100%;">
+                            <img th:src="${m.imageUrl}" class="object-fit-cover position-absolute h-100 w-100" alt="...">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${m.name}"></h5>
+                            <small class="text-muted" th:text="${#numbers.formatDecimal(m.price, 0, 'COMMA', 0, 'POINT')} + 'đ'"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Bootstrap tabs for desktop -->
+            <ul class="nav nav-tabs d-none d-lg-flex" id="orderTab" role="tablist">
+                <li class="nav-item"><button class="nav-link" th:classappend="${successMessage == null} ? 'active' : ''" id="cart-tab" data-bs-toggle="tab" data-bs-target="#cart-tab-pane" type="button">Giỏ hàng</button></li>
+                <li class="nav-item"><button class="nav-link" th:classappend="${successMessage != null} ? 'active' : ''" id="called-tab" data-bs-toggle="tab" data-bs-target="#called-tab-pane" type="button">Đã gọi</button></li>
+                <li class="nav-item"><button class="nav-link" id="served-tab" data-bs-toggle="tab" data-bs-target="#served-tab-pane" type="button">Đã phục vụ</button></li>
+            </ul>
+
+            <div class="tab-content mt-3">
+                <div class="tab-pane fade" th:classappend="${successMessage == null} ? 'show active' : ''" id="cart-tab-pane" data-tab="cart">
+                    <h5>Tóm tắt đơn hàng</h5>
+                    <div class="order-summary" id="cart-items"></div>
+                    <hr>
+                    <div class="mb-3">
+                        <strong>Tổng cộng: </strong><span id="totalAmount">0đ</span>
+                    </div>
+                    <form th:action="@{/waiter/order/submit}" method="post">
+                        <input type="hidden" name="tableId" th:value="${tableId}"/>
+                        <button class="btn btn-success w-100">Xác nhận gọi món</button>
+                    </form>
+                </div>
+
+                <div class="tab-pane fade" th:classappend="${successMessage != null} ? 'show active' : ''" id="called-tab-pane" data-tab="called">
+                    <h5>Đã gọi</h5>
+                    <div class="order-summary" id="called-items"></div>
+                </div>
+
+                <div class="tab-pane fade" id="served-tab-pane" data-tab="served">
+                    <h5>Đã phục vụ</h5>
+                    <div class="order-summary" id="served-items"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tab dưới mobile -->
+<div id="mobile-view-tabs" class="d-lg-none fixed-bottom bg-light border-top">
+    <div class="d-flex justify-content-around text-center py-2">
+        <button id="tab-menu" class="btn btn-link text-decoration-none" onclick="switchMobileTab('menu')">
+            <i class="bi bi-list-ul"></i><br><small>Món</small>
+        </button>
+        <button id="tab-cart" class="btn btn-link text-decoration-none" th:classappend="${successMessage == null} ? 'active' : ''" onclick="switchMobileTab('cart')">
+            <i class="bi bi-cart"></i><br><small>Giỏ</small>
+        </button>
+        <button id="tab-called" class="btn btn-link text-decoration-none" th:classappend="${successMessage != null} ? 'active' : ''" onclick="switchMobileTab('called')">
+            <i class="bi bi-receipt"></i><br><small>Đã gọi</small>
+        </button>
+        <button id="tab-served" class="btn btn-link text-decoration-none" onclick="switchMobileTab('served')">
+            <i class="bi bi-check2-square"></i><br><small>Phục vụ</small>
+        </button>
+    </div>
+</div>
+
+<!-- Modal huỷ món -->
+<div th:replace="fragments/waiter/modal-cancel :: confirmCancelModal"></div>
+
+<div th:replace="~{fragments/shared/toast :: toast}"></div>
+
+<!-- Scripts -->
+<th:block th:replace="fragments/waiter/script :: script"></th:block>
+<script th:inline="javascript">
+    let tableId = [[${tableId}]];
+</script>
+<script th:src="@{/js/waiter/order.js}" type="module"></script>
+<script>
+    function switchMobileTab(tab) {
+        if (window.innerWidth >= 992) return; // Chặn ở desktop
+
+        const tabs = ['menu', 'cart', 'called', 'served'];
+        tabs.forEach(t => {
+            const btn = document.getElementById(`tab-${t}`);
+            const panel = document.querySelector(`[data-tab="${t}"]`);
+            if (btn) btn.classList.remove('active');
+            if (panel) panel.classList.remove('active');
+        });
+
+        const activeBtn = document.getElementById(`tab-${tab}`);
+        const activePanel = document.querySelector(`[data-tab="${tab}"]`);
+        if (activeBtn) activeBtn.classList.add('active');
+        if (activePanel) activePanel.classList.add('active');
+    }
+</script>
+</body>
+</html>
