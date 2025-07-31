@@ -134,6 +134,10 @@
         <img th:src="@{'https://img.vietqr.io/image/mbbank-615892-compact2.jpg?amount='+${invoice.totalAmount}+'&addInfo=Thanh%20toan%20hoa%20don%20'+${invoice.id}+'&accountName=Nguyen%20Tien%20Quan'}"
              alt="QR Thanh toán" class="qr-code"/>
     </div>
+    <div class="text-center mt-2">
+        <p class="m-0">Quét mã QR để đánh giá:</p>
+        <img th:src="'data:image/png;base64,' + ${qrCode}" alt="QR Code" class="qr-code"/>
+    </div>
 
     <div class="text-center mt-2 no-print">
         <div class="d-flex justify-content-center">

@@ -6,11 +6,14 @@ import com.something.restaurantpos.dto.PaymentDto;
 import com.something.restaurantpos.entity.Invoice;
 import com.something.restaurantpos.mapper.InvoiceMapper;
 import com.something.restaurantpos.repository.IMenuItemRepository;
+import com.something.restaurantpos.service.IFeedbackService;
 import com.something.restaurantpos.service.IInvoiceService;
 import com.something.restaurantpos.service.IPaymentService;
 import com.something.restaurantpos.service.impl.CustomUserDetailsService;
+import com.something.restaurantpos.service.impl.QrCodeService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +36,12 @@ import static com.something.restaurantpos.config.VNPayConfig.vnp_Version;
 @Controller
 @RequestMapping("/cashier")
 public class CashierController {
+
+    @Value("${app.base-url}")
+    private String baseUrl;
+
+    @Autowired
+    private QrCodeService qrCodeService;
 
     @Autowired
     private CustomUserDetailsService userDetailsService;
@@ -71,6 +80,10 @@ public class CashierController {
     public String showInvoiceDetail(@PathVariable Integer id, Model model) {
         InvoiceDto dto = invoiceService.findDtoById(id);
         model.addAttribute("invoice", dto);
+        String uuid = invoiceService.findById(id).getOrder().getFeedbackToken();
+        String verifyUrl = baseUrl + "/feedback/verify?uuid=" + uuid;
+        String qrBase64 = qrCodeService.generateQRCodeBase64(verifyUrl, 200, 200);
+        model.addAttribute("qrCode", qrBase64);
         return "pages/cashier/invoice_details";
     }
 
@@ -110,24 +123,7 @@ public class CashierController {
         redirectAttributes.addFlashAttribute("success", "Thanh toán thành công!");
         return "redirect:/cashier/invoices";
     }
-//    @GetMapping("/invoices/edit/{id}")
-//    public String editInvoiceForm(@PathVariable Integer id, Model model) {
-//        Invoice invoice = invoiceService.findById(id);
-//        InvoiceDto dto = invoiceService.findDtoById(id);
-//        if (invoice.getDiningTable() == null) {
-//            System.out.println("⚠️ DiningTable is null for invoice " + id);
-//        }
-//        model.addAttribute("invoice", invoice);
-//        model.addAttribute("invoiceDto", dto);
-//        model.addAttribute("menuItems", menuItemRepository.findAll());
-//        return "pages/cashier/edit_invoice"; // Tạo trang HTML tương ứng
-//    }
-//    @PostMapping("/invoices/update/{id}")
-//    public String updateInvoice(@PathVariable Integer id,
-//                                @ModelAttribute("invoice") InvoiceDto invoiceDto) {
-//        invoiceService.updateInvoiceWithItems(id, invoiceDto);
-//        return "redirect:/cashier/invoices";
-//    }
+
     @GetMapping("/checkout/{id}")
     public String showCheckout(@PathVariable Integer id, Model model) {
         Invoice invoice = invoiceService.findById(id);
@@ -139,62 +135,4 @@ public class CashierController {
         model.addAttribute("payment", dto);
         return "cashier/checkout";
     }
-    public String createVNPayUrl(@ModelAttribute PaymentDto paymentDto, HttpServletRequest request) throws UnsupportedEncodingException {
-        long amount = (long) (paymentDto.getAmount().doubleValue() * 100 * 1000 );
-        String vnp_TxnRef = paymentDto.getInvoiceId().toString();
-
-        String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
-        Map<String, String> vnp_Params = new HashMap<>();
-        vnp_Params.put("vnp_Version", vnp_Version);
-        vnp_Params.put("vnp_Command", vnp_Command);
-        vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
-        vnp_Params.put("vnp_Amount", String.valueOf(amount));
-        vnp_Params.put("vnp_CurrCode", "VND");
-        vnp_Params.put("vnp_BankCode", "NCB");
-        vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl);
-        vnp_Params.put("vnp_IpAddr", VNPayConfig.getIpAddress(request));
-        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
-        String orderType = "billpayment";
-        vnp_Params.put("vnp_OrderType", orderType);
-        vnp_Params.put("vnp_Locale", "vn");
-
-
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        String vnp_CreateDate = formatter.format(cld.getTime());
-        vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
-
-        cld.add(Calendar.MINUTE, 15);
-        String vnp_ExpireDate = formatter.format(cld.getTime());
-        vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
-
-        List fieldNames = new ArrayList(vnp_Params.keySet());
-        Collections.sort(fieldNames);
-        StringBuilder hashData = new StringBuilder();
-        StringBuilder query = new StringBuilder();
-        Iterator itr = fieldNames.iterator();
-        while (itr.hasNext()) {
-            String fieldName = (String) itr.next();
-            String fieldValue = (String) vnp_Params.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                //Build hash data
-                hashData.append(fieldName);
-                hashData.append('=');
-                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()));
-                query.append(URLEncoder.encode(fieldName, StandardCharsets.UTF_8.toString()));
-                query.append('=');
-                query.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()));
-                if (itr.hasNext()) {
-                    query.append('&');
-                    hashData.append('&');
-                }
-            }
-        }
-        String queryUrl = query.toString();
-        String vnp_SecureHash = VNPayConfig.hmacSHA512(VNPayConfig.secretKey, hashData.toString());
-        queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
-        return VNPayConfig.vnp_PayUrl + "?" + queryUrl;
-    }
-
 }
