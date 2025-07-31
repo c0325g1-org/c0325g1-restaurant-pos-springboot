@@ -57,6 +57,7 @@
                         <th scope="col">STT</th>
                         <th scope="col">Ngày</th>
                         <th scope="col">Đánh giá</th>
+                        <th scope="col">Hình ảnh</th>
                         <th scope="col">Ghi chú</th>
                     </tr>
                     </thead>
@@ -73,6 +74,14 @@
                                   th:each="i : ${#numbers.sequence(1, 5 - feedback.rating)}"><i
                                     class="bi bi-star text-secondary"></i></span>
                         </td>
+                        <td>
+                            <img th:if="${feedback.imagePath != null}"
+                                 th:src="${feedback.imagePath}"
+                                 alt="Ảnh minh họa"
+                                 class="img-thumbnail"
+                                 style="max-width: 120px; max-height: 120px; object-fit: cover;">
+                        </td>
+
                         <td th:text="${feedback.content}"></td>
                     </tr>
                     </tbody>

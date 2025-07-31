@@ -5,12 +5,14 @@ import com.something.restaurantpos.entity.OrderItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface IKitchenService {
-    Page<Order> getActiveOrders( Pageable pageable);
     void updateItemStatus(Integer id, OrderItem.ItemStatus newStatus);
-    Page<Order> getActiveOrdersByItemStatus(OrderItem.ItemStatus status, Pageable pageable);
     void softDeleteOrder(Integer id);
+//    Page<Order> getActiveOrdersByDate(LocalDate date, Pageable pageable);
+//    Page<Order> getActiveOrdersByItemStatusAndDate(OrderItem.ItemStatus status, LocalDate date, Pageable pageable);
+
 
 }

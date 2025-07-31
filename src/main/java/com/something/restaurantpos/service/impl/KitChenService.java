@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -24,14 +25,7 @@ public class KitChenService implements IKitchenService {
     @Autowired
     private IOrderRepository orderRepository;
 
-    @Override
-    public Page<Order> getActiveOrders(Pageable pageable) {
-        return orderItemRepository.findActiveOrdersWithItems(pageable);
-    }
-    @Override
-    public Page<Order> getActiveOrdersByItemStatus(OrderItem.ItemStatus status, Pageable pageable) {
-        return orderItemRepository.findOrdersByItemStatus(status, pageable);
-    }
+
 
 
     @Override
@@ -42,7 +36,8 @@ public class KitChenService implements IKitchenService {
 
         Order order = item.getOrder();
 
-        boolean allServed = order.getItems().stream()
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrder_Id(order.getId());
+        boolean allServed = orderItems.stream()
                 .allMatch(i -> i.getStatus() == OrderItem.ItemStatus.SERVED);
 
         if (allServed) {
@@ -59,8 +54,15 @@ public class KitChenService implements IKitchenService {
         orderRepository.save(order);
     }
 
-
-
+//    @Override
+//    public Page<Order> getActiveOrdersByDate(LocalDate date, Pageable pageable) {
+//        return orderItemRepository.findActiveOrdersWithItemsByDate(date,pageable);
+//    }
+//
+//    @Override
+//    public Page<Order> getActiveOrdersByItemStatusAndDate(OrderItem.ItemStatus status, LocalDate date, Pageable pageable) {
+//        return orderItemRepository.findOrdersByItemStatusAndDate(status,date,pageable);
+//    }
 
 
 }

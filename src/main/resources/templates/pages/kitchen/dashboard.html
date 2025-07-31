@@ -10,41 +10,166 @@
             border-radius: 5px;
             padding: 1rem;
             margin-bottom: 1rem;
-            height: 100%;
+            /*height: 100%;*/
         }
         .badge-status {
             font-size: 0.9rem;
         }
-        .late-order {
-            background-color: #fff3cd !important;
+
+        .list-group-item-new {
+            background-color: white;
         }
         .list-group-item-cooking {
-            background-color: gold; /* Vàng */
+            background-color: gold;
         }
         .list-group-item-ready {
-            background-color: springgreen; /* Xanh lá */
+            background-color: springgreen;
         }
         .list-group-item-served {
-            background-color: #e2e3e5; /* Xám */
+            background-color: #e2e3e5;
         }
 
+
     </style>
+    <!-- Bootstrap 5 -->
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </head>
 <body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm px-3">
+    <div class="container-fluid">
+        <!-- Menu icon và Tiêu đề -->
+        <button class="btn btn-outline-secondary me-3" type="button">
+            <i class="bi bi-list"></i>
+        </button>
+        <a class="navbar-brand fw-bold" href="#">Dashboard</a>
+
+        <!-- Spacer để đẩy nội dung sang phải -->
+        <div class="flex-grow-1"></div>
+
+        <!-- Bell notification -->
+        <!-- Chuông thông báo -->
+        <div class="dropdown me-3">
+            <button class="btn position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-bell fs-5"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            5
+        </span>
+            </button>
+
+            <!-- Dropdown menu -->
+            <div class="dropdown-menu dropdown-menu-end p-0 border-0 shadow" aria-labelledby="notificationDropdown" style="min-width: 350px; max-width: 400px;">
+                <div class="p-3 border-bottom">
+                    <strong>You have 5 messages</strong>
+                </div>
+
+                <!-- Một thông báo -->
+                <div class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
+                    <a href="#" class="list-group-item list-group-item-action d-flex gap-3">
+                        <img src="https://i.pravatar.cc/40?img=11" class="rounded-circle mt-1" width="40" height="40">
+                        <div class="w-100">
+                            <div class="d-flex justify-content-between">
+                                <strong>Jessica Williams</strong>
+                                <small class="text-muted">Just now</small>
+                            </div>
+                            <div><span class="text-danger fw-bold">❗ Urgent: System Maintenance Tonight</span></div>
+                            <div class="text-muted small">We'll be conducting system maintenance...</div>
+                        </div>
+                    </a>
+
+                    <a href="#" class="list-group-item list-group-item-action d-flex gap-3">
+                        <img src="https://i.pravatar.cc/40?img=14" class="rounded-circle mt-1" width="40" height="40">
+                        <div class="w-100">
+                            <div class="d-flex justify-content-between">
+                                <strong>Richard Johnson</strong>
+                                <small class="text-muted">5 mins ago</small>
+                            </div>
+                            <div><span class="fw-bold">❗ Project Update: Milestone Achieved</span></div>
+                            <div class="text-muted small">Kudos on hitting sales targets last quarter...</div>
+                        </div>
+                    </a>
+
+                    <!-- Thêm nhiều item tương tự ở đây -->
+                </div>
+
+                <div class="text-center p-2 border-top">
+                    <a href="/messages" class="text-decoration-none">View all messages</a>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Avatar dropdown -->
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
+               id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="https://i.pravatar.cc/40?img=12" alt="avatar" class="rounded-circle" width="36" height="36">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item" href="/profile">Hồ sơ</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
 <div class="container py-4">
     <h2 class="mb-4">Món cần chế biến</h2>
+    <div th:if="${undoItemId != null}" class="alert alert-info alert-dismissible fade show" role="alert" id="undoAlert">
+        Đã thay đổi trạng thái món.
+        <form th:action="@{'/kitchen/dashboard/item/' + ${undoItemId} + '/undo'}" method="post" style="display:inline;">
+            <input type="hidden" name="status" th:value="${undoOldStatus}" />
+            <input type="hidden" name="filter" th:value="${undoFilter}" />
+            <input type="hidden" name="date" th:value="${undoDate}" />
+            <button type="submit" class="btn btn-link p-0 m-0 align-baseline">Hoàn tác</button>
+        </form>
+    </div>
+
+    <form class="mb-3 d-flex align-items-center gap-2" method="get" th:action="@{/kitchen/dashboard}">
+        <input type="hidden" name="filter" th:value="${currentFilter}" />
+        <label for="date" class="form-label mb-0">Ngày:</label>
+        <input type="date" id="date" name="date"
+               th:value="${selectedDate}" class="form-control" style="max-width: 200px;" onchange="this.form.submit()" />
+
+    </form>
+
 
     <!-- Tabs lọc trạng thái -->
     <ul class="nav nav-tabs mb-3">
-        <li class="nav-item"><a class="nav-link" th:classappend="${currentFilter == 'ALL'} ? 'active'"
-                                th:href="@{/kitchen(filter='ALL')}">Tất cả</a></li>
-        <li class="nav-item"><a class="nav-link" th:classappend="${currentFilter == 'NEW'} ? 'active'"
-                                th:href="@{/kitchen(filter='NEW')}">Chưa bắt đầu</a></li>
-        <li class="nav-item"><a class="nav-link" th:classappend="${currentFilter == 'COOKING'} ? 'active'"
-                                th:href="@{/kitchen(filter='COOKING')}">Đang chế biến</a></li>
-        <li class="nav-item"><a class="nav-link" th:classappend="${currentFilter == 'READY'} ? 'active'"
-                                th:href="@{/kitchen(filter='READY')}">Đã sẵn sàng</a></li>
+        <li class="nav-item">
+            <a class="nav-link"
+               th:classappend="${currentFilter == 'ALL'} ? 'active'"
+               th:href="@{/kitchen/dashboard(filter='ALL', date=${currentDate})}">
+                Tất cả
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               th:classappend="${currentFilter == 'NEW'} ? 'active'"
+               th:href="@{/kitchen/dashboard(filter='NEW', date=${currentDate})}">
+                Chưa bắt đầu
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               th:classappend="${currentFilter == 'COOKING'} ? 'active'"
+               th:href="@{/kitchen/dashboard(filter='COOKING', date=${currentDate})}">
+                Đang chế biến
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               th:classappend="${currentFilter == 'READY'} ? 'active'"
+               th:href="@{/kitchen/dashboard(filter='READY', date=${currentDate})}">
+                Đã sẵn sàng
+            </a>
+        </li>
     </ul>
+
 
     <!-- Giao diện các nhóm đơn hàng -->
     <div class="row">
@@ -70,14 +195,17 @@
                                 <strong th:text="${item.menuItem.name}">Tên món</strong>
                                 <span class="badge bg-primary rounded-pill" th:text="'x' + ${item.quantity}">x1</span>
                             </div>
-                            <form th:action="@{'/kitchen/item/' + ${item.id} + '/status'}" method="post" onsubmit="playNotify()">
+                            <form th:action="@{'/kitchen/dashboard/item/' + ${item.id} + '/status'}" method="post" onsubmit="playNotify()">
+                                <input type="hidden" name="date" th:value="${currentDate}" />
+                                <input type="hidden" name="filter" th:value="${currentFilter}" />
+
                                 <input type="hidden" name="status" th:if="${item.status.name() == 'NEW'}" value="COOKING"/>
                                 <input type="hidden" name="status" th:if="${item.status.name() == 'COOKING'}" value="READY"/>
                                 <input type="hidden" name="status" th:if="${item.status.name() == 'READY'}" value="SERVED"/>
 
                                 <button type="submit" th:if="${item.status.name() == 'NEW'}" class="btn btn-outline-warning btn-sm">Bắt đầu</button>
                                 <button type="submit" th:if="${item.status.name() == 'COOKING'}" class="btn btn-outline-success btn-sm">Sẵn sàng</button>
-                                <button type="submit" th:if="${item.status.name() == 'READY'}" class="btn btn-success btn-sm">Đã phục vụ</button>
+                                <button type="submit" th:if="${item.status.name() == 'READY'}" class="btn btn-success btn-sm">Đã sẵn sàng</button>
                             </form>
                         </div>
                     </li>
@@ -94,30 +222,16 @@
                             <span th:text="'SL: ' + ${item.quantity}">SL: 1</span>
                         </li>
                     </ul>
-                    <form th:action="@{'/kitchen/order/' + ${item.order.id} + '/delete'}" method="post"
+                    <form th:action="@{'/kitchen/dashboard/order/' + ${item.order.id} + '/delete'}" method="post"
                           onsubmit="return confirm('Ẩn đơn này khỏi màn hình bếp?')">
+                        <input type="hidden" name="date" th:value="${currentDate}" />
+                        <input type="hidden" name="filter" th:value="${currentFilter}" />
                         <button type="submit" class="btn btn-outline-danger btn-sm mt-2">🗑️ Đóng (ẩn)</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Thanh phân trang -->
-    <nav th:if="${totalPages > 1}">
-        <ul class="pagination justify-content-center">
-            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/kitchen(page=${currentPage - 1}, filter=${currentFilter})}">«</a>
-            </li>
-            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                th:classappend="${i == currentPage} ? 'active'">
-                <a class="page-link" th:href="@{/kitchen(page=${i}, filter=${currentFilter})}" th:text="${i + 1}">1</a>
-            </li>
-            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/kitchen(page=${currentPage + 1}, filter=${currentFilter})}">»</a>
-            </li>
-        </ul>
-    </nav>
 </div>
 
 <!-- Âm thanh cảnh báo -->
@@ -126,6 +240,16 @@
     function playNotify() {
         document.getElementById("notifySound").play();
     }
+
+        setTimeout(() => {
+        const alert = document.getElementById("undoAlert");
+        if (alert) {
+        alert.classList.remove("show");
+        alert.classList.add("hide");
+    }
+    }, 3000);
+
+
 </script>
 </body>
 </html>

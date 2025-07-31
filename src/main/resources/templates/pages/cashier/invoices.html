@@ -67,10 +67,10 @@
               <i class="bi bi-eye"></i> Chi tiết
             </a>
 
-            <a class="btn btn-warning btn-sm"
-               th:href="@{'/cashier/invoices/edit/' + ${invoice.id}}">
-              <i class="bi bi-pencil-square"></i> Sửa
-            </a>
+<!--            <a class="btn btn-warning btn-sm"-->
+<!--               th:href="@{'/cashier/invoices/edit/' + ${invoice.id}}">-->
+<!--              <i class="bi bi-pencil-square"></i> Sửa-->
+<!--            </a>-->
 
             <th:block th:if="${!invoice.paid}">
               <button class="btn btn-success btn-sm"
@@ -89,7 +89,6 @@
                       </div>
                       <div class="modal-body">
                         <input type="hidden" th:name="invoiceId" th:value="${invoice.id}"/>
-
                         <div class="mb-3">
                           <label class="form-label">Phương thức thanh toán</label>
                           <select class="form-select" name="method" required>
@@ -101,7 +100,7 @@
 
                         <div class="mb-3">
                           <label class="form-label">Số tiền thanh toán</label>
-                          <input type="number" class="form-control" name="amount" th:value="${invoice.totalAmount}" readonly/>
+                          <input type="number" class="form-control" name="amount" th:value="${invoice.totalAmount}" >
                         </div>
                       </div>
                       <div class="modal-footer">
@@ -114,9 +113,7 @@
               </div>
             </th:block>
           </td>
-
         </tr>
-
         </tbody>
       </table>
     </div>

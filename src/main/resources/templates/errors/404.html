@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>404 - Không tìm thấy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .icon {
+            font-size: 6rem;
+            animation: float 2s infinite ease-in-out;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="bg-white text-center py-5">
+<div class="container">
+    <div class="text-secondary icon mb-3">🔍</div>
+    <h1 class="fw-bold text-danger">404 - Không tìm thấy trang</h1>
+    <p class="lead">Trang bạn đang tìm không tồn tại hoặc đã bị xóa.</p>
+    <a href="/" class="btn btn-danger mt-3">Quay về trang chủ</a>
+</div>
+</body>
+</html>

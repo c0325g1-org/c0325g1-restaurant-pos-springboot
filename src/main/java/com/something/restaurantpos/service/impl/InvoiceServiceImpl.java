@@ -3,10 +3,7 @@ package com.something.restaurantpos.service.impl;
 import com.something.restaurantpos.dto.InvoiceDto;
 import com.something.restaurantpos.dto.OrderItemDTO;
 import com.something.restaurantpos.dto.PaymentDto;
-import com.something.restaurantpos.entity.Invoice;
-import com.something.restaurantpos.entity.Order;
-import com.something.restaurantpos.entity.OrderItem;
-import com.something.restaurantpos.entity.Payment;
+import com.something.restaurantpos.entity.*;
 import com.something.restaurantpos.repository.*;
 import com.something.restaurantpos.service.IInvoiceService;
 import jakarta.transaction.Transactional;
@@ -35,6 +32,8 @@ public class InvoiceServiceImpl implements IInvoiceService {
     @Autowired
     private IIPaymentRepository paymentRepository;
     @Autowired
+    private IDiningTableRepository tableRepository;
+    @Autowired
     private ModelMapper modelMapper;
 
     @Override
@@ -58,7 +57,7 @@ public class InvoiceServiceImpl implements IInvoiceService {
             throw new RuntimeException("Invoice has no associated order");
         }
 
-        List<OrderItem> existingItems = order.getItems();
+        List<OrderItem> existingItems = orderItemRepository.findAllByOrder_Id(order.getId());
         List<OrderItem> updatedItems = new ArrayList<>();
         List<Integer> updatedItemIds = new ArrayList<>();
 
@@ -93,7 +92,6 @@ public class InvoiceServiceImpl implements IInvoiceService {
                 .collect(Collectors.toList());
 
         orderItemRepository.deleteAll(itemsToDelete);
-        order.setItems(updatedItems);
 
         // Lưu đơn hàng trước
         orderRepository.save(order); // 🔥 THÊM DÒNG NÀY
@@ -122,8 +120,16 @@ public class InvoiceServiceImpl implements IInvoiceService {
         }
 
         // Cập nhật hóa đơn
+        invoice.setTotalAmount(dto.getAmount());
         invoice.setPaid(true);
         invoiceRepository.save(invoice);
+        Order order = invoice.getOrder();
+        order.setStatus(Order.OrderStatus.CLOSED);
+        orderRepository.save(order);
+
+        DiningTable table = order.getTable();
+        table.setStatus(DiningTable.TableStatus.EMPTY);
+        tableRepository.save(table);
 
         // Ghi log thanh toán nếu có bảng `payment`
         Payment payment = new Payment();
@@ -199,7 +205,8 @@ public class InvoiceServiceImpl implements IInvoiceService {
         dto.setEmployeeName(invoice.getOrder().getEmployee().getName());
         dto.setOrderTime(invoice.getOrder().getCreatedAt());
 
-        List<OrderItemDTO> itemDtos = invoice.getOrder().getItems().stream()
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrder_Id(invoice.getOrder().getId());
+        List<OrderItemDTO> itemDtos = orderItems.stream()
                 .filter(orderItem -> "SERVED".equals(orderItem.getStatus().name())) // 🔥 Chỉ lấy món SERVED
                 .map(orderItem -> {
                     OrderItemDTO itemDto = new OrderItemDTO();
@@ -210,6 +217,11 @@ public class InvoiceServiceImpl implements IInvoiceService {
                 }).collect(Collectors.toList());
 
         dto.setOrderItems(itemDtos);
+        BigDecimal totalAmount = itemDtos.stream()
+                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        dto.setTotalAmount(totalAmount);
 
         return dto;
     }
@@ -229,5 +241,13 @@ public class InvoiceServiceImpl implements IInvoiceService {
         return invoiceRepository.findByOrder_Id(orderId);
     }
 
+    @Override
+    public Invoice createInvoiceFromOrder(Order order) {
+        Invoice invoice = new Invoice();
+        invoice.setOrder(order);
+        invoice.setCreatedAt(LocalDateTime.now());
+        invoice.setDeleted(false);
+        return invoiceRepository.save(invoice);
+    }
 }
     
