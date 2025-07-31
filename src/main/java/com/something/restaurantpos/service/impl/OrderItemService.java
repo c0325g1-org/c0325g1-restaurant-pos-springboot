@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +20,12 @@ public class OrderItemService implements IOrderItemService {
     }
 
     @Override
-    public List<OrderItem> findAllCreatedAtOnDate(LocalDate createdAtDate) {
-        return orderItemRepository.findAllCreatedAtOnDate(createdAtDate);
+    public List<OrderItem> findAllCreatedAtOnDateAndStatus(LocalDate createdAtDate, OrderItem.ItemStatus status) {
+        return orderItemRepository.findAllCreatedAtOnDateAndStatus(createdAtDate, status);
+    }
+
+    @Override
+    public Optional<OrderItem> findById(Integer id) {
+        return orderItemRepository.findById(id);
     }
 }

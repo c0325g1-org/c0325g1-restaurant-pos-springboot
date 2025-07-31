@@ -29,6 +29,6 @@ public interface IOrderItemRepository extends JpaRepository<OrderItem, Integer> 
 
     List<OrderItem> findAllByOrder_Id(Integer orderId);
 
-    @Query(value = "SELECT oi FROM OrderItem oi WHERE DATE(oi.createdAt) = :targetDate")
-    List<OrderItem> findAllCreatedAtOnDate(@Param("targetDate") LocalDate date);
+    @Query(value = "SELECT oi FROM OrderItem oi WHERE (DATE(oi.createdAt) = :targetDate or :targetDate is null) and (oi.status = :status or :status is null)")
+    List<OrderItem> findAllCreatedAtOnDateAndStatus(@Param("targetDate") LocalDate date, @Param("status") OrderItem.ItemStatus status);
 }
