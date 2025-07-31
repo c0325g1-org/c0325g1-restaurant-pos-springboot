@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 @Repository
 public interface IOrderItemRepository extends JpaRepository<OrderItem, Integer> {
@@ -23,15 +24,17 @@ public interface IOrderItemRepository extends JpaRepository<OrderItem, Integer> 
         com.something.restaurantpos.entity.OrderItem.ItemStatus.READY
     )
     AND o.status != 'CLOSED'
+    AND DATE(o.createdAt) = :date
 """)
-    Page<Order> findActiveOrdersWithItems(Pageable pageable);
+    Page<Order> findActiveOrdersWithItemsByDate(@Param("date") LocalDate date, Pageable pageable);
     @Query("""
     SELECT DISTINCT o FROM Order o
     JOIN o.items i
     WHERE i.status = :status
     AND o.status != 'CLOSED'
+    AND DATE(o.createdAt) = :date
 """)
-    Page<Order> findOrdersByItemStatus(@Param("status") OrderItem.ItemStatus status, Pageable pageable);
+    Page<Order> findOrdersByItemStatusAndDate(@Param("status") OrderItem.ItemStatus status,@Param("date") LocalDate date, Pageable pageable);
 
     List<OrderItem> findByOrder(Order order);
 

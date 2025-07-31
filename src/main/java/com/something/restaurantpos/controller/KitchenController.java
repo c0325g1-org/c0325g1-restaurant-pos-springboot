@@ -13,11 +13,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,16 +38,20 @@ public class KitchenController {
             @RequestParam(required = false, defaultValue = "ALL") String filter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "6") int size,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             Model model
     ) {
+        if(date == null){
+            date = LocalDate.now();
+        }
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
         Page<Order> orderPage;
 
         if (filter.equals("ALL")) {
-            orderPage = kitchenService.getActiveOrders(pageable);
+            orderPage = kitchenService.getActiveOrdersByDate(date,pageable);
         } else {
             OrderItem.ItemStatus status = OrderItem.ItemStatus.valueOf(filter);
-            orderPage = kitchenService.getActiveOrdersByItemStatus(status, pageable);
+            orderPage = kitchenService.getActiveOrdersByItemStatusAndDate(status,date, pageable);
         }
 
 
@@ -74,7 +80,8 @@ public class KitchenController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", orderPage.getTotalPages());
         model.addAttribute("orderPairs", groupOrdersInPairs(wrapped));
-
+        model.addAttribute("selectedDate", date.toString());
+        model.addAttribute("currentDate", date);
 
         return "pages/kitchen/dashboard";
     }

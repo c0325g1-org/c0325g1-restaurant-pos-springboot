@@ -33,18 +33,47 @@
 <body>
 <div class="container py-4">
     <h2 class="mb-4">Món cần chế biến</h2>
+    <form class="mb-3 d-flex align-items-center gap-2" method="get" th:action="@{/kitchen}">
+        <input type="hidden" name="filter" th:value="${currentFilter}" />
+        <label for="date" class="form-label mb-0">Ngày:</label>
+        <input type="date" id="date" name="date"
+               th:value="${selectedDate}" class="form-control" style="max-width: 200px;" />
+        <button type="submit" class="btn btn-outline-secondary">Lọc</button>
+    </form>
+
 
     <!-- Tabs lọc trạng thái -->
     <ul class="nav nav-tabs mb-3">
-        <li class="nav-item"><a class="nav-link" th:classappend="${currentFilter == 'ALL'} ? 'active'"
-                                th:href="@{/kitchen(filter='ALL')}">Tất cả</a></li>
-        <li class="nav-item"><a class="nav-link" th:classappend="${currentFilter == 'NEW'} ? 'active'"
-                                th:href="@{/kitchen(filter='NEW')}">Chưa bắt đầu</a></li>
-        <li class="nav-item"><a class="nav-link" th:classappend="${currentFilter == 'COOKING'} ? 'active'"
-                                th:href="@{/kitchen(filter='COOKING')}">Đang chế biến</a></li>
-        <li class="nav-item"><a class="nav-link" th:classappend="${currentFilter == 'READY'} ? 'active'"
-                                th:href="@{/kitchen(filter='READY')}">Đã sẵn sàng</a></li>
+        <li class="nav-item">
+            <a class="nav-link"
+               th:classappend="${currentFilter == 'ALL'} ? 'active'"
+               th:href="@{/kitchen(filter='ALL', date=${currentDate})}">
+                Tất cả
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               th:classappend="${currentFilter == 'NEW'} ? 'active'"
+               th:href="@{/kitchen(filter='NEW', date=${currentDate})}">
+                Chưa bắt đầu
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               th:classappend="${currentFilter == 'COOKING'} ? 'active'"
+               th:href="@{/kitchen(filter='COOKING', date=${currentDate})}">
+                Đang chế biến
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               th:classappend="${currentFilter == 'READY'} ? 'active'"
+               th:href="@{/kitchen(filter='READY', date=${currentDate})}">
+                Đã sẵn sàng
+            </a>
+        </li>
     </ul>
+
 
     <!-- Giao diện các nhóm đơn hàng -->
     <div class="row">
@@ -77,7 +106,7 @@
 
                                 <button type="submit" th:if="${item.status.name() == 'NEW'}" class="btn btn-outline-warning btn-sm">Bắt đầu</button>
                                 <button type="submit" th:if="${item.status.name() == 'COOKING'}" class="btn btn-outline-success btn-sm">Sẵn sàng</button>
-                                <button type="submit" th:if="${item.status.name() == 'READY'}" class="btn btn-success btn-sm">Đã phục vụ</button>
+                                <button type="submit" th:if="${item.status.name() == 'READY'}" class="btn btn-success btn-sm">Đã sẵn sàng</button>
                             </form>
                         </div>
                     </li>
