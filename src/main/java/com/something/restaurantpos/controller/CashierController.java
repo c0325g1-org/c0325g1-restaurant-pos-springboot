@@ -51,7 +51,6 @@ public class CashierController {
         model.addAttribute("employeeName", employeeName);
         return "pages/cashier/dashboard";
     }
-
     @GetMapping("/invoices")
     public String listInvoices(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, Model model) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
@@ -70,7 +69,7 @@ public class CashierController {
 
     @GetMapping("/{id}/invoice")
     public String showInvoiceDetail(@PathVariable Integer id, Model model) {
-        InvoiceDto dto = invoiceService.findDtoById(id); // ✅ đã chứa tableName
+        InvoiceDto dto = invoiceService.findDtoById(id); //
         model.addAttribute("invoice", dto);
         return "pages/cashier/invoice_details";
     }

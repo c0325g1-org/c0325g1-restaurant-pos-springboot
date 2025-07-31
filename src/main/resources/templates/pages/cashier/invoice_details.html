@@ -116,10 +116,10 @@
         </thead>
         <tbody>
         <tr th:each="item : ${invoice.orderItems}">
-            <td class="col-item-name" th:text="${item.itemName}"></td>
+            <td class="col-item-name" th:text="${item.menuItemName}"></td>
             <td class="col-qty" th:text="${item.quantity}"></td>
             <td class="col-price" th:text="${#numbers.formatDecimal(item.price, 1, 'COMMA', 0, 'POINT')}"></td>
-            <td class="col-total" th:text="${#numbers.formatDecimal(item.total, 1, 'COMMA', 0, 'POINT')}"></td>
+            <td class="col-total" th:text="${#numbers.formatDecimal(item.price * item.quantity, 1, 'COMMA', 0, 'POINT')}"></td>
         </tr>
         </tbody>
     </table>

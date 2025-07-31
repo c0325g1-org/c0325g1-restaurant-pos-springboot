@@ -229,5 +229,13 @@ public class InvoiceServiceImpl implements IInvoiceService {
         return invoiceRepository.findByOrder_Id(orderId);
     }
 
+    @Override
+    public Invoice createInvoiceFromOrder(Order order) {
+        Invoice invoice = new Invoice();
+        invoice.setOrder(order);
+        invoice.setCreatedAt(LocalDateTime.now());
+        invoice.setDeleted(false);
+        return invoiceRepository.save(invoice);
+    }
 }
     
