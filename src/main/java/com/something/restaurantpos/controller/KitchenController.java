@@ -116,12 +116,7 @@ public class KitchenController {
         }
         return groupedKitchenOrderDTOS;
     }
-
-
-
-
-
-
+    
     @PostMapping("/item/{id}/status")
     @Transactional
     public String updateItemStatus(@PathVariable Integer id, @RequestParam("status") OrderItem.ItemStatus status) {
