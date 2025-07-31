@@ -28,7 +28,7 @@ public class SecurityConfig {
                         .requestMatchers("/feedback/verify", "/feedback/submit", "/feedback/success").permitAll()
                         .requestMatchers("/feedback/**").permitAll()
                         // PHÂN QUYỀN
-                        .requestMatchers("/manager/**").hasRole("QUẢN_LÝ")
+                        .requestMatchers("/manager/**", "/cashier/**", "/waiter/**", "/kitchen/**").hasRole("QUẢN_LÝ")
                         .requestMatchers("/cashier/**").hasRole("THU_NGÂN")
                         .requestMatchers("/waiter/**").hasRole("PHỤC_VỤ")
                         .requestMatchers("/kitchen/**").hasRole("BẾP")
