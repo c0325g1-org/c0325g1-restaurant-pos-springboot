@@ -30,7 +30,7 @@
                 <th>Hình ảnh</th>
                 <th>Loại</th>
                 <th>Trạng thái</th>
-                <th>Chỉnh sửa</th>
+                <th>Phục hồi</th>
                 <th>Xóa</th>
             </tr>
             </thead>
@@ -48,7 +48,6 @@
                 </td>
                 <td th:text="${menu.category.name}"></td>
                 <td>
-                <td>
                 <span th:text="${menu.isAvailable ? 'Đang bán' : 'Đã hết'}"
                       th:classappend="${menu.isAvailable} ? 'badge bg-success' : 'badge bg-secondary'"></span>
                 </td>
@@ -61,6 +60,8 @@
                             <i class="bi bi-arrow-counterclockwise"></i>
                         </button>
                     </form>
+                </td>
+                <td>
                     <button type="button"
                             class="btn btn-outline-danger btn-sm"
                             data-bs-toggle="modal"
