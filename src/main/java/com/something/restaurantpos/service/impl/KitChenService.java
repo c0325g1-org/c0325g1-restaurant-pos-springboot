@@ -25,16 +25,6 @@ public class KitChenService implements IKitchenService {
     private IOrderRepository orderRepository;
 
     @Override
-    public Page<Order> getActiveOrders(Pageable pageable) {
-        return orderItemRepository.findActiveOrdersWithItems(pageable);
-    }
-    @Override
-    public Page<Order> getActiveOrdersByItemStatus(OrderItem.ItemStatus status, Pageable pageable) {
-        return orderItemRepository.findOrdersByItemStatus(status, pageable);
-    }
-
-
-    @Override
     public void updateItemStatus(Integer id, OrderItem.ItemStatus newStatus) {
         OrderItem item = orderItemRepository.findById(id).orElseThrow();
         item.setStatus(newStatus);
@@ -42,7 +32,8 @@ public class KitChenService implements IKitchenService {
 
         Order order = item.getOrder();
 
-        boolean allServed = order.getItems().stream()
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrder_Id(order.getId());
+        boolean allServed = orderItems.stream()
                 .allMatch(i -> i.getStatus() == OrderItem.ItemStatus.SERVED);
 
         if (allServed) {

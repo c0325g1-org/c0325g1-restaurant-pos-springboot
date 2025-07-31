@@ -125,7 +125,7 @@ public class OrderService implements IOrderService {
 
     @Override
     public List<OrderItem> getItemsByOrder(Order order) {
-        return orderItemRepository.findByOrder(order);
+        return orderItemRepository.findAllByOrder(order);
     }
 
     @Override
@@ -135,7 +135,7 @@ public class OrderService implements IOrderService {
 
     @Override
     public List<OrderItem> getOrderItemsByTableAndStatuses(Integer tableId, List<OrderItem.ItemStatus> statuses) {
-        return orderItemRepository.findByOrder_Table_IdAndStatusIn(tableId, statuses);
+        return orderItemRepository.findAllByOrder_Table_IdAndStatusIn(tableId, statuses);
     }
 
     @Override
