@@ -47,7 +47,4 @@ public class Order extends AuditMetadata {
     public enum OrderStatus {
         OPEN, CLOSED, CANCELED;
     }
-    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
-    private List<OrderItem> items = new ArrayList<>();
-
 }

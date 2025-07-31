@@ -58,7 +58,7 @@ public class InvoiceServiceImpl implements IInvoiceService {
             throw new RuntimeException("Invoice has no associated order");
         }
 
-        List<OrderItem> existingItems = order.getItems();
+        List<OrderItem> existingItems = orderItemRepository.findAllByOrder_Id(order.getId());
         List<OrderItem> updatedItems = new ArrayList<>();
         List<Integer> updatedItemIds = new ArrayList<>();
 
@@ -93,7 +93,6 @@ public class InvoiceServiceImpl implements IInvoiceService {
                 .collect(Collectors.toList());
 
         orderItemRepository.deleteAll(itemsToDelete);
-        order.setItems(updatedItems);
 
         // Lưu đơn hàng trước
         orderRepository.save(order); // 🔥 THÊM DÒNG NÀY
@@ -199,7 +198,8 @@ public class InvoiceServiceImpl implements IInvoiceService {
         dto.setEmployeeName(invoice.getOrder().getEmployee().getName());
         dto.setOrderTime(invoice.getOrder().getCreatedAt());
 
-        List<OrderItemDTO> itemDtos = invoice.getOrder().getItems().stream()
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrder_Id(invoice.getOrder().getId());
+        List<OrderItemDTO> itemDtos = orderItems.stream()
                 .filter(orderItem -> "SERVED".equals(orderItem.getStatus().name())) // 🔥 Chỉ lấy món SERVED
                 .map(orderItem -> {
                     OrderItemDTO itemDto = new OrderItemDTO();

@@ -4,6 +4,7 @@ import com.something.restaurantpos.dto.InvoiceDto;
 import com.something.restaurantpos.dto.OrderItemDTO;
 import com.something.restaurantpos.entity.Invoice;
 import com.something.restaurantpos.entity.OrderItem;
+import com.something.restaurantpos.service.IOrderItemService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,9 @@ public class InvoiceMapper {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private IOrderItemService orderItemService;
+
     public InvoiceDto toDto(Invoice invoice) {
         InvoiceDto dto = modelMapper.map(invoice, InvoiceDto.class);
         dto.setOrderId(invoice.getOrder().getId());
@@ -25,7 +29,8 @@ public class InvoiceMapper {
         dto.setEmployeeName(invoice.getOrder().getEmployee().getName());
         dto.setOrderTime(invoice.getOrder().getCreatedAt());
 
-        List<OrderItemDTO> itemDtos = invoice.getOrder().getItems()
+        List<OrderItem> orderItems = orderItemService.findAllByOrderId(invoice.getOrder().getId());
+        List<OrderItemDTO> itemDtos = orderItems
                 .stream()
                 .map(this::mapOrderItem)
                 .collect(Collectors.toList());
