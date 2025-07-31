@@ -12,20 +12,6 @@ public class KitchenOrderDTO {
         this.order = order;
         this.late = java.time.Duration.between(order.getCreatedAt(), java.time.LocalDateTime.now()).toMinutes() > 15;
     }
-
-    public boolean hasStatus(OrderItem.ItemStatus status) {
-        return order.getItems().stream().anyMatch(i -> i.getStatus() == status);
-    }
-
-    public boolean isAllReady() {
-        return order.getItems().stream().allMatch(i -> i.getStatus() == OrderItem.ItemStatus.READY);
-    }
-
-    public boolean isAllServed() {
-        return order.getItems().stream().allMatch(i -> i.getStatus() == OrderItem.ItemStatus.SERVED);
-    }
-
-
 }
 
 

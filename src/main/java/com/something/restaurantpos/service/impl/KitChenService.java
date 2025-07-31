@@ -27,6 +27,7 @@ public class KitChenService implements IKitchenService {
 
 
 
+
     @Override
     public void updateItemStatus(Integer id, OrderItem.ItemStatus newStatus) {
         OrderItem item = orderItemRepository.findById(id).orElseThrow();
@@ -35,7 +36,8 @@ public class KitChenService implements IKitchenService {
 
         Order order = item.getOrder();
 
-        boolean allServed = order.getItems().stream()
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrder_Id(order.getId());
+        boolean allServed = orderItems.stream()
                 .allMatch(i -> i.getStatus() == OrderItem.ItemStatus.SERVED);
 
         if (allServed) {
@@ -52,15 +54,15 @@ public class KitChenService implements IKitchenService {
         orderRepository.save(order);
     }
 
-    @Override
-    public Page<Order> getActiveOrdersByDate(LocalDate date, Pageable pageable) {
-        return orderItemRepository.findActiveOrdersWithItemsByDate(date,pageable);
-    }
-
-    @Override
-    public Page<Order> getActiveOrdersByItemStatusAndDate(OrderItem.ItemStatus status, LocalDate date, Pageable pageable) {
-        return orderItemRepository.findOrdersByItemStatusAndDate(status,date,pageable);
-    }
+//    @Override
+//    public Page<Order> getActiveOrdersByDate(LocalDate date, Pageable pageable) {
+//        return orderItemRepository.findActiveOrdersWithItemsByDate(date,pageable);
+//    }
+//
+//    @Override
+//    public Page<Order> getActiveOrdersByItemStatusAndDate(OrderItem.ItemStatus status, LocalDate date, Pageable pageable) {
+//        return orderItemRepository.findOrdersByItemStatusAndDate(status,date,pageable);
+//    }
 
 
 }

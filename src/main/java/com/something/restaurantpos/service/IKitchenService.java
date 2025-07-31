@@ -11,8 +11,8 @@ import java.util.List;
 public interface IKitchenService {
     void updateItemStatus(Integer id, OrderItem.ItemStatus newStatus);
     void softDeleteOrder(Integer id);
-    Page<Order> getActiveOrdersByDate(LocalDate date, Pageable pageable);
-    Page<Order> getActiveOrdersByItemStatusAndDate(OrderItem.ItemStatus status, LocalDate date, Pageable pageable);
+//    Page<Order> getActiveOrdersByDate(LocalDate date, Pageable pageable);
+//    Page<Order> getActiveOrdersByItemStatusAndDate(OrderItem.ItemStatus status, LocalDate date, Pageable pageable);
 
 
 }

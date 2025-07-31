@@ -2,17 +2,11 @@ package com.something.restaurantpos.controller;
 
 import com.something.restaurantpos.dto.GroupedKitchenOrderDTO;
 import com.something.restaurantpos.dto.KitchenOrderDTO;
-import com.something.restaurantpos.dto.StatusViewHelper;
-import com.something.restaurantpos.entity.Order;
 import com.something.restaurantpos.entity.OrderItem;
-import com.something.restaurantpos.entity.base.AuditMetadata;
 import com.something.restaurantpos.service.IKitchenService;
+import com.something.restaurantpos.service.IOrderItemService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,20 +14,18 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/kitchen")
 public class KitchenController {
     @Autowired
     private IKitchenService kitchenService;
+    @Autowired
+    private IOrderItemService orderItemService;
 
-    @GetMapping
+    @GetMapping("/dashboard")
     public String kitchen(
             @RequestParam(required = false, defaultValue = "ALL") String filter,
             @RequestParam(defaultValue = "0") int page,
@@ -44,56 +36,23 @@ public class KitchenController {
         if(date == null){
             date = LocalDate.now();
         }
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
-        Page<Order> orderPage;
-
-        if (filter.equals("ALL")) {
-            orderPage = kitchenService.getActiveOrdersByDate(date,pageable);
-        } else {
-            OrderItem.ItemStatus status = OrderItem.ItemStatus.valueOf(filter);
-            orderPage = kitchenService.getActiveOrdersByItemStatusAndDate(status,date, pageable);
+        OrderItem.ItemStatus status = null;
+        try {
+            status = OrderItem.ItemStatus.valueOf(filter);
+        } catch (IllegalArgumentException ignored) {
         }
-
-
-        List<KitchenOrderDTO> wrapped = orderPage.stream()
-                .map(KitchenOrderDTO::new)
-                .toList();
-
-
-
-        List<OrderItem> allItems = wrapped.stream()
-                .flatMap(dto -> dto.getOrder().getItems().stream())
-                .sorted(Comparator.comparing(AuditMetadata::getCreatedAt))
-                .toList();
-        List<Order> rawOrders = orderPage.getContent();
+        List<OrderItem> allItems = orderItemService.findAllCreatedAtOnDateAndStatus(date, status);
         List<GroupedKitchenOrderDTO> groupedOrders = groupOrdersByTableAndTime(allItems);
 
         model.addAttribute("groupedOrders", groupedOrders);
-        model.addAttribute("allItems", rawOrders.stream()
-                .flatMap(o -> o.getItems().stream()).toList());
-
-
-        model.addAttribute("orders", wrapped);
         model.addAttribute("allItems", allItems);
         model.addAttribute("currentFilter", filter);
-        model.addAttribute("statusHelper", new StatusViewHelper());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", orderPage.getTotalPages());
-        model.addAttribute("orderPairs", groupOrdersInPairs(wrapped));
         model.addAttribute("selectedDate", date.toString());
         model.addAttribute("currentDate", date);
 
         return "pages/kitchen/dashboard";
     }
-    // KitchenController.java hoặc bạn có thể đưa vào service
-    public List<List<KitchenOrderDTO>> groupOrdersInPairs(List<KitchenOrderDTO> orders) {
-        List<List<KitchenOrderDTO>> result = new ArrayList<>();
-        for (int i = 0; i < orders.size(); i += 2) {
-            int end = Math.min(i + 2, orders.size());
-            result.add(orders.subList(i, end));
-        }
-        return result;
-    }
+
     private List<GroupedKitchenOrderDTO> groupOrdersByTableAndTime( List<OrderItem> allItems) {
         List<GroupedKitchenOrderDTO> groupedKitchenOrderDTOS = new ArrayList<>();
         List<OrderItem> orderItems = new ArrayList<>();
@@ -128,20 +87,44 @@ public class KitchenController {
 
 
 
-
-    @PostMapping("/item/{id}/status")
+    @PostMapping("/dashboard/item/{id}/status")
     @Transactional
-    public String updateItemStatus(@PathVariable Integer id, @RequestParam("status") OrderItem.ItemStatus status) {
+    public String updateItemStatusWithUndo(
+            @PathVariable Integer id,
+            @RequestParam("status") OrderItem.ItemStatus status,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam("filter") String filter,
+            RedirectAttributes redirectAttributes
+    ) {
+        OrderItem item = orderItemService.findById(id).orElseThrow();
+        OrderItem.ItemStatus oldStatus = item.getStatus();
+
         kitchenService.updateItemStatus(id, status);
-        return "redirect:/kitchen";
+
+        // Gửi flash message với trạng thái cũ để hiển thị Undo
+        redirectAttributes.addFlashAttribute("undoItemId", id);
+        redirectAttributes.addFlashAttribute("undoOldStatus", oldStatus);
+        redirectAttributes.addFlashAttribute("undoFilter", filter);
+        redirectAttributes.addFlashAttribute("undoDate", date.toString());
+
+        return "redirect:/kitchen/dashboard?filter=" + filter + "&date=" + date;
+    }
+    @PostMapping("/dashboard/item/{id}/undo")
+    @Transactional
+    public String undoItemStatus(
+            @PathVariable Integer id,
+            @RequestParam("status") OrderItem.ItemStatus status,
+            @RequestParam("filter") String filter,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            RedirectAttributes redirectAttributes
+    ) {
+        kitchenService.updateItemStatus(id, status);
+        redirectAttributes.addFlashAttribute("success", "Đã hoàn tác trạng thái món.");
+        return "redirect:/kitchen/dashboard?filter=" + filter + "&date=" + date;
     }
 
-    @PostMapping("/order/{id}/delete")
-    public String softDeleteOrder(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
-        kitchenService.softDeleteOrder(id);
-        redirectAttributes.addFlashAttribute("success", "Đơn #" + id + " đã được ẩn khỏi danh sách.");
-        return "redirect:/kitchen";
-    }
+
+
 
 
 
