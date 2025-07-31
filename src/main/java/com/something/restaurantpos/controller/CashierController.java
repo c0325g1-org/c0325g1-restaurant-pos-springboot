@@ -69,7 +69,7 @@ public class CashierController {
 
     @GetMapping("/{id}/invoice")
     public String showInvoiceDetail(@PathVariable Integer id, Model model) {
-        InvoiceDto dto = invoiceService.findDtoById(id); //
+        InvoiceDto dto = invoiceService.findDtoById(id);
         model.addAttribute("invoice", dto);
         return "pages/cashier/invoice_details";
     }
@@ -106,33 +106,28 @@ public class CashierController {
                                   RedirectAttributes redirectAttributes,
                                   HttpServletRequest request) throws UnsupportedEncodingException {
         paymentDto.setInvoiceId(id); // ✅ Gán trước
-        if (paymentDto.getMethod().equals("VNPAY")) {
-            return "redirect:" + createVNPayUrl(paymentDto, request);
-        } else {
-            invoiceService.processPayment(paymentDto);           // OK, giờ đã có id
-            paymentService.save(paymentDto);
-            redirectAttributes.addFlashAttribute("success", "Thanh toán thành công!");
-            return "redirect:/cashier/invoices";// OK
-        }
-    }
-    @GetMapping("/invoices/edit/{id}")
-    public String editInvoiceForm(@PathVariable Integer id, Model model) {
-        Invoice invoice = invoiceService.findById(id);
-        InvoiceDto dto = invoiceService.findDtoById(id);
-        if (invoice.getDiningTable() == null) {
-            System.out.println("⚠️ DiningTable is null for invoice " + id);
-        }
-        model.addAttribute("invoice", invoice);
-        model.addAttribute("invoiceDto", dto);
-        model.addAttribute("menuItems", menuItemRepository.findAll());
-        return "pages/cashier/edit_invoice"; // Tạo trang HTML tương ứng
-    }
-    @PostMapping("/invoices/update/{id}")
-    public String updateInvoice(@PathVariable Integer id,
-                                @ModelAttribute("invoice") InvoiceDto invoiceDto) {
-        invoiceService.updateInvoiceWithItems(id, invoiceDto);
+        invoiceService.processPayment(paymentDto);           // OK, giờ đã có id
+        redirectAttributes.addFlashAttribute("success", "Thanh toán thành công!");
         return "redirect:/cashier/invoices";
     }
+//    @GetMapping("/invoices/edit/{id}")
+//    public String editInvoiceForm(@PathVariable Integer id, Model model) {
+//        Invoice invoice = invoiceService.findById(id);
+//        InvoiceDto dto = invoiceService.findDtoById(id);
+//        if (invoice.getDiningTable() == null) {
+//            System.out.println("⚠️ DiningTable is null for invoice " + id);
+//        }
+//        model.addAttribute("invoice", invoice);
+//        model.addAttribute("invoiceDto", dto);
+//        model.addAttribute("menuItems", menuItemRepository.findAll());
+//        return "pages/cashier/edit_invoice"; // Tạo trang HTML tương ứng
+//    }
+//    @PostMapping("/invoices/update/{id}")
+//    public String updateInvoice(@PathVariable Integer id,
+//                                @ModelAttribute("invoice") InvoiceDto invoiceDto) {
+//        invoiceService.updateInvoiceWithItems(id, invoiceDto);
+//        return "redirect:/cashier/invoices";
+//    }
     @GetMapping("/checkout/{id}")
     public String showCheckout(@PathVariable Integer id, Model model) {
         Invoice invoice = invoiceService.findById(id);

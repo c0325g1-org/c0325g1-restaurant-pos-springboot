@@ -34,17 +34,12 @@
                     </p>
 
                     <div th:if="${table.status.name() == 'SERVING'}" class="d-flex gap-2">
-                        <!-- In tạm tính -->
-                        <a th:href="@{'/cashier/'+${invoice.id}+'/invoice'}"
-                           class="btn btn-outline-secondary w-50" target="_blank">
-                            <i class="bi bi-printer"></i> In tạm tính
-<!--                        </a>-->
-                         Nút mở modal thanh toán
-                        <button type="button" class="btn btn-primary w-50"
-                                data-bs-toggle="modal"
-                                th:data-bs-target="'#checkoutModal__' + ${table.id}">
-                            <i class="bi bi-cash-coin"></i> Thanh toán
-                        </button>
+                        <form action="/cashier/tables/checkout" method="post">
+                            <input type="hidden" name="tableId" th:value="${table.id}">
+                            <button type="submit" class="btn btn-outline-secondary">
+                                <i class="bi bi-printer"></i> Thanh toán
+                            </button>
+                        </form>
                     </div>
 
                     <!-- Nếu không SERVING -->
@@ -53,42 +48,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Modal thanh toán -->
-            <div class="modal fade" th:id="'checkoutModal__' + ${table.id}" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form th:action="@{'/cashier//' + ${table.id} + '/checkout'}" method="post">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Thanh toán bàn: <span th:text="${table.name}">1</span></h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-                            </div>
-                            <div class="modal-body">
-                                <input type="hidden" name="tableId" th:value="${table.id}" />
-                                <div class="mb-3">
-                                    <label class="form-label">Phương thức thanh toán</label>
-                                    <select class="form-select" name="method" required>
-                                        <option value="">-- Chọn phương thức --</option>
-                                        <option value="CASH">Tiền mặt</option>
-                                        <option value="TRANSFER">Chuyển khoản</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Số tiền thanh toán (VND)</label>
-                                    <input type="number" class="form-control" name="amount"
-                                            required>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
-                                <button type="submit" class="btn btn-success">Xác nhận</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <!-- End modal -->
-
         </div>
     </div>
 
