@@ -24,7 +24,7 @@
 <div class="container py-4" style="max-width: 480px;">
     <h2 class="mb-4 text-center">Đánh giá của khách hàng</h2>
 
-    <form th:action="@{/feedback/submit}" method="post" onsubmit="return validateForm()">
+    <form th:action="@{/feedback/submit}" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
         <input type="hidden" name="uuid" th:value="${uuid}" />
         <input type="hidden" name="rating" id="rating" required />
 
@@ -50,6 +50,11 @@
         <div class="mb-4">
             <label class="form-label fw-bold" for="content">Nội dung đánh giá</label>
             <textarea class="form-control" id="content" name="content" rows="4" placeholder="Thức ăn ngon, phục vụ tốt..." required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Ảnh minh họa (tùy chọn)</label>
+            <input type="file" class="form-control" name="imageFile" accept="image/*" capture="environment" />
         </div>
 
         <div class="text-center">
