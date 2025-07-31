@@ -8,12 +8,16 @@ import com.something.restaurantpos.repository.IEmployeeRepository;
 import com.something.restaurantpos.repository.IPasswordResetTokenRepository;
 import com.something.restaurantpos.service.IPasswordResetService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,6 +36,9 @@ public class PasswordResetService implements IPasswordResetService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private TemplateEngine templateEngine;
 
     // Thời gian hết hạn token (15 phút)
     private static final int TOKEN_EXPIRY_MINUTES = 15;
@@ -127,26 +134,36 @@ public class PasswordResetService implements IPasswordResetService {
         return true;
     }
 
-    /**
-     * Gửi email chứa link reset password
-     */
+    // Gửi email chứa link reset password sử dụng HTML template
     private void sendResetEmail(String email, String token) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("Đặt lại mật khẩu - Restaurant POS");
-        
-        String resetLink = "http://localhost:8080/reset-password?token=" + token;
-        
-        String emailContent = "Xin chào,\n\n" +
-                "Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản Restaurant POS.\n\n" +
-                "Vui lòng click vào link sau để đặt lại mật khẩu:\n" +
-                resetLink + "\n\n" +
-                "Link này sẽ hết hạn sau " + TOKEN_EXPIRY_MINUTES + " phút.\n\n" +
-                "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.\n\n" +
-                "Trân trọng,\n" +
-                "Đội ngũ Restaurant POS";
-        
-        message.setText(emailContent);
-        mailSender.send(message);
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            
+            helper.setTo(email);
+            helper.setSubject("Đặt lại mật khẩu - Restaurant POS");
+            
+            // Tìm thông tin nhân viên
+            Optional<Employee> employeeOpt = employeeRepository.findByEmail(email);
+            String employeeName = "";
+            if (employeeOpt.isPresent()) {
+                employeeName = employeeOpt.get().getName();
+            }
+            
+            // Tạo context cho Thymeleaf template
+            Context context = new Context();
+            context.setVariable("resetLink", "http://localhost:8080/reset-password?token=" + token);
+            context.setVariable("expiryMinutes", TOKEN_EXPIRY_MINUTES);
+            context.setVariable("employeeName", employeeName);
+            
+            // Render HTML template
+            String htmlContent = templateEngine.process("email/password_reset", context);
+            helper.setText(htmlContent, true); // true = HTML content
+            
+            mailSender.send(message);
+            
+        } catch (MessagingException e) {
+            throw new RuntimeException("Không thể gửi email reset password", e);
+        }
     }
 } 
