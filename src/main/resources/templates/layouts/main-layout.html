@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,6 +13,7 @@
     <!-- Bootstrap & Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <!-- Custom CSS -->
     <style>
@@ -124,15 +126,15 @@
     <div class="text-center p-3 shadow logo-wrapper">
         <img th:src="@{'/img/logo.png'}" alt="Logo" width="100%" style="max-width: 106px; filter: drop-shadow(2px 4px 6px black);">
     </div>
-    <a th:href="@{/manager/dashboard}" class="nav-link"><i class="bi bi-speedometer2"></i> <span>Trang chủ</span></a>
-    <a th:href="@{/manager/menu_items}" class="nav-link"><i class="bi bi-card-list"></i> <span>Món ăn</span></a>
-    <a th:href="@{/manager/menu_category}" class="nav-link"><i class="bi bi-tags"></i> <span>Danh mục Món</span></a>
-    <a th:href="@{/manager/vouchers}" class="nav-link"><i class="bi bi-percent"></i> <span>Mã giảm giá</span></a>
-    <a th:href="@{/feedback}" class="nav-link"><i class="bi bi-rss"></i> <span>Phản hồi KH</span></a>
-    <a th:href="@{/cashier/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
-    <a th:href="@{/cashier/invoices}" class="nav-link"><i class="bi bi-receipt"></i> <span>Hoá đơn</span></a>
-    <a th:href="@{/waiter/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
-    <a th:href="@{/waiter/orders}" class="nav-link"><i class="bi bi-bag"></i> <span>Gọi món</span></a>
+    <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/dashboard}" class="nav-link"><i class="bi bi-speedometer2"></i> <span>Trang chủ</span></a>
+    <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/menu_items}" class="nav-link"><i class="bi bi-card-list"></i> <span>Món ăn</span></a>
+    <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/menu_category}" class="nav-link"><i class="bi bi-tags"></i> <span>Danh mục Món</span></a>
+    <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/vouchers}" class="nav-link"><i class="bi bi-percent"></i> <span>Mã giảm giá</span></a>
+    <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/feedback}" class="nav-link"><i class="bi bi-rss"></i> <span>Phản hồi KH</span></a>
+    <a sec:authorize="hasAnyRole('THU_NGÂN', 'QUẢN_LÝ')" th:href="@{/cashier/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
+    <a sec:authorize="hasAnyRole('THU_NGÂN', 'QUẢN_LÝ')" th:href="@{/cashier/invoices}" class="nav-link"><i class="bi bi-receipt"></i> <span>Hoá đơn</span></a>
+    <a sec:authorize="hasRole('PHỤC_VỤ')" th:href="@{/waiter/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
+    <a sec:authorize="hasRole('PHỤC_VỤ')" th:href="@{/waiter/orders}" class="nav-link"><i class="bi bi-bag"></i> <span>Gọi món</span></a>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -189,10 +191,11 @@
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <span sec:authentication="name"></span>
                         <img src="https://i.pravatar.cc/40?img=11" class="rounded-circle" width="36" height="36">
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow">
-                        <li><a class="dropdown-item" href="#">Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">Hồ sơ</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
                     </ul>
@@ -207,6 +210,201 @@
 
     <footer class="border-top">&copy; 2025 Hệ thống POS nhà hàng</footer>
 </div>
+
+<!-- Profile Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="profileModalLabel">
+                    <i class="fas fa-user me-2"></i>Hồ sơ nhân viên
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <div class="profile-avatar mx-auto mb-3">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h4 id="profileName" class="mb-1">Đang tải...</h4>
+                    <p id="profileRole" class="text-muted mb-0">Đang tải...</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-section">
+                            <h6 class="text-primary mb-3">
+                                <i class="fas fa-info-circle me-2"></i>Thông tin cơ bản
+                            </h6>
+                            
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-id-card"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Mã nhân viên</div>
+                                    <div class="info-value" id="profileId">-</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Tên đăng nhập</div>
+                                    <div class="info-value" id="profileUsername">-</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Email</div>
+                                    <div class="info-value" id="profileEmail">-</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-user-tag"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Vai trò</div>
+                                    <div class="info-value" id="profileRoleValue">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-section">
+                            <h6 class="text-primary mb-3">
+                                <i class="fas fa-clock me-2"></i>Thông tin hệ thống
+                            </h6>
+                            
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-calendar-plus"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Ngày tạo</div>
+                                    <div class="info-value" id="profileCreatedAt">-</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Cập nhật lần cuối</div>
+                                    <div class="info-value" id="profileUpdatedAt">-</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-toggle-on"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Trạng thái</div>
+                                    <div class="info-value">
+                                        <span class="status-badge" id="profileStatus">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #495057, #6c757d);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: white;
+        border: 3px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .info-section {
+        margin-bottom: 20px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        color: #495057;
+        font-size: 14px;
+    }
+
+    .info-content {
+        flex: 1;
+    }
+
+    .info-label {
+        font-size: 12px;
+        color: #6c757d;
+        margin-bottom: 3px;
+        font-weight: 500;
+    }
+
+    .info-value {
+        font-size: 14px;
+        color: #343a40;
+        font-weight: 600;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+</style>
 
 <th:block layout:fragment="modal"></th:block>
 
@@ -235,6 +433,60 @@
                 }
             }
         });
+
+        // Profile Modal functionality
+        const profileModal = document.getElementById('profileModal');
+        if (profileModal) {
+            profileModal.addEventListener('show.bs.modal', function () {
+                loadProfileData();
+            });
+        }
+
+        function loadProfileData() {
+            fetch('/profile/data')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Update profile information
+                    document.getElementById('profileName').textContent = data.name || 'N/A';
+                    document.getElementById('profileRole').textContent = data.role || 'N/A';
+                    document.getElementById('profileId').textContent = data.id || 'N/A';
+                    document.getElementById('profileUsername').textContent = data.username || 'N/A';
+                    document.getElementById('profileEmail').textContent = data.email || 'N/A';
+                    document.getElementById('profileRoleValue').textContent = data.role || 'N/A';
+                    
+                    // Format dates
+                    if (data.createdAt) {
+                        const createdDate = new Date(data.createdAt);
+                        document.getElementById('profileCreatedAt').textContent = createdDate.toLocaleString('vi-VN');
+                    }
+                    
+                    if (data.updatedAt) {
+                        const updatedDate = new Date(data.updatedAt);
+                        document.getElementById('profileUpdatedAt').textContent = updatedDate.toLocaleString('vi-VN');
+                    }
+                    
+                    // Update status
+                    const statusElement = document.getElementById('profileStatus');
+                    if (data.deleted) {
+                        statusElement.textContent = 'Đã xóa';
+                        statusElement.className = 'status-badge status-inactive';
+                    } else {
+                        statusElement.textContent = 'Hoạt động';
+                        statusElement.className = 'status-badge status-active';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading profile data:', error);
+                    // Show error message
+                    document.getElementById('profileName').textContent = 'Lỗi tải dữ liệu';
+                    document.getElementById('profileRole').textContent = 'Vui lòng thử lại';
+                });
+        }
     });
 </script>
 <th:block layout:fragment="script"></th:block>
