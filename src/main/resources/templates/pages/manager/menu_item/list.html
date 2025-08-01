@@ -40,8 +40,6 @@
     </div>
 
 
-
-
     <table class="table table-hover table-striped shadow-sm rounded bg-white">
         <thead class="table-dark text-center">
         <tr>
@@ -52,8 +50,7 @@
             <th>Hình ảnh</th>
             <th>Loại</th>
             <th>Trạng thái</th>
-            <th>Chỉnh sửa</th>
-            <th>Xóa</th>
+            <th>Hành động</th>
         </tr>
         </thead>
         <tbody class="align-middle text-center">
@@ -79,8 +76,8 @@
                    title="Sửa"
                    th:attr="data-bs-title='Sửa voucher ' + ${menu.name}">
                 <i class="bi bi-pencil-square"></i>
-            </a></td>
-            <td>
+            </a>
+
                 <button type="button"
                         class="btn btn-outline-danger btn-sm"
                         data-bs-toggle="modal"
