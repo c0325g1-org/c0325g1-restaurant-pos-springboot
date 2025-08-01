@@ -14,7 +14,7 @@ import java.util.List;
 public class FeedbackService implements IFeedbackService {
     @Autowired
     private IFeedbackRepository feedbackRepository;
-    
+
     @Override
     public boolean existsById(String id) {
         return feedbackRepository.existsById(id);
@@ -33,5 +33,10 @@ public class FeedbackService implements IFeedbackService {
     @Override
     public void save(Feedback feedback) {
         feedbackRepository.save(feedback);
+    }
+
+    @Override
+    public Page<Feedback> search(String name, Pageable pageable) {
+        return feedbackRepository.search(name, pageable);
     }
 }
