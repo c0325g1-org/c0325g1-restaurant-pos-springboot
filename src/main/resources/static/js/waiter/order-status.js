@@ -23,7 +23,6 @@ export function loadCalledItems(tableId) {
     fetch(`/waiter/order/called-items?tableId=${tableId}`)
         .then(res => res.json())
         .then(data => {
-            console.log(data);
             const container = document.getElementById("called-items");
             container.innerHTML = "";
             if (data.length > 0) {

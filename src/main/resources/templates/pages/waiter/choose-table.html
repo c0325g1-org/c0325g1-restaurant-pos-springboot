@@ -1,0 +1,103 @@
+<html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Chọn bàn - Phục vụ</title>
+</head>
+<div layout:fragment="content">
+    <div class="row mb-3 g-3">
+        <div class="col-md-3">
+            <input id="tableSearch" type="text" class="form-control" placeholder="Tìm bàn..." oninput="filterTables()"/>
+        </div>
+        <div class="col-md-3">
+            <select id="statusFilter" class="form-select" onchange="filterTables()">
+                <option value="">Tất cả trạng thái</option>
+                <option value="EMPTY">Trống</option>
+                <option value="RESERVED">Đặt trước</option>
+                <option value="SERVING">Đang phục vụ</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-6 col-md-3 table-card" th:each="table : ${tables}" th:attr="data-status=${table.status.name()}">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title" th:text="${table.name}"></h5>
+                    <span class="badge"
+                          th:class="${'badge ' +  (table.status.name() == 'EMPTY' ? 'bg-success' :
+                          table.status.name() == 'RESERVED' ? 'bg-warning text-dark' : 'bg-danger')}"
+                          th:text="${table.status}">
+                    </span>
+
+                    <form th:action="@{/waiter/tables/{id}/change-status(id=${table.id})}" method="post" class="mt-2">
+                        <select name="status" class="form-select form-select-sm mb-2">
+                            <option value="EMPTY" th:if="${table.status.name() != 'EMPTY'}">Trống</option>
+                            <option value="RESERVED" th:if="${table.status.name() != 'RESERVED'}">Đặt trước</option>
+                            <option value="SERVING" th:if="${table.status.name() != 'SERVING'}">Đang phục vụ</option>
+                        </select>
+                        <button class="btn btn-sm btn-outline-primary w-100">Cập nhật</button>
+                    </form>
+
+                    <button class="btn btn-sm btn-success w-100 mt-2" onclick="handleOrder(this)"
+                            th:attr="data-id=${table.id}, data-status=${table.status.name()}">Gọi món
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="modal">
+    <div class="modal fade" id="confirmServeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chuyển trạng thái bàn</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Bàn này chưa ở trạng thái "Đang phục vụ". Bạn có muốn chuyển sang để gọi món không?
+                </div>
+                <div class="modal-footer">
+                    <form id="serveForm" method="post">
+                        <input type="hidden" name="status" value="SERVING">
+                        <button type="submit" class="btn btn-primary">Đồng ý</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+
+<th:block layout:fragment="script">
+    <script>
+        function filterTables() {
+            const query = document.getElementById("tableSearch").value.toLowerCase();
+            const status = document.getElementById("statusFilter").value;
+            const cards = document.querySelectorAll(".table-card");
+            cards.forEach(card => {
+                const name = card.querySelector(".card-title").innerText.toLowerCase();
+                const cardStatus = card.getAttribute("data-status");
+                const nameMatch = name.includes(query);
+                const statusMatch = !status || status === cardStatus;
+                card.style.display = nameMatch && statusMatch ? "block" : "none";
+            });
+        }
+
+        function handleOrder(button) {
+            const tableId = button.dataset.id;
+            const status = button.dataset.status;
+            if (status !== 'SERVING') {
+                const form = document.getElementById('serveForm');
+                form.action = `/waiter/tables/${tableId}/force-serving`;
+                const modal = new bootstrap.Modal(document.getElementById('confirmServeModal'));
+                modal.show();
+            } else {
+                window.location.href = `/waiter/tables/go-to-order?tableId=${tableId}`;
+            }
+        }
+    </script>
+</th:block>
+</html>
+
