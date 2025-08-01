@@ -20,7 +20,7 @@
         <tr>
             <th>STT</th>
             <th>Tên</th>
-            <th>Chỉnh sửa</th>
+            <th>Hành động</th>
 
         </tr>
         </thead>
@@ -34,7 +34,7 @@
                       class="d-inline">
                     <button type="submit" class="btn btn-outline-success btn-sm me-1"
                             title="Khôi phục"
-                            th:attr="data-bs-title='Khôi phục loại ' + ${menuCategory.name}"
+                            th:attr="data-bs-title='Khôi phục danh mục ' + ${menuCategory.name}"
                     >
                         <i class="bi bi-arrow-counterclockwise"></i>
                     </button>
@@ -44,7 +44,7 @@
                         data-bs-toggle="modal"
                         data-bs-target="#deleteModal"
                         title="Xoá vĩnh viễn"
-                        th:attr="data-id=${menuCategory.id}, data-title=${menuCategory.name}, data-bs-title='Xóa vĩnh viễn voucher ' + ${menuCategory.name}">
+                        th:attr="data-id=${menuCategory.id}, data-title=${menuCategory.name}, data-bs-title='Xóa vĩnh viễn danh mục ' + ${menuCategory.name}">
                     <i class="bi bi-trash3"></i>
                 </button>
             </td>

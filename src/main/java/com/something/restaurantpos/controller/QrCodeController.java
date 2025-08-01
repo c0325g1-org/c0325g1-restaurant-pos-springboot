@@ -15,7 +15,7 @@ public class QrCodeController {
 
     @GetMapping("/qr-code")
     public void qrCode(@RequestParam("text") String text, HttpServletResponse response) throws IOException {
-        byte[] qrImage = qrCodeService.generateQRCode(text, 250, 250);
+        byte[] qrImage = qrCodeService.generateQRCode(text, 150, 150);
         response.setContentType("image/png");
         response.getOutputStream().write(qrImage);
         response.getOutputStream().flush();

@@ -24,6 +24,24 @@
         .list-group-item-served {
             background-color: #e2e3e5;
         }
+        .item-canceled {
+            background-color: #f8d7da !important;  /* nền đỏ nhạt */
+            color: #842029 !important;             /* chữ đỏ đậm */
+            font-style: italic;
+        }
+
+        .btn-cancel {
+            color: #842029;
+            border: 1px solid #842029;
+            background-color: #f8d7da;
+        }
+
+        .btn-cancel:hover {
+            background-color: #e58d96;
+            color: white;
+            border-color: #842029;
+        }
+
     </style>
 </head>
 <div layout:fragment="content">
@@ -80,7 +98,7 @@
     </ul>
     <!-- Giao diện các nhóm đơn hàng -->
     <div class="row">
-        <div class="col-12 col-md-6 mb-4" th:each="group : ${groupedOrders}">
+        <div class="col-12 col-md-6 mb-4" th:each="group : ${groupedOrders}" th:if="${group.hasUnservedItems()}">
             <div class="order-card bg-white d-flex flex-column justify-content-between">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div>
@@ -93,13 +111,18 @@
                 <ul class="list-group"  >
                     <li class="list-group-item"
                         th:each="item : ${group.orderItems}"
-                        th:if="${item.status.name() != 'CANCELED'}"
-                        th:classappend="' list-group-item-' + (${item.status.name().toLowerCase()})">
+                        th:if="${item.deleted == false}"
+                        th:classappend="' list-group-item-' + ${item.status.name().toLowerCase()} + (${item.status.name() == 'CANCELED'} ? ' item-canceled' : '')">
 
 
-                        <div class="d-flex justify-content-between">
+
+                    <div class="d-flex justify-content-between">
                             <div>
-                                <strong th:text="${item.menuItem.name}">Tên món</strong>
+                                <strong>
+                                    <span th:text="${item.menuItem.name}"></span>
+                                    <span th:if="${item.status.name() == 'CANCELED'}">(Đã huỷ)</span>
+                                </strong>
+
                                 <span class="badge bg-primary rounded-pill" th:text="'x' + ${item.quantity}">x1</span>
                             </div>
                             <form th:action="@{'/kitchen/dashboard/item/' + ${item.id} + '/status'}" method="post" onsubmit="playNotify()">
@@ -114,28 +137,15 @@
                                 <button type="submit" th:if="${item.status.name() == 'COOKING'}" class="btn btn-outline-success btn-sm">Sẵn sàng</button>
                                 <button type="submit" th:if="${item.status.name() == 'READY'}" class="btn btn-success btn-sm">Đã sẵn sàng</button>
                             </form>
+                            <form th:action="@{'/kitchen/hide/orderItem'}" method="post" th:if="${item.deleted == false and item.status.name() == 'CANCELED'}">
+                                <input type="hidden" name="orderId" th:value="${item.id}" />
+                                <input type="hidden" name="date" th:value="${currentDate}" />
+                                <input type="hidden" name="filter" th:value="${currentFilter}" />
+                                <input type="submit" value="Ẩn" class="btn btn-cancel btn-sm">
+                            </form>
                         </div>
                     </li>
                 </ul>
-
-                <!-- Món bị huỷ -->
-<!--                <div class="mt-2" th:if="${group.hasCanceledItems()}">-->
-<!--                    <p class="text-danger small">* Một số món đã bị huỷ:</p>-->
-<!--                    <ul class="list-group list-group-flush">-->
-<!--                        <li class="list-group-item text-danger small"-->
-<!--                            th:each="item : ${group.orderItems}"-->
-<!--                            th:if="${item.status == T(com.something.restaurantpos.entity.OrderItem.ItemStatus).CANCELED}">-->
-<!--                            <span th:text="${item.menuItem.name}">Tên món</span> - -->
-<!--                            <span th:text="'SL: ' + ${item.quantity}">SL: 1</span>-->
-<!--                        </li>-->
-<!--                    </ul>-->
-<!--                    <form th:action="@{'/kitchen/dashboard/order/' + ${item.order.id} + '/delete'}" method="post"-->
-<!--                          onsubmit="return confirm('Ẩn đơn này khỏi màn hình bếp?')">-->
-<!--                        <input type="hidden" name="date" th:value="${currentDate}" />-->
-<!--                        <input type="hidden" name="filter" th:value="${currentFilter}" />-->
-<!--                        <button type="submit" class="btn btn-outline-danger btn-sm mt-2">🗑️ Đóng (ẩn)</button>-->
-<!--                    </form>-->
-<!--                </div>-->
             </div>
         </div>
     </div>
