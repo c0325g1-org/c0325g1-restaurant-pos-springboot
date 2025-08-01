@@ -1,0 +1,58 @@
+<html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Bàn ăn - Thu ngân</title>
+    <style>
+        .card:hover {
+            transform: scale(1.02);
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<div layout:fragment="content">
+    <div class="row g-4" th:if="${tables != null and !tables.isEmpty()}">
+        <div class="col-md-4 col-sm-6" th:each="table : ${tables}">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-grid-3x3-gap"></i>
+                        Bàn số <span th:text="${table.name}">1</span>
+                    </h5>
+                    <p class="card-text mb-3">
+                        Trạng thái:
+                        <span class="badge"
+                              th:class="${'badge ' +  (table.status.name() == 'EMPTY' ? 'bg-success' :
+                              table.status.name() == 'RESERVED' ? 'bg-warning text-dark' : 'bg-danger')}">
+                            <span th:text="${table.status}"></span>
+                        </span>
+                    </p>
+
+                    <div th:if="${table.status.name() == 'SERVING'}" class="d-flex gap-2">
+                        <form action="/cashier/tables/checkout" method="post">
+                            <input type="hidden" name="tableId" th:value="${table.id}">
+                            <button type="submit" class="btn btn-outline-secondary">
+                                <i class="bi bi-printer"></i> Thanh toán
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Nếu không SERVING -->
+                    <div th:if="${table.status.name() != 'SERVING'}" class="text-muted fst-italic">
+                        Không khả dụng để thanh toán
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-info text-center" th:if="${tables == null or tables.isEmpty()}">
+        Không có bàn nào để hiển thị.
+    </div>
+</div>
+
+<th:block layout:fragment="modal">
+    <div th:replace="~{fragments/shared/delete_modal :: deleteModal ('món ăn')}"></div>
+</th:block>
+
+<th:block layout:fragment="script">
+</th:block>
+</html>

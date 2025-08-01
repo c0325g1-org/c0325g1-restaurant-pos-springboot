@@ -23,9 +23,13 @@ public class Feedback extends AuditMetadata {
     private String content;
 
     @Column(nullable = false, length = 100)
-    private String customerName;  
+    private String customerName;
 
     @Column(nullable = false, length = 15)
-    private String customerPhone; 
+    private String customerPhone;
+
+    @Column(name = "image_path")
+    private String imagePath;
 }
+
 
