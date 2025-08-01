@@ -25,8 +25,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(config -> config
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/uploads/feedbacks/**").permitAll()
                         .requestMatchers("/login", "/register", "/forgot-password", "/reset-password").permitAll()
-                        .requestMatchers("/feedback/verify", "/feedback/submit", "/feedback/success").permitAll()
-                        .requestMatchers("/feedback/**").permitAll()
+                        .requestMatchers("/feedback/**").permitAll() 
                         // PHÂN QUYỀN
                         .requestMatchers("/manager/**", "/cashier/**", "/waiter/**", "/kitchen/**").hasRole("QUẢN_LÝ")
                         .requestMatchers("/cashier/**").hasRole("THU_NGÂN")
