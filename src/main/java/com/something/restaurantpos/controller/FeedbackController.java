@@ -77,7 +77,8 @@ public class FeedbackController {
     @PostMapping("/submit")
     public String submit(@Valid FeedbackDTO feedbackDTO,
                          BindingResult result,
-                         @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                         @RequestParam(value = "imageFiles", required = false) MultipartFile[] imageFiles,
+
                          Model model) {
         String uuid = feedbackDTO.getUuid();
 
@@ -91,14 +92,28 @@ public class FeedbackController {
             return "pages/manager/feedback";
         }
 
-        if (imageFile != null && !imageFile.isEmpty()) {
-            try {
-                String imageUrl = cloudinaryService.uploadImage(imageFile);
-                feedbackDTO.setImagePath(imageUrl);
-            } catch (IOException e) {
-                e.printStackTrace();
+        StringBuilder imagePaths = new StringBuilder();
+
+        if (imageFiles != null) {
+            for (MultipartFile file : imageFiles) {
+                if (!file.isEmpty()) {
+                    try {
+                        String imageUrl = cloudinaryService.uploadImage(file);
+                        imagePaths.append(imageUrl).append(";");
+                    } catch (IOException e) {
+                        e.printStackTrace(); // Bạn có thể xử lý lỗi này tốt hơn nếu muốn
+                    }
+                }
             }
+
+            // ✅ Xóa dấu ; cuối nếu có
+            if (imagePaths.length() > 0 && imagePaths.charAt(imagePaths.length() - 1) == ';') {
+                imagePaths.deleteCharAt(imagePaths.length() - 1);
+            }
+
+            feedbackDTO.setImagePath(imagePaths.toString());
         }
+
 
         Order order = orderRepository.findByFeedbackToken(uuid);
         if (order == null) return "pages/manager/already_rated";
@@ -109,7 +124,7 @@ public class FeedbackController {
         f.setCustomerPhone(feedbackDTO.getCustomerPhone());
         f.setContent(feedbackDTO.getContent());
         f.setRating(feedbackDTO.getRating());
-        f.setImagePath(feedbackDTO.getImagePath());
+        f.setImagePath(feedbackDTO.getImagePath() != null ? feedbackDTO.getImagePath() : "");
 
         feedbackService.save(f);
         return "redirect:/feedback/success";
