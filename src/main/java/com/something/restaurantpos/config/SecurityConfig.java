@@ -23,13 +23,14 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(config -> config
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/uploads/feedbacks/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/img/**", "/uploads/feedbacks/**").permitAll()
                         .requestMatchers("/login", "/register", "/forgot-password", "/reset-password").permitAll()
                         .requestMatchers("/feedback/verify", "/feedback/submit", "/feedback/success").permitAll()
                         .requestMatchers("/feedback/**").permitAll()
+                        .requestMatchers("/profile/**").authenticated()
                         // PHÂN QUYỀN
-                        .requestMatchers("/manager/**", "/cashier/**", "/waiter/**", "/kitchen/**").hasRole("QUẢN_LÝ")
-                        .requestMatchers("/cashier/**").hasRole("THU_NGÂN")
+                        .requestMatchers("/manager/**").hasRole("QUẢN_LÝ")
+                        .requestMatchers("/cashier/**").hasAnyRole("THU_NGÂN", "QUẢN_LÝ")
                         .requestMatchers("/waiter/**").hasRole("PHỤC_VỤ")
                         .requestMatchers("/kitchen/**").hasRole("BẾP")
                         .anyRequest().authenticated()

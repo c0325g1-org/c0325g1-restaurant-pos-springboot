@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập - Restaurant POS</title>
+    <title>Đăng nhập - LEON</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #e9ecef;
+            background-color: #e4e9f2;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #212529;
+            color: #333;
+            font-family: 'Montserrat', sans-serif;
         }
 
         .login-container {
@@ -26,7 +30,7 @@
         }
 
         .login-header {
-            background: #343a40;
+            background: #6c757d;
             color: white;
             padding: 35px;
             text-align: center;
@@ -48,12 +52,12 @@
         }
 
         .form-control:focus {
-            border-color: #343a40;
-            box-shadow: 0 0 0 0.15rem rgba(52, 58, 64, 0.25);
+            border-color: #6c757d;
+            box-shadow: 0 0 0 0.15rem rgba(108, 117, 125, 0.25);
         }
 
         .btn-login {
-            background-color: #343a40;
+            background-color: #6c757d;
             color: #fff;
             border: none;
             border-radius: 8px;
@@ -64,7 +68,7 @@
         }
 
         .btn-login:hover {
-            background-color: #495057;
+            background-color: #5a6268;
         }
 
         .input-group-text {
@@ -83,12 +87,20 @@
             border-radius: 8px;
             font-size: 0.95rem;
         }
+
+        .login-logo {
+            max-width: 120px;
+            height: auto;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
     </style>
 </head>
 <body>
 <div class="login-container">
     <div class="login-header">
-        <h3><i class="fas fa-store me-2"></i>Restaurant POS</h3>
+        <div class="text-center">
+                            <img th:src="@{'/img/logo.png'}" alt="LEON" class="login-logo mb-3">
+        </div>
     </div>
 
     <div class="login-body">
