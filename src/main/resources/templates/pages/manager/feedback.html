@@ -24,18 +24,20 @@
 <div class="container py-4" style="max-width: 480px;">
     <h2 class="mb-4 text-center">Đánh giá của khách hàng</h2>
 
-    <form th:action="@{/feedback/submit}" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+    <form th:action="@{/feedback/submit}" method="post" enctype="multipart/form-data" th:object="${feedbackDTO}" onsubmit="return validateForm()">
         <input type="hidden" name="uuid" th:value="${uuid}" />
         <input type="hidden" name="rating" id="rating" required />
 
         <div class="mb-3">
             <label class="form-label fw-bold" for="customerName">Họ tên khách hàng</label>
-            <input type="text" class="form-control" id="customerName" name="customerName" placeholder="Nhập họ tên" required />
+            <input type="text" class="form-control" id="customerName" th:field="*{customerName}" placeholder="Nhập họ tên" />
+            <div class="text-danger small" th:if="${#fields.hasErrors('customerName')}" th:errors="*{customerName}"></div>
         </div>
 
         <div class="mb-3">
             <label class="form-label fw-bold" for="customerPhone">Số điện thoại</label>
-            <input type="tel" class="form-control" id="customerPhone" name="customerPhone" placeholder="Nhập số điện thoại" pattern="^\+?\d{7,15}$" required />
+            <input type="tel" class="form-control" id="customerPhone" th:field="*{customerPhone}" placeholder="Nhập số điện thoại" />
+            <div class="text-danger small" th:if="${#fields.hasErrors('customerPhone')}" th:errors="*{customerPhone}"></div>
         </div>
 
         <div class="mb-3 text-center">
@@ -45,11 +47,13 @@
             <span class="star" onclick="rate(3)">&#9733;</span>
             <span class="star" onclick="rate(4)">&#9733;</span>
             <span class="star" onclick="rate(5)">&#9733;</span>
+            <div class="text-danger small" th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}"></div>
         </div>
 
         <div class="mb-4">
             <label class="form-label fw-bold" for="content">Nội dung đánh giá</label>
-            <textarea class="form-control" id="content" name="content" rows="4" placeholder="Thức ăn ngon, phục vụ tốt..." required></textarea>
+            <textarea class="form-control" id="content" th:field="*{content}" rows="4" placeholder="Thức ăn ngon, phục vụ tốt..."></textarea>
+            <div class="text-danger small" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
         </div>
 
         <div class="mb-3">
