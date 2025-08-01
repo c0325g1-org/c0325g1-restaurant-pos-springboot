@@ -141,7 +141,7 @@ public class PasswordResetService implements IPasswordResetService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
             helper.setTo(email);
-            helper.setSubject("Đặt lại mật khẩu - Restaurant POS");
+            helper.setSubject("Đặt lại mật khẩu - LEON");
             
             // Tìm thông tin nhân viên
             Optional<Employee> employeeOpt = employeeRepository.findByEmail(email);
