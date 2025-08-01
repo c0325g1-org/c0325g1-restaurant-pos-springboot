@@ -1,11 +1,17 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+
+
+
+
+
+<html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
 <head>
-    <th:block th:replace="fragments/manager/head :: head ('Danh sách loại món ăn')"></th:block>
+    <title>Thêm mới món ăn - Quản lý</title>
     <style>
         .form-wrapper {
-            max-width: 700px;
+            max-width: 900px;
             margin: 0 auto;
+            min-height: 400px;
         }
 
         .form-title {
@@ -24,33 +30,83 @@
             border-color: #0d6efd;
             box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
         }
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .main-content {
+            height: 100vh;
+            overflow: auto;
+        }
+        .image-preview {
+            width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            object-fit: cover;
+        }
     </style>
 </head>
-<body>
-<div class="sidebar" th:replace="~{fragments/manager/sidebar :: sidebar}"></div>
-<div class="main-content">
-    <div th:replace="~{fragments/manager/header :: header}"></div>
+<div layout:fragment="content">
+    <div class="form-wrapper bg-white p-4 rounded shadow-sm">
+        <h2 class="form-title mb-4">Chỉnh sửa loại món</h2>
+        <form th:action="@{/manager/menu_category/{id}/edit(id=${menuCategoryDTO.id})}"
+              th:object="${menuCategoryDTO}" method="post" enctype="multipart/form-data" novalidate>
+            <div class="row">
+                <!-- Cột phải: Form nhập -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tên loại món</label>
+                        <input type="text" class="form-control" th:field="*{name}" placeholder="Nhập tên loại món">
+                        <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                    </div>
 
 
-    <main class="container py-4">
-        <div class="form-wrapper bg-white p-4 rounded shadow-sm">
-            <h2 class="form-title mb-4"> Chỉnh sửa loại </h2>
-            <form th:action="@{/manager/menu_category/{id}/edit(id=${menuCategoryDTO.id})}"
-                  th:object="${menuCategoryDTO}" method="post" enctype="multipart/form-data" novalidate>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Tên</label>
-                    <input type="text" class="form-control" th:field="*{name}" placeholder="Nhập loại">
-                    <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                    <div class="d-flex justify-content-between">
+                        <a class="btn btn-secondary"  th:href="@{/manager/menu_category}">Quay lại</a>
+                        <button class="btn btn-primary" type="submit">Lưu</button>
+                    </div>
                 </div>
-                <div class="d-flex justify-content-between">
-                    <a class="btn btn-secondary" th:href="@{/manager/menu_category}">Quay lại</a>
-                    <button class="btn btn-primary" type="submit">Lưu</button>
-                </div>
-            </form>
-        </div>
-    </main>
-    <div th:replace="~{fragments/manager/footer :: footer}"></div>
+            </div>
+        </form>
+    </div>
 </div>
-<th:block th:replace="fragments/manager/script :: script"></th:block>
-</body>
+
+<th:block layout:fragment="modal">
+
+</th:block>
+
+<th:block layout:fragment="script">
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteModal = document.getElementById('deleteModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                const title = button.getAttribute('data-title');
+                deleteModal.querySelector('#modalTitle').textContent = title;
+                deleteModal.querySelector('#deleteForm').setAttribute('action', '/manager/menu_category/' + id + '/delete');
+            });
+        });
+    </script>
+</th:block>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
