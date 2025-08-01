@@ -42,9 +42,7 @@
                     <div th:if="${table.status.name() == 'SERVING'}" class="d-grid text-center" >
                         <form action="/cashier/tables/checkout" method="post">
                             <input type="hidden" name="tableId" th:value="${table.id}">
-                            <button type="submit"
-                                    class="btn btn-outline-success"
-                                    data-bs-toggle="tooltip" title="Thanh toán bàn này">
+                            <button type="submit" class="btn btn-outline-success">
                                  Thanh toán
                             </button>
                         </form>
