@@ -48,10 +48,10 @@ public class KitChenService implements IKitchenService {
 
     @Override
     @Transactional
-    public void softDeleteOrder(Integer id) {
-        Order order = orderRepository.findById(id).orElseThrow();
-        order.markDeleted();
-        orderRepository.save(order);
+    public void softDeleteOrderItem(Integer id) {
+        OrderItem orderItem = orderItemRepository.findById(id).orElseThrow();
+        orderItem.markDeleted();
+        orderItemRepository.save(orderItem);
     }
 
 //    @Override

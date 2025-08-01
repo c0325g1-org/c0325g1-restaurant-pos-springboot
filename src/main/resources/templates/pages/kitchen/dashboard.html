@@ -173,7 +173,7 @@
 
     <!-- Giao diện các nhóm đơn hàng -->
     <div class="row">
-        <div class="col-12 col-md-6 mb-4" th:each="group : ${groupedOrders}">
+        <div class="col-12 col-md-6 mb-4" th:each="group : ${groupedOrders}" th:if="${group.getOrderItems().size() > 0}">
             <div class="order-card d-flex flex-column justify-content-between">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div>
@@ -186,8 +186,7 @@
                 <ul class="list-group"  >
                     <li class="list-group-item"
                         th:each="item : ${group.orderItems}"
-                        th:if="${item.status.name() != 'CANCELED'}"
-                        th:classappend="' list-group-item-' + (${item.status.name().toLowerCase()})">
+                        th:classappend="' list-group-item-' + (${item.status.name().toLowerCase()})" th:if="${item.deleted == false}">
 
 
                     <div class="d-flex justify-content-between">
@@ -207,35 +206,41 @@
                                 <button type="submit" th:if="${item.status.name() == 'COOKING'}" class="btn btn-outline-success btn-sm">Sẵn sàng</button>
                                 <button type="submit" th:if="${item.status.name() == 'READY'}" class="btn btn-success btn-sm">Đã sẵn sàng</button>
                             </form>
+                            <form th:action="@{'/kitchen/hide/orderItem'}" method="post" th:if="${item.deleted == false and item.status.name() == 'CANCELED'}">
+                                <input type="hidden" name="orderId" th:value="${item.id}" />
+                                <input type="hidden" name="date" th:value="${currentDate}" />
+                                <input type="hidden" name="filter" th:value="${currentFilter}" />
+                                <input type="submit" value="Ẩn" class="btn btn-outline-warning btn-sm">
+                            </form>
                         </div>
                     </li>
                 </ul>
 
-                <!-- Món bị huỷ -->
-                <div class="mt-2" th:if="${group.hasCanceledItems()}">
-                    <p class="text-danger small">* Một số món đã bị huỷ:</p>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item text-danger small"
-                            th:each="item : ${group.orderItems}"
-                            th:if="${item.status == T(com.something.restaurantpos.entity.OrderItem.ItemStatus).CANCELED}">
-                            <span th:text="${item.menuItem.name}">Tên món</span> -
-                            <span th:text="'SL: ' + ${item.quantity}">SL: 1</span>
-                        </li>
-                    </ul>
-                    <form th:action="@{'/kitchen/dashboard/order/' + ${item.order.id} + '/delete'}" method="post"
-                          onsubmit="return confirm('Ẩn đơn này khỏi màn hình bếp?')">
-                        <input type="hidden" name="date" th:value="${currentDate}" />
-                        <input type="hidden" name="filter" th:value="${currentFilter}" />
-                        <button type="submit" class="btn btn-outline-danger btn-sm mt-2">🗑️ Đóng (ẩn)</button>
-                    </form>
-                </div>
+<!--                &lt;!&ndash; Món bị huỷ &ndash;&gt;-->
+<!--                <div class="mt-2" th:if="${group.hasCanceledItems()}">-->
+<!--                    <p class="text-danger small">* Một số món đã bị huỷ:</p>-->
+<!--                    <ul class="list-group list-group-flush">-->
+<!--                        <li class="list-group-item text-danger small"-->
+<!--                            th:each="item : ${group.orderItems}"-->
+<!--                            th:if="${item.status == T(com.something.restaurantpos.entity.OrderItem.ItemStatus).CANCELED}">-->
+<!--                            <span th:text="${item.menuItem.name}">Tên món</span> - -->
+<!--                            <span th:text="'SL: ' + ${item.quantity}">SL: 1</span>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+<!--                    <form th:action="@{'/kitchen/dashboard/orderItem/' + ${group.orderItems[0].id} + '/delete'}"-->
+<!--                          method="post"-->
+<!--                          onsubmit="return confirm('Ẩn đơn này khỏi màn hình bếp?')">-->
+<!--                        <input type="hidden" name="date" th:value="${currentDate}" />-->
+<!--                        <input type="hidden" name="filter" th:value="${currentFilter}" />-->
+<!--                        <button type="submit" class="btn btn-outline-danger btn-sm mt-2">🗑️ Đóng (ẩn)</button>-->
+<!--                    </form>-->
+
+<!--                </div>-->
             </div>
         </div>
     </div>
 </div>
 
-<!-- Âm thanh cảnh báo -->
-<audio id="notifySound" src="https://www.myinstants.com/media/sounds/bell-notification.mp3" preload="auto"></audio>
 <script>
     function playNotify() {
         document.getElementById("notifySound").play();
@@ -251,5 +256,7 @@
 
 
 </script>
+
+
 </body>
 </html>
