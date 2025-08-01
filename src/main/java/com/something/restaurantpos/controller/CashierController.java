@@ -54,11 +54,8 @@ public class CashierController {
     private IMenuItemRepository menuItemRepository;
 
     @GetMapping("/dashboard")
-    public String dashboard(Model model, Authentication authentication) {
-        String username = authentication.getName();
-        String employeeName = userDetailsService.getEmployeeNameByUsername(username);
-        model.addAttribute("employeeName", employeeName);
-        return "pages/cashier/dashboard";
+    public String dashboard() {
+        return "redirect:/cashier/tables";
     }
     @GetMapping("/invoices")
     public String listInvoices(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, Model model) {

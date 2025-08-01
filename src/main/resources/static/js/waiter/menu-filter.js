@@ -15,7 +15,7 @@ export function initCategoryFilters() {
 function filterMenu(query) {
     const q = query.toLowerCase();
     document.querySelectorAll("#menuContainer .menu-item").forEach(item => {
-        const name = item.querySelector("h6").innerText.toLowerCase();
+        const name = item.querySelector("h5").innerText.toLowerCase();
         item.closest(".col-md-4").style.display = name.includes(q) ? 'block' : 'none';
     });
 }
