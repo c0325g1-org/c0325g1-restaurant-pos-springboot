@@ -42,14 +42,22 @@ public class KitchenController {
         }
         List<OrderItem> allItems = orderItemService.findAllCreatedAtOnDateAndStatus(date, status);
         List<GroupedKitchenOrderDTO> groupedOrders = groupOrdersByTableAndTime(allItems);
+        List<GroupedKitchenOrderDTO> visibleGroups = groupedOrders.stream()
+                .filter(this::shouldDisplayGroup)
+                .toList(); // hoặc .collect(Collectors.toList()) nếu dùng Java < 16
 
-        model.addAttribute("groupedOrders", groupedOrders);
+        model.addAttribute("groupedOrders", visibleGroups);
+
         model.addAttribute("allItems", allItems);
         model.addAttribute("currentFilter", filter);
         model.addAttribute("selectedDate", date.toString());
         model.addAttribute("currentDate", date);
 
         return "pages/kitchen/dashboard";
+    }
+    private boolean shouldDisplayGroup(GroupedKitchenOrderDTO group) {
+        return group.getOrderItems().stream()
+                .anyMatch(item -> !item.isDeleted() && item.getStatus() != OrderItem.ItemStatus.SERVED);
     }
 
     private List<GroupedKitchenOrderDTO> groupOrdersByTableAndTime( List<OrderItem> allItems) {

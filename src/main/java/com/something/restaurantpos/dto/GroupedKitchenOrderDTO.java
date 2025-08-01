@@ -20,5 +20,10 @@ public class GroupedKitchenOrderDTO {
     public Integer getOrderId() {
         return orderItems.get(0).getOrder().getId(); // Vì tất cả item trong group đều cùng 1 order
     }
+    public boolean hasUnservedItems() {
+        return orderItems.stream()
+                .anyMatch(item -> !item.isDeleted() && item.getStatus() != OrderItem.ItemStatus.SERVED);
+    }
+
 
 }
