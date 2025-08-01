@@ -6,7 +6,6 @@ import com.something.restaurantpos.entity.Payment;
 import com.something.restaurantpos.repository.IIPaymentRepository;
 import com.something.restaurantpos.repository.IInvoiceRepository;
 import com.something.restaurantpos.service.IPaymentService;
-import com.something.restaurantpos.service.IService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

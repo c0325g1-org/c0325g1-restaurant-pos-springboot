@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -28,7 +26,6 @@ public class CashierTableController {
         private final IInvoiceService invoiceService;
         @GetMapping
         public String listTables(Model model) {
-
             model.addAttribute("tables", diningTableService.findAll());
             return "pages/cashier/table-list";
         }
