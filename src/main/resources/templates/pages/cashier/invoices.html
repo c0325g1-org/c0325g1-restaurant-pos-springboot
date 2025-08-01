@@ -44,13 +44,13 @@
                     <span th:if="${!invoice.paid}" class="badge bg-warning text-dark">Chưa thanh toán</span>
                 </td>
                 <td class="d-flex flex-column flex-md-row gap-2 justify-content-center">
-                    <a class="btn btn-outline-primary btn-sm"
+                    <a class="btn btn-outline-primary btn-sm" title="Xem chi tiết" data-bs-title="Xem chi tiết"
                        th:href="@{'/cashier/' + ${invoice.id}+'/invoice'}">
                         <i class="bi bi-eye"></i>
                     </a>
                     <th:block>
                         <button class="btn btn-success btn-sm"
-                                data-bs-toggle="modal"
+                                data-bs-toggle="modal" title="Thanh toán" data-bs-title="Thanh toán"
                                 th:attr="data-bs-target='#checkoutModal__' + ${invoice.id}"
                                 th:classappend="${invoice.paid ? 'disabled' : ''}">
                             <i class="bi bi-cash-coin"></i>
