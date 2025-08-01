@@ -96,7 +96,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Giá</label>
+                        <label class="form-label fw-semibold">Giá(VNĐ)</label>
                         <input type="text" id="priceInput" class="form-control" th:field="*{price}" placeholder="Nhập giá">
                         <div class="text-danger small" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
                     </div>

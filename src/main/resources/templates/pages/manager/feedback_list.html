@@ -1,0 +1,49 @@
+<html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Trang chủ - Quản lý</title>
+</head>
+<div layout:fragment="content">
+    <div class="mt-5">
+        <h2 class="mb-3">Danh sách đánh giá</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-striped align-middle">
+                <thead class="table-dark text-center">
+                <tr>
+                    <th scope="col">STT</th>
+                    <th scope="col">Ngày</th>
+                    <th scope="col">Đánh giá</th>
+                    <th scope="col">Hình ảnh</th>
+                    <th scope="col">Ghi chú</th>
+                </tr>
+                </thead>
+                <tbody th:each="feedback, iterStat : ${feedbacks}">
+                <tr class="text-center">
+                    <td th:text="${iterStat.count}">1</td>
+                    <td th:text="${feedback.createdAt}"></td>
+                    <td th:title="${feedback.rating + ' sao'}">
+                        <!-- Sao vàng: rating đã chấm -->
+                        <span th:each="i : ${#numbers.sequence(1, feedback.rating)}"><i
+                                class="bi bi-star-fill text-warning"></i></span>
+                        <!-- Sao xám: còn lại đến 5 sao -->
+                        <span th:if="${feedback.rating < 5}"
+                              th:each="i : ${#numbers.sequence(1, 5 - feedback.rating)}"><i
+                                class="bi bi-star text-secondary"></i></span>
+                    </td>
+                    <td>
+                        <img th:if="${feedback.imagePath != null}"
+                             th:src="${feedback.imagePath}"
+                             alt="Ảnh minh họa"
+                             class="img-thumbnail"
+                             style="max-width: 120px; max-height: 120px; object-fit: cover;">
+                    </td>
+
+                    <td th:text="${feedback.content}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</html>
+
+

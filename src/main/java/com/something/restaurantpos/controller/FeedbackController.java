@@ -15,19 +15,25 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/feedback")
 public class FeedbackController {
+    
     @Autowired
     private IOrderRepository orderRepository;
-    @Autowired private IFeedbackService feedbackService;
+    
+    @Autowired 
+    private IFeedbackService feedbackService;
+    
     @Autowired
     private CloudinaryService cloudinaryService;
+
+    @GetMapping("")
+    public String list(Model model) {
+        model.addAttribute("feedbacks", feedbackService.findAll());
+        return "pages/manager/feedback_list";
+    }
 
     @GetMapping("/verify")
     public String verify(@RequestParam("uuid") String uuid, Model model) {
