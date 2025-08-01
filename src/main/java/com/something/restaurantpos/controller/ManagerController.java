@@ -26,7 +26,6 @@ public class ManagerController {
     public String dashboard(Model model) {
         model.addAttribute("feedbacks", feedbackService.findAll());
         model.addAttribute("invoices", invoiceService.findAll());
-        model.addAttribute("orders", orderService.findAll());
         return "pages/manager/dashboard";
     }
     
