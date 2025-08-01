@@ -141,6 +141,21 @@
 </div>
 <th:block th:replace="fragments/manager/script :: script"></th:block>
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const priceInput = document.getElementById('priceInput');
+        let value = priceInput.value;
+
+        // Chuyển giá trị số thành định dạng có dấu phân cách hàng nghìn, bỏ phần thập phân
+        if (value) {
+            let num = parseFloat(value);
+            priceInput.value = num.toLocaleString('vi-VN', {maximumFractionDigits: 0});
+        }
+
+        // Nếu muốn cho phép người dùng nhập lại số, bạn nên xử lý JS để remove định dạng khi focus, hoặc khi submit...
+    });
+
+</script>
 </html>
 <!--<div class="mb-3">-->
 
