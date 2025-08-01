@@ -92,16 +92,12 @@ public class InvoiceServiceImpl implements IInvoiceService {
                 .collect(Collectors.toList());
 
         orderItemRepository.deleteAll(itemsToDelete);
-
-        // Lưu đơn hàng trước
-        orderRepository.save(order); // 🔥 THÊM DÒNG NÀY
-
+        orderRepository.save(order);
         BigDecimal total = updatedItems.stream()
                 .map(i -> i.getPrice().multiply(BigDecimal.valueOf(i.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         invoice.setTotalAmount(total);
-
-        invoiceRepository.save(invoice); // lưu invoice cuối cùng
+        invoiceRepository.save(invoice);
     }
 
     @Override
@@ -118,8 +114,6 @@ public class InvoiceServiceImpl implements IInvoiceService {
         if (invoice.isPaid()) {
             throw new IllegalStateException("Hóa đơn đã được thanh toán!");
         }
-
-        // Cập nhật hóa đơn
         invoice.setTotalAmount(dto.getAmount());
         invoice.setPaid(true);
         invoiceRepository.save(invoice);
@@ -130,8 +124,6 @@ public class InvoiceServiceImpl implements IInvoiceService {
         DiningTable table = order.getTable();
         table.setStatus(DiningTable.TableStatus.EMPTY);
         tableRepository.save(table);
-
-        // Ghi log thanh toán nếu có bảng `payment`
         Payment payment = new Payment();
         payment.setInvoice(invoice);
         payment.setAmount(dto.getAmount());
@@ -204,10 +196,9 @@ public class InvoiceServiceImpl implements IInvoiceService {
         dto.setTableName(invoice.getOrder().getTable().getName());
         dto.setEmployeeName(invoice.getOrder().getEmployee().getName());
         dto.setOrderTime(invoice.getOrder().getCreatedAt());
-
         List<OrderItem> orderItems = orderItemRepository.findAllByOrder_Id(invoice.getOrder().getId());
         List<OrderItemDTO> itemDtos = orderItems.stream()
-                .filter(orderItem -> "SERVED".equals(orderItem.getStatus().name())) // 🔥 Chỉ lấy món SERVED
+                .filter(orderItem -> "SERVED".equals(orderItem.getStatus().name()))
                 .map(orderItem -> {
                     OrderItemDTO itemDto = new OrderItemDTO();
                     itemDto.setMenuItemName(orderItem.getMenuItem().getName());
@@ -215,14 +206,11 @@ public class InvoiceServiceImpl implements IInvoiceService {
                     itemDto.setPrice(orderItem.getPrice());
                     return itemDto;
                 }).collect(Collectors.toList());
-
         dto.setOrderItems(itemDtos);
         BigDecimal totalAmount = itemDtos.stream()
                 .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
         dto.setTotalAmount(totalAmount);
-
         return dto;
     }
 

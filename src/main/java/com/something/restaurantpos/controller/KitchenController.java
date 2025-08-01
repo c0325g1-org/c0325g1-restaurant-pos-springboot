@@ -1,7 +1,6 @@
 package com.something.restaurantpos.controller;
 
 import com.something.restaurantpos.dto.GroupedKitchenOrderDTO;
-import com.something.restaurantpos.dto.KitchenOrderDTO;
 import com.something.restaurantpos.entity.OrderItem;
 import com.something.restaurantpos.service.IKitchenService;
 import com.something.restaurantpos.service.IOrderItemService;
@@ -43,8 +42,12 @@ public class KitchenController {
         }
         List<OrderItem> allItems = orderItemService.findAllCreatedAtOnDateAndStatus(date, status);
         List<GroupedKitchenOrderDTO> groupedOrders = groupOrdersByTableAndTime(allItems);
+        List<GroupedKitchenOrderDTO> visibleGroups = groupedOrders.stream()
+                .filter(this::shouldDisplayGroup)
+                .toList(); // hoặc .collect(Collectors.toList()) nếu dùng Java < 16
 
-        model.addAttribute("groupedOrders", groupedOrders);
+        model.addAttribute("groupedOrders", visibleGroups);
+
         model.addAttribute("allItems", allItems);
         model.addAttribute("currentFilter", filter);
         model.addAttribute("selectedDate", date.toString());
@@ -52,12 +55,19 @@ public class KitchenController {
 
         return "pages/kitchen/dashboard";
     }
+    private boolean shouldDisplayGroup(GroupedKitchenOrderDTO group) {
+        return group.getOrderItems().stream()
+                .anyMatch(item -> !item.isDeleted() && item.getStatus() != OrderItem.ItemStatus.SERVED);
+    }
 
     private List<GroupedKitchenOrderDTO> groupOrdersByTableAndTime( List<OrderItem> allItems) {
         List<GroupedKitchenOrderDTO> groupedKitchenOrderDTOS = new ArrayList<>();
         List<OrderItem> orderItems = new ArrayList<>();
         int currentIndex = 0;
         for (OrderItem item : allItems){
+            if (item.isDeleted()) {
+                continue;
+            }
             if (groupedKitchenOrderDTOS.isEmpty()){
                 orderItems.add(item);
                 groupedKitchenOrderDTOS.add(new GroupedKitchenOrderDTO(
@@ -122,6 +132,21 @@ public class KitchenController {
         redirectAttributes.addFlashAttribute("success", "Đã hoàn tác trạng thái món.");
         return "redirect:/kitchen/dashboard?filter=" + filter + "&date=" + date;
     }
+
+    @PostMapping("/hide/orderItem")
+    @Transactional
+    public String hideOrderFromKitchen(
+            @RequestParam("orderId") Integer id,
+            @RequestParam("filter") String filter,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            RedirectAttributes redirectAttributes
+    ) {
+        kitchenService.softDeleteOrderItem(id);
+        redirectAttributes.addFlashAttribute("success", "Đã ẩn món khỏi màn hình bếp.");
+        return "redirect:/kitchen/dashboard?filter=" + filter + "&date=" + date;
+    }
+
+
 
 
 
