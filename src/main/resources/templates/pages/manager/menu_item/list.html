@@ -1,191 +1,139 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
 <head>
-    <th:block th:replace="fragments/manager/head :: head ('Danh sách món ăn')"></th:block>
+    <title>Món ăn - Quản lý</title>
 </head>
-<body>
-<div class="sidebar" th:replace="~{fragments/manager/sidebar :: sidebar}"></div>
-<div class="main-content">
-    <div th:replace="~{fragments/manager/header :: header}"></div>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
 
-    <main class="container py-4">
-        <h2 class="fw-bold">Danh sách món ăn</h2>
-        <!-- Header + Thêm mới + Form tìm kiếm trên cùng một hàng -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <a class="btn btn-success shadow-sm" th:href="@{/manager/menu_items/save}">
+            <i class="bi bi-plus-lg"></i> Thêm mới
+        </a>
+        <div class="d-flex gap-2 align-items-center">
+            <!-- Nút thêm mới bên trái -->
 
-            <a class="btn btn-success shadow-sm" th:href="@{/manager/menu_items/save}">
-                <i class="bi bi-plus-lg"></i> Thêm mới
-            </a>
-            <div class="d-flex gap-2 align-items-center">
-                <!-- Nút thêm mới bên trái -->
-
-                <!-- Form tìm kiếm bên phải -->
-                <form method="get" action="/manager/menu_items" class="d-flex align-items-center gap-2">
-                    <input type="text" th:value="${keyword}" name="keyword"
-                           class="form-control form-control-sm"
-                           placeholder="Tìm theo tên" style="width: 200px;">
-                    <select name="categoryId" class="form-select form-select-sm" style="width: 200px;">
-                        <option value="" th:selected="${categoryId==null or categoryId==''}">Tất cả loại</option>
-                        <option th:each="temp : ${categories}" th:text="${temp.name}" th:value="${temp.id}"
-                                th:selected="${temp.id==categoryId}"></option>
-                    </select>
-                    <button type="submit" class="btn btn-sm btn-success d-flex align-items-center">
-                        <i class="bi bi-search me-1"></i> Tìm kiếm
-                    </button>
-                </form>
+            <!-- Form tìm kiếm bên phải -->
+            <form method="get" action="/manager/menu_items" class="d-flex align-items-center gap-2">
+                <input type="text" th:value="${keyword}" name="keyword"
+                       class="form-control form-control-sm"
+                       placeholder="Tìm theo tên" style="width: 200px;">
+                <select name="categoryId" class="form-select form-select-sm" style="width: 200px;">
+                    <option value="" th:selected="${categoryId==null or categoryId==''}">Tất cả loại</option>
+                    <option th:each="temp : ${categories}" th:text="${temp.name}" th:value="${temp.id}"
+                            th:selected="${temp.id==categoryId}"></option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-success d-flex align-items-center">
+                    <i class="bi bi-search me-1"></i> Tìm kiếm
+                </button>
+            </form>
 
 
-            </div>
         </div>
+    </div>
 
-            <!-- Nút Thùng rác nằm xuống dưới bên phải -->
-            <div class="d-flex justify-content-end mb-3">
-                <a class="btn btn-danger" th:href="@{/manager/menu_items/trash}">
-                    <i class="bi bi-trash3"></i>
-                    Thùng rác
-                    <span th:if="${trashCount > 0}">(<span th:text="${trashCount}">1</span>)</span>
-                </a>
-            </div>
+    <!-- Nút Thùng rác nằm xuống dưới bên phải -->
+    <div class="d-flex justify-content-end mb-3">
+        <a class="btn btn-danger" th:href="@{/manager/menu_items/trash}">
+            <i class="bi bi-trash3"></i>
+            Thùng rác
+            <span th:if="${trashCount > 0}">(<span th:text="${trashCount}">1</span>)</span>
+        </a>
+    </div>
 
 
 
 
-        <table class="table table-hover table-striped shadow-sm rounded bg-white">
-            <thead class="table-dark text-center">
-            <tr>
-                <th>STT</th>
-                <th>Tên</th>
-                <th>Mô tả</th>
-                <th>Giá (VND)</th>
-                <th>Hình ảnh</th>
-                <th>Loại</th>
-                <th>Trạng thái</th>
-                <th>Chỉnh sửa</th>
-                <th>Xóa</th>
-            </tr>
-            </thead>
-            <tbody class="align-middle text-center">
-            <tr th:each="menu, status : ${menuItems}">
-                <td th:text="${status.count}"></td>
-                <td th:text="${menu.name}"></td>
-                <td th:text="${menu.description}"></td>
-                <td th:text="${#numbers.formatDecimal(menu.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
-                <td>
-                    <img th:src="${menu.imageUrl}"
-                         alt="Hình ảnh món ăn"
-                         class="img-thumbnail"
-                         style="width: 100px; height: 100px; object-fit: cover;">
-                </td>
-                <td th:text="${menu.category.name}"></td>
-                <td>
+    <table class="table table-hover table-striped shadow-sm rounded bg-white">
+        <thead class="table-dark text-center">
+        <tr>
+            <th>STT</th>
+            <th>Tên</th>
+            <th>Mô tả</th>
+            <th>Giá (VND)</th>
+            <th>Hình ảnh</th>
+            <th>Loại</th>
+            <th>Trạng thái</th>
+            <th>Chỉnh sửa</th>
+            <th>Xóa</th>
+        </tr>
+        </thead>
+        <tbody class="align-middle text-center">
+        <tr th:each="menu, status : ${menuItems}">
+            <td th:text="${status.count}"></td>
+            <td th:text="${menu.name}"></td>
+            <td th:text="${menu.description}"></td>
+            <td th:text="${#numbers.formatDecimal(menu.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+            <td>
+                <img th:src="${menu.imageUrl}"
+                     alt="Hình ảnh món ăn"
+                     class="img-thumbnail"
+                     style="width: 100px; height: 100px; object-fit: cover;">
+            </td>
+            <td th:text="${menu.category.name}"></td>
+            <td>
                 <span th:text="${menu.isAvailable ? 'Đang bán' : 'Đã hết'}"
                       th:classappend="${menu.isAvailable} ? 'badge bg-success' : 'badge bg-secondary'"></span>
-                </td>
-                <td><a th:href="@{/manager/menu_items/{id}/edit(id=${menu.id})}"
-                       class="btn btn-outline-primary btn-sm me-1"
-                       data-bs-toggle="tooltip"
-                       title="Sửa"
-                       th:attr="data-bs-title='Sửa voucher ' + ${menu.name}">
-                    <i class="bi bi-pencil-square"></i>
-                </a></td>
-                <td>
-                    <button type="button"
-                            class="btn btn-outline-danger btn-sm"
-                            data-bs-toggle="modal"
-                            data-bs-target="#deleteModal"
-                            title="Xoá"
-                            th:attr="data-id=${menu.id}, data-title=${menu.name}, data-bs-title='Xóa món ăn ' + ${menu.name}">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </td>
+            </td>
+            <td><a th:href="@{/manager/menu_items/{id}/edit(id=${menu.id})}"
+                   class="btn btn-outline-primary btn-sm me-1"
+                   data-bs-toggle="tooltip"
+                   title="Sửa"
+                   th:attr="data-bs-title='Sửa voucher ' + ${menu.name}">
+                <i class="bi bi-pencil-square"></i>
+            </a></td>
+            <td>
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal"
+                        title="Xoá"
+                        th:attr="data-id=${menu.id}, data-title=${menu.name}, data-bs-title='Xóa món ăn ' + ${menu.name}">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
 
-            </tr>
-            </tbody>
-        </table>
-        <nav th:if="${menuItems.totalPages > 1}" aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                <li class="page-item" th:classappend="${menuItems.first} ? 'disabled'">
-                    <a class="page-link" th:href="@{/manager/menu_items(page=${menuItems.number - 1},
+        </tr>
+        </tbody>
+    </table>
+    <nav th:if="${menuItems.totalPages > 1}" aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${menuItems.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/manager/menu_items(page=${menuItems.number - 1},
                   keyword=${param.keyword}, categoryId=${param.categoryId})}">Trước</a>
-                </li>
-                <li th:each="pageNum : ${#numbers.sequence(0, menuItems.totalPages - 1)}"
-                    class="page-item"
-                    th:classappend="${pageNum == menuItems.number} ? 'active'">
-                    <a class="page-link"
-                       th:href="@{/manager/menu_items(page=${pageNum}, keyword=${param.keyword}, categoryId=${param.categoryId})}"
-                       th:text="${pageNum + 1}">1</a>
-                </li>
-                <li class="page-item" th:classappend="${menuItems.last} ? 'disabled'">
-                    <a class="page-link" th:href="@{/manager/menu_items(page=${menuItems.number + 1},
+            </li>
+            <li th:each="pageNum : ${#numbers.sequence(0, menuItems.totalPages - 1)}"
+                class="page-item"
+                th:classappend="${pageNum == menuItems.number} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/manager/menu_items(page=${pageNum}, keyword=${param.keyword}, categoryId=${param.categoryId})}"
+                   th:text="${pageNum + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${menuItems.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/manager/menu_items(page=${menuItems.number + 1},
                   keyword=${param.keyword}, categoryId=${param.categoryId})}">Sau</a>
-                </li>
-            </ul>
-        </nav>
-        <!-- Modal xác nhận xoá-->
-
-        <div th:fragment="deleteModal (entityDisplayName)" class="modal fade" id="deleteModal" tabindex="-1"
-             aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content border-0 shadow">
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title">Xác nhận xóa</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        Bạn có chắc muốn xóa <span th:text="${entityDisplayName}"></span> <strong id="modalTitle"
-                                                                                                  class="text-danger"></strong>
-                        không?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <form id="deleteForm" method="post">
-                            <button type="submit" class="btn btn-danger">Xác nhận</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <!--            <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">-->
-        <!--                <div class="modal-dialog">-->
-        <!--                    <div class="modal-content">-->
-        <!--                        <div class="modal-header bg-danger text-white">-->
-        <!--                            <h5 class="modal-title" id="deleteModalLabel">Xác nhận xoá</h5>-->
-        <!--                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>-->
-        <!--                        </div>-->
-        <!--                        <div class="modal-body">-->
-        <!--                           Món ăn này của bạn đã hết?-->
-        <!--                        </div>-->
-        <!--                        <div class="modal-footer">-->
-        <!--                            <form id="deleteForm" method="post">-->
-        <!--                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>-->
-        <!--                                <button type="submit" class="btn btn-danger">Xoá</button>-->
-        <!--                            </form>-->
-        <!--                        </div>-->
-        <!--                    </div>-->
-        <!--                </div>-->
-        <!--            </div>-->
-
-    </main>
-    <div th:replace="~{fragments/manager/footer :: footer}"></div>
+            </li>
+        </ul>
+    </nav>
 </div>
-<div th:replace="~{fragments/shared/toast :: toast}"></div>
 
-<th:block th:replace="~{fragments/manager/script :: script}"></th:block>
+<th:block layout:fragment="modal">
+    <div th:replace="~{fragments/shared/delete_modal :: deleteModal ('món ăn')}"></div>
+</th:block>
 
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const deleteModal = document.getElementById('deleteModal');
-        deleteModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const id = button.getAttribute('data-id');
-            const title = button.getAttribute('data-title');
-            deleteModal.querySelector('#modalTitle').textContent = title;
-            deleteModal.querySelector('#deleteForm').setAttribute('action', '/manager/menu_items/' + id + '/delete');
+<th:block layout:fragment="script">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteModal = document.getElementById('deleteModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                const title = button.getAttribute('data-title');
+                deleteModal.querySelector('#modalTitle').textContent = title;
+                deleteModal.querySelector('#deleteForm').setAttribute('action', '/manager/menu_items/' + id + '/delete');
+            });
         });
-    });
-</script>
-</body>
+    </script>
+</th:block>
 </html>
+
+
+

@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
 <head>
-    <th:block th:replace="fragments/manager/head :: head ('Danh sách mã giảm giá')"></th:block>
+    <title>Thêm mới món ăn - Quản lý</title>
     <style>
         .form-wrapper {
             max-width: 900px;
@@ -25,8 +24,6 @@
             border-color: #0d6efd;
             box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
         }
-
-        /* Đảm bảo không cần cuộn */
         body, html {
             height: 100%;
             margin: 0;
@@ -38,7 +35,6 @@
             height: 100vh;
             overflow: auto;
         }
-
         .image-preview {
             width: 100%;
             height: auto;
@@ -47,96 +43,176 @@
         }
     </style>
 </head>
-<body>
-<div class="sidebar" th:replace="~{fragments/manager/sidebar :: sidebar}"></div>
-<div class="main-content">
-    <div th:replace="~{fragments/manager/header :: header}"></div>
+<div layout:fragment="content">
+    <div class="form-wrapper bg-white p-4 rounded shadow-sm">
+        <h2 class="form-title mb-4">Thêm mới món ăn</h2>
+        <form th:action="@{/manager/menu_items/save}"
+              th:object="${menuItemDTO}" method="post" enctype="multipart/form-data" novalidate>
+            <div class="row">
+                <!-- Cột trái: Hình ảnh -->
+                <div class="col-md-6 text-center">
+                    <label class="form-label fw-semibold">Hình Ảnh</label>
+                    <input type="file" name="image" id="imageInput" accept="image/*" class="form-control mb-3"
+                           th:field="*{imageUrl}"/>
 
+                    <!-- Vùng hiển thị ảnh -->
+                    <div class="mt-3">
+                        <img id="previewImage" style="max-width: 100%; max-height: 300px;" />
+                    </div>
 
-    <main class="container py-4">
-        <div class="form-wrapper bg-white p-4 rounded shadow-sm">
-            <h2 class="form-title mb-4">Thêm mới món ăn</h2>
-            <form th:action="@{/manager/menu_items/save}"
-                  th:object="${menuItemDTO}" method="post" enctype="multipart/form-data" novalidate>
-                <div class="row">
-                    <!-- Cột trái: Hình ảnh -->
-                    <div class="col-md-6 text-center">
-                        <label class="form-label fw-semibold">Hình Ảnh</label>
-                        <input type="file" name="image" id="imageInput" accept="image/*" class="form-control mb-3"
-                               th:field="*{imageUrl}"/>
-
-                        <!-- Vùng hiển thị ảnh -->
-                        <div class="mt-3">
-                            <img id="previewImage" style="max-width: 100%; max-height: 300px;" />
-                        </div>
-
-                        <!-- Modal crop -->
-                        <div class="modal fade" id="cropModal" tabindex="-1">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-body">
-                                        <div>
-                                            <img id="imageToCrop" style="max-width: 100%;" />
-                                        </div>
-                                        <button type="button" class="btn btn-primary mt-3" id="cropBtn">Cắt và xem trước</button>
+                    <!-- Modal crop -->
+                    <div class="modal fade" id="cropModal" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <div>
+                                        <img id="imageToCrop" style="max-width: 100%;" />
                                     </div>
+                                    <button type="button" class="btn btn-primary mt-3" id="cropBtn">Cắt và xem trước</button>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Hidden input để submit ảnh đã crop -->
-                        <input type="hidden" name="croppedImage" id="croppedImage"/>
-                        <div class="text-danger small" th:if="${#fields.hasErrors('imageUrl')}" th:errors="*{imageUrl}"></div>
                     </div>
 
-                    <!-- Cột phải: Form nhập -->
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Tên món ăn</label>
-                            <input type="text" class="form-control" th:field="*{name}" placeholder="Nhập tên món">
-                            <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-                        </div>
+                    <!-- Hidden input để submit ảnh đã crop -->
+                    <input type="hidden" name="croppedImage" id="croppedImage"/>
+                    <div class="text-danger small" th:if="${#fields.hasErrors('imageUrl')}" th:errors="*{imageUrl}"></div>
+                </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Mô tả</label>
-                            <textarea class="form-control" th:field="*{description}" rows="3" placeholder="Nhập mô tả"></textarea>
-                            <div class="text-danger small" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
-                        </div>
+                <!-- Cột phải: Form nhập -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tên món ăn</label>
+                        <input type="text" class="form-control" th:field="*{name}" placeholder="Nhập tên món">
+                        <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Giá(VNĐ)</label>
-                            <input type="text"  id="priceInput" class="form-control" th:field="*{price}" placeholder="Nhập giá">
-                            <div class="text-danger small" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Mô tả</label>
+                        <textarea class="form-control" th:field="*{description}" rows="3" placeholder="Nhập mô tả"></textarea>
+                        <div class="text-danger small" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Loại món</label>
-                            <select class="form-select" th:field="*{category}">
-                                <option value="">Tất cả loại</option>
-                                <option th:each="temp : ${menuCategoryList}"
-                                        th:text="${temp.name}"
-                                        th:value="${temp.id}">
-                                </option>
-                            </select>
-                            <div class="text-danger small" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Giá</label>
+                        <input type="text"  id="priceInput" class="form-control" th:field="*{price}" placeholder="Nhập giá">
+                        <div class="text-danger small" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+                    </div>
 
-                        <div class="form-check form-switch mb-4">
-                            <input class="form-check-input" type="checkbox" role="switch" th:field="*{isAvailable}" id="isActive">
-                            <label class="form-check-label" for="isActive">Đang hoạt động</label>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Loại món</label>
+                        <select class="form-select" th:field="*{category}">
+                            <option value="">Tất cả loại</option>
+                            <option th:each="temp : ${menuCategoryList}"
+                                    th:text="${temp.name}"
+                                    th:value="${temp.id}">
+                            </option>
+                        </select>
+                        <div class="text-danger small" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
+                    </div>
 
-                        <div class="d-flex justify-content-between">
-                            <a class="btn btn-secondary" th:href="@{/manager/menu_items}">Quay lại</a>
-                            <button class="btn btn-primary" type="submit">Lưu</button>
-                        </div>
+                    <div class="form-check form-switch mb-4">
+                        <input class="form-check-input" type="checkbox" role="switch" th:field="*{isAvailable}" id="isActive">
+                        <label class="form-check-label" for="isActive">Đang hoạt động</label>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a class="btn btn-secondary" th:href="@{/manager/menu_items}">Quay lại</a>
+                        <button class="btn btn-primary" type="submit">Lưu</button>
                     </div>
                 </div>
-            </form>
-        </div>
-    </main>
-    <div th:replace="~{fragments/manager/footer :: footer}"></div>
+            </div>
+        </form>
+    </div>
 </div>
-<th:block th:replace="fragments/manager/script :: script"></th:block>
-</body>
+
+<th:block layout:fragment="modal">
+
+</th:block>
+
+<th:block layout:fragment="script">
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
+    <script>
+        let cropper;
+        const imageInput = document.getElementById('imageInput');
+        const previewImage = document.getElementById('previewImage');
+        const imageToCrop = document.getElementById('imageToCrop');
+        const cropModal = new bootstrap.Modal(document.getElementById('cropModal'));
+        const cropBtn = document.getElementById('cropBtn');
+        const croppedImageInput = document.getElementById('croppedImage');
+        imageInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                imageToCrop.src = event.target.result;
+                cropModal.show();
+            };
+            reader.readAsDataURL(file);
+        });
+        // Khi modal hiện ra, khởi tạo cropper
+        document.getElementById('cropModal').addEventListener('shown.bs.modal', function () {
+            cropper = new Cropper(imageToCrop, {
+                aspectRatio: 1, // hoặc tỷ lệ bạn muốn
+                viewMode: 1,
+            });
+        });
+        // Khi crop xong
+        cropBtn.addEventListener('click', function () {
+            const canvas = cropper.getCroppedCanvas({
+                width: 400,
+                height: 400,
+            });
+
+            const croppedDataUrl = canvas.toDataURL('image/jpeg');
+            previewImage.src = croppedDataUrl;
+            croppedImageInput.value = croppedDataUrl;
+
+            cropModal.hide();
+            cropper.destroy();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const priceInput = document.getElementById('priceInput');
+            priceInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // tránh submit form
+                    formatCurrency();
+                }
+            });
+            function formatCurrency() {
+                let value = priceInput.value.replace(/\D/g, ''); // loại bỏ ký tự không phải số
+                if (value) {
+                    priceInput.value = Number(value).toLocaleString('vi-VN'); // format theo tiền tệ VN
+                }
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const priceInput = document.getElementById('priceInput');
+            // Khi nhấn Enter thì định dạng cho dễ nhìn
+            priceInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    formatCurrency();
+                }
+            });
+            // Khi submit form thì bỏ dấu chấm
+            const form = priceInput.closest('form');
+            form.addEventListener('submit', function () {
+                let raw = priceInput.value.replace(/\./g, '').replace(/\D/g, '');
+                priceInput.value = raw;
+            });
+            function formatCurrency() {
+                let value = priceInput.value.replace(/\D/g, '');
+                if (value) {
+                    priceInput.value = Number(value).toLocaleString('vi-VN');
+                }
+            }
+        });
+    </script>
+</th:block>
 </html>
