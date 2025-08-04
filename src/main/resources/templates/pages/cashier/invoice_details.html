@@ -140,14 +140,13 @@
         Tổng cộng:
         <span th:text="${#numbers.formatDecimal(invoice.totalAmount, 1, 'POINT', 0, 'COMMA')} + ' VND'"></span>
     </div>
-    <div class="invoice-summary mt-1">
-        Mã(
-        <label th:if="${invoice.getVoucher() != null}"
-              th:text="${invoice.voucher.discountPercent + '%'}">
-            </label>
-        <span th:if="${invoice.voucher == null}">Không áp dụng</span>
-        ):<label th:text="${#numbers.formatDecimal(invoice.totalAmount*invoice.voucher.discountPercent*0.01, 1, 'POINT', 0, 'COMMA')} + ' VND'"></label>
+    <div class="invoice-summary mt-1" th:if="${invoice.voucher != null}">
+        Mã (
+        <label th:text="${invoice.voucher.discountPercent + '%'}"></label>
+        ):
+        <span th:text="${#numbers.formatDecimal(invoice.totalAmount * invoice.voucher.discountPercent * 0.01, 1, 'POINT', 0, 'COMMA')} + ' VND'"></span>
     </div>
+
 
     <div class="invoice-summary mt-1">
         Tổng hóa đơn:
@@ -230,7 +229,10 @@
                                 <div class="mb-3">
                                     <label class="form-label">Số tiền thanh toán</label>
                                     <input type="text" class="form-control" name="amount"
-                                           th:value="${#numbers.formatDecimal(invoice.totalAmount - invoice.totalAmount * invoice.getVoucher().discountPercent*0.01, 0, 'COMMA', 0, 'POINT')} + ' VNĐ' ">
+                                           th:value="${invoice.voucher != null ?
+                  #numbers.formatDecimal(invoice.totalAmount - invoice.totalAmount * invoice.voucher.discountPercent * 0.01, 0, 'COMMA', 0, 'POINT') + ' VNĐ' :
+                  #numbers.formatDecimal(invoice.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">
+
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -244,7 +246,7 @@
         </div>
 
         <!-- Nút quay lại -->
-        <a th:href="@{/cashier/invoices}" class="btn btn-link btn-sm mt-2">← Quay lại danh sách</a>
+        <a href="#" onclick="window.history.back()" class="btn btn-link btn-sm mt-2">← Quay lại danh sách</a>
     </div>
 </div>
 
@@ -256,27 +258,49 @@
         if (btn) {
             btn.addEventListener("click", function () {
                 const invoiceElement = document.getElementById("invoice-area");
+
                 html2canvas(invoiceElement, {
                     scale: 3,
                     useCORS: true
-                }).then(canvas => {
-                    const imgData = canvas.toDataURL("image/png");
+                }).then(originalCanvas => {
+                    const dpi = 96;
+                    const pixelsPerMm = dpi / 25.4;
+                    const cutHeightPx = 20 * pixelsPerMm;
+
+                    const croppedHeight = originalCanvas.height - cutHeightPx;
+
+                    const croppedCanvas = document.createElement("canvas");
+                    croppedCanvas.width = originalCanvas.width;
+                    croppedCanvas.height = croppedHeight;
+
+                    const ctx = croppedCanvas.getContext("2d");
+                    ctx.drawImage(
+                        originalCanvas,
+                        0, 0,
+                        originalCanvas.width, croppedHeight,
+                        0, 0,
+                        originalCanvas.width, croppedHeight
+                    );
+
+                    const imgData = croppedCanvas.toDataURL("image/png");
+
+                    // Tính kích thước ảnh theo mm để đặt chiều cao PDF chính xác
+                    const mmWidth = 80;
+                    const mmHeight = (croppedHeight / croppedCanvas.width) * mmWidth;
+
                     const pdf = new jspdf.jsPDF({
                         orientation: 'portrait',
                         unit: 'mm',
-                        format: [80, 296]
+                        format: [mmWidth, mmHeight-40]
                     });
 
-                    const pageWidth = pdf.internal.pageSize.getWidth();
-                    const imgWidth = pageWidth;
-                    const imgHeight = canvas.height * imgWidth / canvas.width;
-
-                    pdf.addImage(imgData, 'PNG', 0, 10, imgWidth, imgHeight);
+                    pdf.addImage(imgData, 'PNG', 0, 0, mmWidth, mmHeight);
                     pdf.save("hoa_don.pdf");
                 });
             });
         }
     });
+
 </script>
 
 </body>

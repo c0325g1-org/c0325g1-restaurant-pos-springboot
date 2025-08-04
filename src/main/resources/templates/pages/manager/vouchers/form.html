@@ -29,7 +29,7 @@
     <div class="form-wrapper bg-white p-4 rounded shadow-sm">
         <h2 class="form-title mb-4" th:text="${voucher.id == null ? 'Thêm mới mã giảm giá' : 'Chỉnh sửa mã giảm giá'}"></h2>
 
-        <form th:with="actionUrl=${voucher.id != null} ? '/manager/vouchers/' + voucher.id + '/edit' : '/manager/vouchers/create'"
+        <form th:with="actionUrl=${voucher.id != null} ? '/manager/vouchers/' + ${voucher.id} + '/edit' : '/manager/vouchers/create'"
               th:action="@{${actionUrl}}"
               th:object="${voucher}" method="post" novalidate>
             <div class="mb-3">

@@ -49,7 +49,7 @@
             <!-- Chọn Voucher -->
             <form th:action="@{/cashier/invoices/{id}/apply-voucher(id=${invoice.id})}" method="post" id="voucherForm">
                 <select name="voucherId" class="form-select" onchange="document.getElementById('voucherForm').submit()">
-                    <option value="">-- Chọn voucher --</option>
+                    <option value="-1">-- Chọn voucher --</option>
                     <option th:each="v : ${vouchers}"
                             th:value="${v.id}"
                             th:text="${v.code + ' - ' + v.discountPercent + '%'}"
@@ -81,7 +81,6 @@
 
                 <div class="d-flex gap-2">
                     <a th:href="@{'/cashier/invoices/print/'+${invoice.id} }"
-                       target="_blank"
                        class="btn btn-outline-secondary">
                         <i class="bi bi-printer"></i> In hoá đơn
                     </a>

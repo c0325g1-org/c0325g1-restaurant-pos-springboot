@@ -102,18 +102,15 @@ public class InvoiceServiceImpl implements IInvoiceService {
         invoice.setTotalAmount(total);
         invoiceRepository.save(invoice);
     }
-
     @Override
     @Transactional
     public void applyVoucher(Integer invoiceId, Integer voucherId) {
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
-
         Order order = invoice.getOrder();
         if (order == null) {
             throw new RuntimeException("Invoice has no associated order");
         }
-
         // Tính tổng tiền gốc từ danh sách OrderItem
         List<OrderItem> orderItems = orderItemRepository.findAllByOrder_Id(order.getId());
         BigDecimal originalTotal = orderItems.stream()
@@ -130,13 +127,10 @@ public class InvoiceServiceImpl implements IInvoiceService {
             boolean isValid = voucher.getIsActive()
                     && !voucher.getValidFrom().isAfter(LocalDateTime.now())
                     && !voucher.getValidTo().isBefore(LocalDateTime.now());
-
             if (!isValid) {
                 throw new RuntimeException("Voucher is not valid or expired");
             }
-
             invoice.setVoucher(voucher);
-
             // Áp dụng giảm giá
             BigDecimal discount = originalTotal.multiply(BigDecimal.valueOf(voucher.getDiscountPercent()))
                     .divide(BigDecimal.valueOf(100));
@@ -145,9 +139,7 @@ public class InvoiceServiceImpl implements IInvoiceService {
             invoice.setVoucher(null);
             invoice.setTotalAmount(originalTotal);
         }
-
         invoiceRepository.save(invoice);
-
     }
 
     @Override

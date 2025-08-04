@@ -72,12 +72,15 @@
             InvoiceDto dto = invoiceService.findDtoById(id);
             model.addAttribute("invoice", dto);
             model.addAttribute("vouchers", vouchers);
-            return "pages/cashier/checkout";
+            return "/pages/cashier/checkout";
         }
         @PostMapping("/invoices/{id}/apply-voucher")
         public String applyVoucher(@PathVariable Integer id,
                                    @RequestParam Integer voucherId,
                                    RedirectAttributes redirectAttributes,Model model) {
+            if(voucherId == -1){
+                voucherId = null;
+            }
             invoiceService.applyVoucher(id, voucherId);
             redirectAttributes.addFlashAttribute("success", "Áp dụng voucher thành công");
             return "redirect:/cashier/invoices/" + id + "/checkout";
@@ -98,7 +101,7 @@
             String qrBase64 = qrCodeService.generateQRCodeBase64(verifyUrl, 200, 200);
             model.addAttribute("qrCode", qrBase64);
 
-            return "pages/cashier/invoice_details";
+            return "/pages/cashier/invoice_details";
         }
 
 
