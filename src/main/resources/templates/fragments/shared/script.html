@@ -247,8 +247,7 @@
                 console.warn("Âm thanh chưa được bật do thiếu tương tác người dùng.");
                 return; // Hoặc push lại vào queue nếu cần
             }
-            const apiKey = 'AIzaSyAibQ6NZv3Nv-YRKrkuakTgXnzMMROw7fk';
-            const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
+            const url = `/api/tts`;
 
             const requestBody = {
                 input: {text},
