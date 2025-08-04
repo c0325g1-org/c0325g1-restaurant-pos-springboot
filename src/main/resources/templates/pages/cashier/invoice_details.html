@@ -42,7 +42,7 @@
         }
 
         .table {
-            font-size: 9pt;
+            font-size: 6pt;
             table-layout: fixed;
             width: 100%;
         }
@@ -50,7 +50,7 @@
         .table th, .table td {
             vertical-align: middle;
             text-align: center;
-            padding: 4px;
+            padding: 3px;
             word-wrap: break-word;
         }
 
@@ -61,12 +61,15 @@
 
         .col-qty {
             width: 15%;
-            font-size: 8pt;
+            font-weight: bold;
+            font-size: 6pt;
         }
 
         .col-price, .col-total {
             width: 17.5%;
-            font-size: 8pt;
+            font-size: 6pt;
+            font-weight: bold;
+            white-space: nowrap;
         }
 
         .header-title {
@@ -88,6 +91,15 @@
 
         .text-end {
             text-align: right;
+        }
+
+        .restaurant-info {
+            font-size: 8pt;
+            margin-top: 10px;
+            text-align: center;
+            line-height: 1.3;
+            border-top: 1px dashed #ccc;
+            padding-top: 6px;
         }
     </style>
 </head>
@@ -133,11 +145,19 @@
         <p class="m-0">Quét mã QR để thanh toán:</p>
         <img src="https://img.vietqr.io/image/mbbank-615892-compact2.jpg?amount=123000&addInfo=Thanh%20toan%20hoa%20don%20123&accountName=Nguyen%20Tien%20Quan"
              alt="QR Thanh toán" class="qr-code"/>
-
     </div>
+
     <div class="text-center mt-2">
         <p class="m-0">Quét mã QR để đánh giá:</p>
         <img th:src="'data:image/png;base64,' + ${qrCode}" alt="QR Code" class="qr-code m-0"/>
+    </div>
+
+    <!-- THÔNG TIN NHÀ HÀNG -->
+    <div class="restaurant-info">
+        <strong>Nhà hàng LEON</strong><br/>
+        Địa chỉ: 295 Nguyễn Văn Linh, Quận Hải Châu, tp.Đà Nẵng<br/>
+        Hotline: 0909 123 456<br/>
+        Xin cảm ơn quý khách!
     </div>
 
     <div class="text-center mt-3 no-print">
@@ -208,8 +228,8 @@
         <!-- Nút quay lại -->
         <a th:href="@{/cashier/invoices}" class="btn btn-link btn-sm mt-2">← Quay lại danh sách</a>
     </div>
-
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -219,14 +239,14 @@
             btn.addEventListener("click", function () {
                 const invoiceElement = document.getElementById("invoice-area");
                 html2canvas(invoiceElement, {
-                    scale: 3, // tăng độ phân giải (mặc định là 1)
-                    useCORS: true // để load được ảnh từ domain khác (ảnh QR)
+                    scale: 3,
+                    useCORS: true
                 }).then(canvas => {
                     const imgData = canvas.toDataURL("image/png");
                     const pdf = new jspdf.jsPDF({
                         orientation: 'portrait',
                         unit: 'mm',
-                        format: [80, 280] // Khổ in 80mm x chiều dài động (có thể để tối đa A4)
+                        format: [80, 285]
                     });
 
                     const pageWidth = pdf.internal.pageSize.getWidth();
@@ -236,15 +256,11 @@
                     pdf.addImage(imgData, 'PNG', 0, 10, imgWidth, imgHeight);
                     pdf.save("hoa_don.pdf");
                 });
-
             });
         }
     });
 </script>
 
 </body>
-<th:block th:replace="fragments/cashier/script :: script">
-
-
-</th:block>
+<th:block th:replace="fragments/cashier/script :: script"></th:block>
 </html>
