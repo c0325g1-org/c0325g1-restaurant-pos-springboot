@@ -140,7 +140,24 @@
         Tổng cộng:
         <span th:text="${#numbers.formatDecimal(invoice.totalAmount, 1, 'POINT', 0, 'COMMA')} + ' VND'"></span>
     </div>
+    <div class="invoice-summary mt-1">
+        Mã(
+        <label th:if="${invoice.getVoucher() != null}"
+              th:text="${invoice.voucher.discountPercent + '%'}">
+            </label>
+        <span th:if="${invoice.voucher == null}">Không áp dụng</span>
+        ):<label th:text="${#numbers.formatDecimal(invoice.totalAmount*invoice.voucher.discountPercent*0.01, 1, 'POINT', 0, 'COMMA')} + ' VND'"></label>
+    </div>
 
+    <div class="invoice-summary mt-1">
+        Tổng hóa đơn:
+        <span th:if="${invoice.voucher != null}"
+              th:text="${#numbers.formatDecimal(invoice.totalAmount - (invoice.totalAmount * invoice.voucher.discountPercent / 100), 1, 'POINT', 0, 'COMMA')} + ' VND'">
+    </span>
+        <span th:if="${invoice.voucher == null}"
+              th:text="${#numbers.formatDecimal(invoice.totalAmount, 1, 'POINT', 0, 'COMMA')} + ' VND'">
+    </span>
+    </div>
     <div class="text-center mt-2">
         <p class="m-0">Quét mã QR để thanh toán:</p>
         <img src="https://img.vietqr.io/image/mbbank-615892-compact2.jpg?amount=123000&addInfo=Thanh%20toan%20hoa%20don%20123&accountName=Nguyen%20Tien%20Quan"
@@ -212,7 +229,8 @@
 
                                 <div class="mb-3">
                                     <label class="form-label">Số tiền thanh toán</label>
-                                    <input type="number" class="form-control" name="amount" th:value="${invoice.totalAmount}">
+                                    <input type="text" class="form-control" name="amount"
+                                           th:value="${#numbers.formatDecimal(invoice.totalAmount - invoice.totalAmount * invoice.getVoucher().discountPercent*0.01, 0, 'COMMA', 0, 'POINT')} + ' VNĐ' ">
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -246,7 +264,7 @@
                     const pdf = new jspdf.jsPDF({
                         orientation: 'portrait',
                         unit: 'mm',
-                        format: [80, 285]
+                        format: [80, 296]
                     });
 
                     const pageWidth = pdf.internal.pageSize.getWidth();

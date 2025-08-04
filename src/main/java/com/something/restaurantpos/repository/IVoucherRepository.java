@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
 public interface IVoucherRepository extends JpaRepository<Voucher, Integer> {
     Page<Voucher> findByDeletedFalse(Pageable pageable);
@@ -24,4 +27,9 @@ public interface IVoucherRepository extends JpaRepository<Voucher, Integer> {
     Page<Voucher> findByDeletedTrue(Pageable pageable);
 
     long countByDeletedTrue();
+    @Query("SELECT v FROM Voucher v " +
+            "WHERE v.isActive = true " +
+            "AND v.validFrom <= :now " +
+            "AND v.validTo >= :now")
+    List<Voucher> findAllValid(@Param("now") LocalDateTime now);
 }

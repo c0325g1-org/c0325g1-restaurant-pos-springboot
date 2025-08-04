@@ -3,6 +3,7 @@ package com.something.restaurantpos.service.impl;
 import com.something.restaurantpos.dto.InvoiceDto;
 import com.something.restaurantpos.dto.OrderItemDTO;
 import com.something.restaurantpos.dto.PaymentDto;
+import com.something.restaurantpos.dto.VoucherDTO;
 import com.something.restaurantpos.entity.*;
 import com.something.restaurantpos.repository.*;
 import com.something.restaurantpos.service.IInvoiceService;
@@ -33,6 +34,8 @@ public class InvoiceServiceImpl implements IInvoiceService {
     private IIPaymentRepository paymentRepository;
     @Autowired
     private IDiningTableRepository tableRepository;
+    @Autowired
+    private IVoucherRepository voucherRepository;
     @Autowired
     private ModelMapper modelMapper;
 
@@ -98,6 +101,53 @@ public class InvoiceServiceImpl implements IInvoiceService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         invoice.setTotalAmount(total);
         invoiceRepository.save(invoice);
+    }
+
+    @Override
+    @Transactional
+    public void applyVoucher(Integer invoiceId, Integer voucherId) {
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new RuntimeException("Invoice not found"));
+
+        Order order = invoice.getOrder();
+        if (order == null) {
+            throw new RuntimeException("Invoice has no associated order");
+        }
+
+        // Tính tổng tiền gốc từ danh sách OrderItem
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrder_Id(order.getId());
+        BigDecimal originalTotal = orderItems.stream()
+                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Gắn voucher nếu có
+        Voucher voucher = null;
+        if (voucherId != null) {
+            voucher = voucherRepository.findById(voucherId)
+                    .orElseThrow(() -> new RuntimeException("Voucher not found"));
+
+            // Kiểm tra hiệu lực
+            boolean isValid = voucher.getIsActive()
+                    && !voucher.getValidFrom().isAfter(LocalDateTime.now())
+                    && !voucher.getValidTo().isBefore(LocalDateTime.now());
+
+            if (!isValid) {
+                throw new RuntimeException("Voucher is not valid or expired");
+            }
+
+            invoice.setVoucher(voucher);
+
+            // Áp dụng giảm giá
+            BigDecimal discount = originalTotal.multiply(BigDecimal.valueOf(voucher.getDiscountPercent()))
+                    .divide(BigDecimal.valueOf(100));
+            invoice.setTotalAmount(originalTotal.subtract(discount));
+        } else {
+            invoice.setVoucher(null);
+            invoice.setTotalAmount(originalTotal);
+        }
+
+        invoiceRepository.save(invoice);
+
     }
 
     @Override
@@ -192,10 +242,12 @@ public class InvoiceServiceImpl implements IInvoiceService {
 
     private InvoiceDto convertToDto(Invoice invoice) {
         InvoiceDto dto = modelMapper.map(invoice, InvoiceDto.class);
+
         dto.setOrderId(invoice.getOrder().getId());
         dto.setTableName(invoice.getOrder().getTable().getName());
         dto.setEmployeeName(invoice.getOrder().getEmployee().getName());
         dto.setOrderTime(invoice.getOrder().getCreatedAt());
+
         List<OrderItem> orderItems = orderItemRepository.findAllByOrder_Id(invoice.getOrder().getId());
         List<OrderItemDTO> itemDtos = orderItems.stream()
                 .filter(orderItem -> "SERVED".equals(orderItem.getStatus().name()))
@@ -207,12 +259,29 @@ public class InvoiceServiceImpl implements IInvoiceService {
                     return itemDto;
                 }).collect(Collectors.toList());
         dto.setOrderItems(itemDtos);
+
+        // Tính totalAmount
         BigDecimal totalAmount = itemDtos.stream()
                 .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         dto.setTotalAmount(totalAmount);
+
+        // Gắn voucher nếu có
+        if (invoice.getVoucher() != null) {
+            dto.setVoucher(modelMapper.map(invoice.getVoucher(), VoucherDTO.class));
+
+            // Tính discountedTotalAmount
+            BigDecimal discount = totalAmount
+                    .multiply(BigDecimal.valueOf(invoice.getVoucher().getDiscountPercent()))
+                    .divide(BigDecimal.valueOf(100));
+            dto.setDiscountedTotalAmount(totalAmount.subtract(discount));
+        } else {
+            dto.setDiscountedTotalAmount(totalAmount);
+        }
+
         return dto;
     }
+
 
     @Override
     public Invoice findById(String id) {
