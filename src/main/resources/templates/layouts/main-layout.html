@@ -214,117 +214,79 @@
 <!-- Profile Modal -->
 <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-dark text-white">
-                <h5 class="modal-title" id="profileModalLabel">
-                    <i class="fas fa-user me-2"></i>Hồ sơ nhân viên
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title ">
+                    <i class="fas fa-id-badge me-2"></i>Thông tin nhân viên
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="text-center mb-4">
-                    <div class="profile-avatar mx-auto mb-3">
-                        <i class="fas fa-user"></i>
+                    <div class="rounded-circle bg-light border d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                        <i class="fas fa-user fa-3x text-secondary"></i>
                     </div>
-                    <h4 id="profileName" class="mb-1">Đang tải...</h4>
-                    <p id="profileRole" class="text-muted mb-0">Đang tải...</p>
+                    <h4 class="mt-3 mb-0" id="profileName">Đang tải...</h4>
+                    <small class="text-muted" id="profileRole">Đang tải...</small>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="info-section">
-                            <h6 class="text-primary mb-3">
-                                <i class="fas fa-info-circle me-2"></i>Thông tin cơ bản
+                    <div class="row g-4">
+                        <!-- Cột trái: Thông tin cá nhân -->
+                        <div class="col-md-6 border-end pe-4">
+                            <h6 class="text-primary mb-3 text-center">
+                                <i class="fas fa-user-cog me-2"></i>Thông tin cá nhân
                             </h6>
-                            
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-id-card"></i>
-                                </div>
-                                <div class="info-content">
-                                    <div class="info-label">Mã nhân viên</div>
-                                    <div class="info-value" id="profileId">-</div>
-                                </div>
-                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between d-none">
+                                    <strong>Mã nhân viên:</strong>
+                                    <span id="profileId">-</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Tên đăng nhập:</strong>
+                                    <span id="profileUsername">-</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Email:</strong>
+                                    <span id="profileEmail">-</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Vai trò:</strong>
+                                    <span id="profileRoleValue">-</span>
+                                </li>
+                            </ul>
+                        </div>
 
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div class="info-content">
-                                    <div class="info-label">Tên đăng nhập</div>
-                                    <div class="info-value" id="profileUsername">-</div>
-                                </div>
-                            </div>
-
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-envelope"></i>
-                                </div>
-                                <div class="info-content">
-                                    <div class="info-label">Email</div>
-                                    <div class="info-value" id="profileEmail">-</div>
-                                </div>
-                            </div>
-
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-user-tag"></i>
-                                </div>
-                                <div class="info-content">
-                                    <div class="info-label">Vai trò</div>
-                                    <div class="info-value" id="profileRoleValue">-</div>
-                                </div>
-                            </div>
+                        <!-- Cột phải: Hệ thống -->
+                        <div class="col-md-6 ps-4">
+                            <h6 class="text-primary mb-3 text-center">
+                                <i class="fas fa-tools me-2"></i>Hệ thống
+                            </h6>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Ngày tạo:</strong>
+                                    <span id="profileCreatedAt">-</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Cập nhật lần cuối:</strong>
+                                    <span id="profileUpdatedAt">-</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Trạng thái:</strong>
+                                    <span id="profileStatus" class="badge bg-secondary">-</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="info-section">
-                            <h6 class="text-primary mb-3">
-                                <i class="fas fa-clock me-2"></i>Thông tin hệ thống
-                            </h6>
-                            
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-calendar-plus"></i>
-                                </div>
-                                <div class="info-content">
-                                    <div class="info-label">Ngày tạo</div>
-                                    <div class="info-value" id="profileCreatedAt">-</div>
-                                </div>
-                            </div>
-
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-calendar-check"></i>
-                                </div>
-                                <div class="info-content">
-                                    <div class="info-label">Cập nhật lần cuối</div>
-                                    <div class="info-value" id="profileUpdatedAt">-</div>
-                                </div>
-                            </div>
-
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-toggle-on"></i>
-                                </div>
-                                <div class="info-content">
-                                    <div class="info-label">Trạng thái</div>
-                                    <div class="info-value">
-                                        <span class="status-badge" id="profileStatus">-</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Đóng
+                </button>
             </div>
         </div>
     </div>
+
 </div>
 
 <style>
