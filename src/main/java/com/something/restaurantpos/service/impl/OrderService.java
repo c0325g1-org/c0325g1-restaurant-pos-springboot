@@ -1,8 +1,9 @@
 package com.something.restaurantpos.service.impl;
 
+import com.something.restaurantpos.dto.OrderItemStatusNotificationDTO;
 import com.something.restaurantpos.entity.Order;
 import com.something.restaurantpos.repository.IOrderRepository;
-import com.something.restaurantpos.dto.NotificationDTO;
+import com.something.restaurantpos.dto.NewOrderNotificationDTO;
 import com.something.restaurantpos.dto.OrderCartDTO;
 import com.something.restaurantpos.dto.OrderItemDTO;
 import com.something.restaurantpos.entity.*;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -83,12 +85,12 @@ public class OrderService implements IOrderService {
     }
 
     private void sendNewOrderNotification(Order order, List<OrderItem> orderItems) {
-        NotificationDTO notification = new NotificationDTO();
+        NewOrderNotificationDTO notification = new NewOrderNotificationDTO();
         String message = order.getTable().getName() + " có gọi " + orderItems.size() + " món mới!";
-        notification.setMessage(message);
         notification.setOrder(order);
         notification.setOrderItems(orderItems);
         notification.setNewOrder(true);
+        notification.setMessage(message);
         notificationService.create(message, Notification.NotificationType.INFO, Role.UserRole.ROLE_KITCHEN);
         notificationService.sendToUser(notification, Role.UserRole.ROLE_KITCHEN);
     }
@@ -109,9 +111,10 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Order createNewOrderForTable(DiningTable table) {
+    public Order createNewOrderForTable(DiningTable table, Employee employee) {
         Order order = new Order();
         order.setTable(table);
+        order.setEmployee(employee);
         order.setStatus(Order.OrderStatus.OPEN);
         return orderRepository.save(order);
     }
@@ -144,6 +147,18 @@ public class OrderService implements IOrderService {
         OrderItem item = orderItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order item not found"));
         item.setStatus(itemStatus);
+        OrderItemStatusNotificationDTO notification = new OrderItemStatusNotificationDTO();
+        String statusDisplayText = "";
+        if (itemStatus.equals(OrderItem.ItemStatus.CANCELED)) {
+            statusDisplayText = " đã bị huỷ";
+        } else if (itemStatus.equals(OrderItem.ItemStatus.SERVED)) {
+            statusDisplayText = " đã được phục vụ cho khách";
+        }
+        String message = item.getOrder().getTable().getName() + ": Món " + item.getMenuItem().getName() + statusDisplayText;
+        notification.setOrderItem(item);
+        notification.setMessage(message);
+        notificationService.create(message, Notification.NotificationType.INFO, Role.UserRole.ROLE_KITCHEN);
+        notificationService.sendToUser(notification, Role.UserRole.ROLE_KITCHEN);
         orderItemRepository.save(item);
     }
 

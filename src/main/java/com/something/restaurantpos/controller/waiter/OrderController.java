@@ -6,6 +6,7 @@ import com.something.restaurantpos.dto.OrderItemDTO;
 import com.something.restaurantpos.entity.*;
 import com.something.restaurantpos.mapper.MenuItemMapper;
 import com.something.restaurantpos.service.*;
+import com.something.restaurantpos.util.CurrentUserUtil;
 import com.something.restaurantpos.util.OrderCartUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class OrderController {
                     "Không tìm thấy bàn." : "Bàn chưa ở trạng thái Đang phục vụ.");
             return "redirect:/waiter/tables";
         }
-
+        Employee employee = CurrentUserUtil.getCurrentEmployee();
         cartMap.putIfAbsent(tableId, new OrderCartDTO(tableId));
 
         model.addAttribute("menuItems", getAvailableMenuItems());
@@ -118,11 +119,11 @@ public class OrderController {
             return "redirect:/waiter/order?tableId=" + tableId;
         }
 
-        Integer employeeId = 1; // TODO: Replace with logged-in employee
+        Employee employee = CurrentUserUtil.getCurrentEmployee();
 
         Order order = orderService.findLastedOpenOrderByTableId(tableId)
                 .map(existing -> orderService.appendItemsToExistingOrder(existing, cart))
-                .orElseGet(() -> orderService.placeOrder(cart, employeeId));
+                .orElseGet(() -> orderService.placeOrder(cart, Objects.requireNonNull(employee).getId()));
 
         OrderCartUtils.clear(cart);
         redirect.addFlashAttribute("successMessage", "Gọi món thành công!");
