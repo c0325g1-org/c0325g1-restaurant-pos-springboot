@@ -16,7 +16,7 @@
         function unlockAudio() {
             if (!canPlaySound) {
                 const audio = document.getElementById("notificationSound");
-                audio.play().then(() => {
+                audio?.play().then(() => {
                     audio.pause();
                     audio.currentTime = 0;
                     canPlaySound = true;
@@ -118,9 +118,6 @@
                 status.className = data.deleted ? 'status-badge status-inactive' : 'status-badge status-active';
 
             } catch (err) {
-                console.error('Error loading profile data:', err);
-                document.getElementById('profileName').textContent = 'Lỗi tải dữ liệu';
-                document.getElementById('profileRole').textContent = 'Vui lòng thử lại';
             }
         }
 
@@ -131,9 +128,10 @@
 
         // === Notifications ===
         function reloadNotificationList() {
+
             const container = document.getElementById("notification-container");
             const unreadBadge = document.getElementById("unreadCount");
-
+            if (!container) return;
             fetch(`/notifications/lasted`).then(res => res.json()).then(data => {
                 container.innerHTML = "";
                 let unreadCount = 0;
