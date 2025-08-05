@@ -1,9 +1,13 @@
 package com.something.restaurantpos.controller;
 
 import com.something.restaurantpos.dto.GroupedKitchenOrderDTO;
+import com.something.restaurantpos.dto.OrderItemStatusNotificationDTO;
+import com.something.restaurantpos.entity.Notification;
 import com.something.restaurantpos.entity.OrderItem;
+import com.something.restaurantpos.entity.Role;
 import com.something.restaurantpos.service.IKitchenService;
 import com.something.restaurantpos.service.IOrderItemService;
+import com.something.restaurantpos.service.impl.NotificationService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,6 +27,9 @@ public class KitchenController {
     private IKitchenService kitchenService;
     @Autowired
     private IOrderItemService orderItemService;
+    @Autowired
+    private NotificationService notificationService;
+
 
     @GetMapping("/dashboard")
     public String kitchen(
@@ -106,10 +113,28 @@ public class KitchenController {
             @RequestParam("filter") String filter,
             RedirectAttributes redirectAttributes
     ) {
+
         OrderItem item = orderItemService.findById(id).orElseThrow();
         OrderItem.ItemStatus oldStatus = item.getStatus();
-
+        String statusMessage;
+        if (status == OrderItem.ItemStatus.COOKING) {
+            statusMessage = "đang chế biến";
+        } else if (status == OrderItem.ItemStatus.READY) {
+            statusMessage = "đã sẵn sàng";
+        } else if (status == OrderItem.ItemStatus.SERVED) {
+            statusMessage = "đã hoàn thành";
+        } else {
+            statusMessage = "đã cập nhật";
+        }
+        String message = "Món " + item.getMenuItem().getName() + " " + statusMessage;
         kitchenService.updateItemStatus(id, status);
+
+        OrderItemStatusNotificationDTO notificationDTO = new OrderItemStatusNotificationDTO();
+        notificationDTO.setOrderItem(item);
+        notificationDTO.setMessage(message);
+
+        notificationService.create(message,Notification.NotificationType.INFO,Role.UserRole.ROLE_WAITER);
+        notificationService.sendToUser(notificationDTO, Role.UserRole.ROLE_WAITER);
 
         // Gửi flash message với trạng thái cũ để hiển thị Undo
         redirectAttributes.addFlashAttribute("undoItemId", id);
