@@ -14,14 +14,14 @@
             <!-- Form tìm kiếm bên phải -->
             <form method="get" action="/manager/menu_items" class="d-flex align-items-center gap-2">
                 <input type="text" th:value="${keyword}" name="keyword"
-                       class="form-control form-control-sm"
+                       class="form-control"
                        placeholder="Tìm theo tên" style="width: 200px;">
-                <select name="categoryId" class="form-select form-select-sm" style="width: 200px;">
+                <select name="categoryId" class="form-select" style="width: 200px;">
                     <option value="" th:selected="${categoryId==null or categoryId==''}">Tất cả loại</option>
                     <option th:each="temp : ${categories}" th:text="${temp.name}" th:value="${temp.id}"
                             th:selected="${temp.id==categoryId}"></option>
                 </select>
-                <button type="submit" class="btn btn-sm btn-success d-flex align-items-center">
+                <button type="submit" class="btn btn-success d-flex align-items-center">
                     <i class="bi bi-search me-1"></i> Tìm kiếm
                 </button>
             </form>
@@ -74,7 +74,7 @@
                    class="btn btn-outline-primary btn-sm me-1"
                    data-bs-toggle="tooltip"
                    title="Sửa"
-                   th:attr="data-bs-title='Sửa voucher ' + ${menu.name}">
+                   th:attr="data-bs-title='Sửa món ' + ${menu.name}">
                 <i class="bi bi-pencil-square"></i>
             </a>
 
@@ -83,7 +83,7 @@
                         data-bs-toggle="modal"
                         data-bs-target="#deleteModal"
                         title="Xoá"
-                        th:attr="data-id=${menu.id}, data-title=${menu.name}, data-bs-title='Xóa món ăn ' + ${menu.name}">
+                        th:attr="data-id=${menu.id}, data-title=${menu.name}, data-bs-title='Xóa món ' + ${menu.name}">
                     <i class="bi bi-trash"></i>
                 </button>
             </td>

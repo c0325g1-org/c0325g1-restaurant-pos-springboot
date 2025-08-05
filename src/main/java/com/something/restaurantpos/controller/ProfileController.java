@@ -50,7 +50,6 @@ public class ProfileController {
         profileData.put("createdAt", employee.getCreatedAt());
         profileData.put("updatedAt", employee.getUpdatedAt());
         profileData.put("deleted", employee.isDeleted());
-        
         return ResponseEntity.ok(profileData);
     }
 } 

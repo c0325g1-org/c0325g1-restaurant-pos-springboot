@@ -12,6 +12,7 @@ import java.util.List;
 
 @Service
 public class FeedbackService implements IFeedbackService {
+
     @Autowired
     private IFeedbackRepository feedbackRepository;
 
@@ -39,6 +40,48 @@ public class FeedbackService implements IFeedbackService {
     public Page<Feedback> search(String name, Pageable pageable) {
         return feedbackRepository.search(name, pageable);
     }
+
+    @Override
+    public void deleteMultipleByIds(List<String> ids) {
+        for (String id : ids) {
+            Feedback feedback = feedbackRepository.findById(id).orElse(null);
+            if (feedback != null) {
+                feedback.markDeleted();
+                feedbackRepository.save(feedback);
+            }
+        }
+    }
+
+    @Override
+    public boolean existsIncludingDeleted(String id) {
+        return feedbackRepository.existsIncludingDeleted(id);
+    }
+
+    @Override
+    public Page<Feedback> searchDeleted(String keyword, Pageable pageable) {
+        return feedbackRepository.searchDeleted(keyword, pageable);
+    }
+
+    @Override
+    public void restoreById(String id) {
+        Feedback feedback = feedbackRepository.findById(id).orElse(null);
+        if (feedback != null) {
+            feedback.restore();
+            feedbackRepository.save(feedback);
+        }
+    }
+
+    @Override
+    public void destroyById(String id) {
+        feedbackRepository.deleteById(id); // Xoá vĩnh viễn khỏi DB
+    }
+
+    @Override
+    public long countByDeleted(boolean deleted) {
+        return feedbackRepository.countByDeleted(true);
+    }
+
+
 
     @Override
     public List<Feedback> findTop5FiveStarFeedbacks(Pageable pageable) {

@@ -6,7 +6,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="fw-bold">Danh sách mã giảm giá</h2>
         <div>
-            <a class="btn btn-outline-danger me-2" th:href="@{/manager/vouchers/trash}">
+            <a class="btn btn-danger me-2" th:href="@{/manager/vouchers/trash}">
                 <i class="bi bi-trash"></i>
                 Thùng rác
                 <span th:if="${trashCount > 0}">(<span th:text="${trashCount}">1</span>)</span>

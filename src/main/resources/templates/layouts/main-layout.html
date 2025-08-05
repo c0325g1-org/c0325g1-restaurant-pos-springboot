@@ -98,6 +98,7 @@
 
             .main-content {
                 margin-left: 0;
+                margin-bottom: 28px;
             }
         }
 
@@ -118,6 +119,84 @@
             padding: 10px 0;
         }
     </style>
+    <style>
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #495057, #6c757d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .info-section {
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .info-content {
+            flex: 1;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 3px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #343a40;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
 </head>
 <body>
 
@@ -126,15 +205,25 @@
     <div class="text-center p-3 shadow logo-wrapper">
         <img th:src="@{'/img/logo.png'}" alt="Logo" width="100%" style="max-width: 106px; filter: drop-shadow(2px 4px 6px black);">
     </div>
+    <!-- Admin Menu -->
+    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/admin/dashboard}" class="nav-link"><i class="bi bi-speedometer2"></i> <span>Trang chủ</span></a>
+    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/admin/employees}" class="nav-link"><i class="bi bi-people"></i> <span>Nhân viên</span></a>
+    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/manager/menu_items}" class="nav-link"><i class="bi bi-card-list"></i> <span>Món ăn</span></a>
+    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/manager/menu_category}" class="nav-link"><i class="bi bi-tags"></i> <span>Danh mục Món</span></a>
+    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/manager/vouchers}" class="nav-link"><i class="bi bi-percent"></i> <span>% Mã giảm giá</span></a>
+                    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/feedback}" class="nav-link"><i class="bi bi-chat-dots"></i> <span>Phản hồi KH</span></a>
+                        <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/waiter/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
+    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/cashier/invoices}" class="nav-link"><i class="bi bi-receipt"></i> <span>Hoá đơn</span></a>
+    
+    <!-- Manager Menu -->
     <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/dashboard}" class="nav-link"><i class="bi bi-speedometer2"></i> <span>Trang chủ</span></a>
     <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/menu_items}" class="nav-link"><i class="bi bi-card-list"></i> <span>Món ăn</span></a>
     <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/menu_category}" class="nav-link"><i class="bi bi-tags"></i> <span>Danh mục Món</span></a>
     <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/vouchers}" class="nav-link"><i class="bi bi-percent"></i> <span>Mã giảm giá</span></a>
-    <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/feedback}" class="nav-link"><i class="bi bi-rss"></i> <span>Phản hồi KH</span></a>
+    <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/feedback}" class="nav-link"><i class="bi bi-rss"></i> <span>Phản hồi KH</span></a>
     <a sec:authorize="hasAnyRole('THU_NGÂN', 'QUẢN_LÝ')" th:href="@{/cashier/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
     <a sec:authorize="hasAnyRole('THU_NGÂN', 'QUẢN_LÝ')" th:href="@{/cashier/invoices}" class="nav-link"><i class="bi bi-receipt"></i> <span>Hoá đơn</span></a>
     <a sec:authorize="hasRole('PHỤC_VỤ')" th:href="@{/waiter/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
-    <a sec:authorize="hasRole('PHỤC_VỤ')" th:href="@{/waiter/orders}" class="nav-link"><i class="bi bi-bag"></i> <span>Gọi món</span></a>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -191,7 +280,7 @@
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <span sec:authentication="name"></span>
+                        <span sec:authentication="name" class="fw-bold me-2 fs-6"></span>
                         <img src="https://i.pravatar.cc/40?img=11" class="rounded-circle" width="36" height="36">
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow">
@@ -214,197 +303,80 @@
 <!-- Profile Modal -->
 <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-dark text-white">
-                <h5 class="modal-title" id="profileModalLabel">
-                    <i class="fas fa-user me-2"></i>Hồ sơ nhân viên
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title ">
+                    <i class="fas fa-id-badge me-2"></i>Thông tin nhân viên
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="text-center mb-4">
-                    <div class="profile-avatar mx-auto mb-3">
-                        <i class="fas fa-user"></i>
+                    <div class="rounded-circle bg-light border d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                        <i class="fas fa-user fa-3x text-secondary"></i>
                     </div>
-                    <h4 id="profileName" class="mb-1">Đang tải...</h4>
-                    <p id="profileRole" class="text-muted mb-0">Đang tải...</p>
+                    <h4 class="mt-3 mb-0" id="profileName">Đang tải...</h4>
+                    <small class="text-muted" id="profileRole">Đang tải...</small>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="info-section">
-                            <h6 class="text-primary mb-3">
-                                <i class="fas fa-info-circle me-2"></i>Thông tin cơ bản
+                    <div class="row g-4">
+                        <!-- Cột trái: Thông tin cá nhân -->
+                        <div class="col-md-6 border-end pe-4">
+                            <h6 class="text-primary mb-3 text-center">
+                                <i class="fas fa-user-cog me-2"></i>Thông tin cá nhân
                             </h6>
-                            
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-id-card"></i>
-                                </div>
-                                <div class="info-content">
-                                    <div class="info-label">Mã nhân viên</div>
-                                    <div class="info-value" id="profileId">-</div>
-                                </div>
-                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between d-none">
+                                    <strong>Mã nhân viên:</strong>
+                                    <span id="profileId">-</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Tên đăng nhập:</strong>
+                                    <span id="profileUsername">-</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Email:</strong>
+                                    <span id="profileEmail">-</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Vai trò:</strong>
+                                    <span id="profileRoleValue">-</span>
+                                </li>
+                            </ul>
+                        </div>
 
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div class="info-content">
-                                    <div class="info-label">Tên đăng nhập</div>
-                                    <div class="info-value" id="profileUsername">-</div>
-                                </div>
-                            </div>
-
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-envelope"></i>
-                                </div>
-                                <div class="info-content">
-                                    <div class="info-label">Email</div>
-                                    <div class="info-value" id="profileEmail">-</div>
-                                </div>
-                            </div>
-
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-user-tag"></i>
-                                </div>
-                                <div class="info-content">
-                                    <div class="info-label">Vai trò</div>
-                                    <div class="info-value" id="profileRoleValue">-</div>
-                                </div>
-                            </div>
+                        <!-- Cột phải: Hệ thống -->
+                        <div class="col-md-6 ps-4">
+                            <h6 class="text-primary mb-3 text-center">
+                                <i class="fas fa-tools me-2"></i>Hệ thống
+                            </h6>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Ngày tạo:</strong>
+                                    <span id="profileCreatedAt">-</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Cập nhật lần cuối:</strong>
+                                    <span id="profileUpdatedAt">-</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Trạng thái:</strong>
+                                    <span id="profileStatus" class="badge bg-secondary">-</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="info-section">
-                            <h6 class="text-primary mb-3">
-                                <i class="fas fa-clock me-2"></i>Thông tin hệ thống
-                            </h6>
-                            
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-calendar-plus"></i>
-                                </div>
-                                <div class="info-content">
-                                    <div class="info-label">Ngày tạo</div>
-                                    <div class="info-value" id="profileCreatedAt">-</div>
-                                </div>
-                            </div>
-
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-calendar-check"></i>
-                                </div>
-                                <div class="info-content">
-                                    <div class="info-label">Cập nhật lần cuối</div>
-                                    <div class="info-value" id="profileUpdatedAt">-</div>
-                                </div>
-                            </div>
-
-                            <div class="info-item">
-                                <div class="info-icon">
-                                    <i class="fas fa-toggle-on"></i>
-                                </div>
-                                <div class="info-content">
-                                    <div class="info-label">Trạng thái</div>
-                                    <div class="info-value">
-                                        <span class="status-badge" id="profileStatus">-</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Đóng
+                </button>
             </div>
         </div>
     </div>
+
 </div>
-
-<style>
-    .profile-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #495057, #6c757d);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 32px;
-        color: white;
-        border: 3px solid rgba(0, 0, 0, 0.1);
-    }
-
-    .info-section {
-        margin-bottom: 20px;
-    }
-
-    .info-item {
-        display: flex;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid #f8f9fa;
-    }
-
-    .info-item:last-child {
-        border-bottom: none;
-    }
-
-    .info-icon {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        background: #f8f9fa;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 12px;
-        color: #495057;
-        font-size: 14px;
-    }
-
-    .info-content {
-        flex: 1;
-    }
-
-    .info-label {
-        font-size: 12px;
-        color: #6c757d;
-        margin-bottom: 3px;
-        font-weight: 500;
-    }
-
-    .info-value {
-        font-size: 14px;
-        color: #343a40;
-        font-weight: 600;
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 15px;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-
-    .status-active {
-        background-color: #d4edda;
-        color: #155724;
-    }
-
-    .status-inactive {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
-</style>
 
 <th:block layout:fragment="modal"></th:block>
 
