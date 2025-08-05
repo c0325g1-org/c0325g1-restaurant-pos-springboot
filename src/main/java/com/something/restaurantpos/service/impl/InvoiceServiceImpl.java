@@ -194,7 +194,7 @@ public class InvoiceServiceImpl implements IInvoiceService {
         InvoiceDto dto = modelMapper.map(invoice, InvoiceDto.class);
         dto.setOrderId(invoice.getOrder().getId());
         dto.setTableName(invoice.getOrder().getTable().getName());
-        dto.setEmployeeName(invoice.getOrder().getEmployee().getName());
+        dto.setEmployeeName("HEHE");
         dto.setOrderTime(invoice.getOrder().getCreatedAt());
         List<OrderItem> orderItems = orderItemRepository.findAllByOrder_Id(invoice.getOrder().getId());
         List<OrderItemDTO> itemDtos = orderItems.stream()

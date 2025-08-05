@@ -1,6 +1,5 @@
 package com.something.restaurantpos.service.impl;
 
-import com.something.restaurantpos.dto.NotificationDTO;
 import com.something.restaurantpos.entity.Employee;
 import com.something.restaurantpos.entity.Notification;
 import com.something.restaurantpos.entity.NotificationReceiver;
@@ -9,6 +8,7 @@ import com.something.restaurantpos.repository.IEmployeeRepository;
 import com.something.restaurantpos.repository.INotificationReceiverRepository;
 import com.something.restaurantpos.repository.INotificationRepository;
 import com.something.restaurantpos.service.INotificationService;
+import com.something.restaurantpos.util.CurrentUserUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -25,10 +25,10 @@ public class NotificationService implements INotificationService {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Override
-    public void sendToUser(NotificationDTO notificationDTO, Role.UserRole role) {
+    public <T> void sendToUser(T t, Role.UserRole role) {
         List<Employee> employeeList = employeeRepository.findAllByRole_UserRole(role);
         for (Employee employee : employeeList) {
-            messagingTemplate.convertAndSend("/topic/user." + employee.getId(), notificationDTO);
+            messagingTemplate.convertAndSend("/topic/user." + employee.getId(), t);
         }
     }
 
@@ -37,6 +37,7 @@ public class NotificationService implements INotificationService {
         List<Employee> employeeList = employeeRepository.findAllByRole_UserRole(role);
 
         Notification notification = new Notification();
+        notification.setSenderEmployee(CurrentUserUtil.getCurrentEmployee());
         notification.setMessage(message);
         notification.setType(notificationType);
         notificationRepository.save(notification);
@@ -48,6 +49,5 @@ public class NotificationService implements INotificationService {
             receiver.setIsRead(false);
             notificationReceiverRepository.save(receiver);
         }
-
     }
 }

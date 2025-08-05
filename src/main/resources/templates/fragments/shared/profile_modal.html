@@ -1,0 +1,117 @@
+<!-- Profile Modal -->
+<div th:fragment="profileModal" class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="profileModalLabel">
+                    <i class="fas fa-user me-2"></i>Hồ sơ nhân viên
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <div class="profile-avatar mx-auto mb-3">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h4 id="profileName" class="mb-1">Đang tải...</h4>
+                    <p id="profileRole" class="text-muted mb-0">Đang tải...</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-section">
+                            <h6 class="text-primary mb-3">
+                                <i class="fas fa-info-circle me-2"></i>Thông tin cơ bản
+                            </h6>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-id-card"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Mã nhân viên</div>
+                                    <div class="info-value" id="profileId">-</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Tên đăng nhập</div>
+                                    <div class="info-value" id="profileUsername">-</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Email</div>
+                                    <div class="info-value" id="profileEmail">-</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-user-tag"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Vai trò</div>
+                                    <div class="info-value" id="profileRoleValue">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="info-section">
+                            <h6 class="text-primary mb-3">
+                                <i class="fas fa-clock me-2"></i>Thông tin hệ thống
+                            </h6>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-calendar-plus"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Ngày tạo</div>
+                                    <div class="info-value" id="profileCreatedAt">-</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Cập nhật lần cuối</div>
+                                    <div class="info-value" id="profileUpdatedAt">-</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-toggle-on"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Trạng thái</div>
+                                    <div class="info-value">
+                                        <span class="status-badge" id="profileStatus">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>

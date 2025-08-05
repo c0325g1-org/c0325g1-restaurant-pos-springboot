@@ -2,6 +2,7 @@ package com.something.restaurantpos.service;
 
 import com.something.restaurantpos.dto.OrderCartDTO;
 import com.something.restaurantpos.entity.DiningTable;
+import com.something.restaurantpos.entity.Employee;
 import com.something.restaurantpos.entity.Order;
 import com.something.restaurantpos.entity.OrderItem;
 
@@ -13,7 +14,7 @@ public interface IOrderService extends IService<Order>{
 
     Optional<Order> findLastedOpenOrderByTableId(Integer tableId);
 
-    Order createNewOrderForTable(DiningTable table);
+    Order createNewOrderForTable(DiningTable table, Employee employee);
 
     Order appendItemsToExistingOrder(Order order, OrderCartDTO cartDTO);
 
