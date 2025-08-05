@@ -237,7 +237,7 @@ public class InvoiceServiceImpl implements IInvoiceService {
 
         dto.setOrderId(invoice.getOrder().getId());
         dto.setTableName(invoice.getOrder().getTable().getName());
-        dto.setEmployeeName("HEHE");
+        dto.setEmployeeName(invoice.getOrder().getEmployee().getName());
         dto.setOrderTime(invoice.getOrder().getCreatedAt());
 
         List<OrderItem> orderItems = orderItemRepository.findAllByOrder_Id(invoice.getOrder().getId());

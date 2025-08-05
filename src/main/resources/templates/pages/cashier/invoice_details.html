@@ -228,7 +228,10 @@
 
                                 <div class="mb-3">
                                     <label class="form-label">Số tiền thanh toán</label>
-                                    <input type="text" class="form-control" name="amount"
+                                    <input type="hidden" name="amount" th:value="${invoice.voucher != null ?
+                  invoice.totalAmount - invoice.totalAmount * invoice.voucher.discountPercent * 0.01:
+                  invoice.totalAmount}">
+                                    <input type="text" class="form-control" readonly
                                            th:value="${invoice.voucher != null ?
                   #numbers.formatDecimal(invoice.totalAmount - invoice.totalAmount * invoice.voucher.discountPercent * 0.01, 0, 'COMMA', 0, 'POINT') + ' VNĐ' :
                   #numbers.formatDecimal(invoice.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">
