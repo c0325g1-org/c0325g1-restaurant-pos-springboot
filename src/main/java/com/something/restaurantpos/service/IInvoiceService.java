@@ -21,6 +21,6 @@ public interface IInvoiceService  extends IService<Invoice> {
     void processPayment(PaymentDto paymentDto);
     Page<InvoiceDto> findAllDtoPage(Pageable pageable);
     void updateInvoiceWithItems(Integer id, InvoiceDto invoiceDto);
-
+    void applyVoucher(Integer invoiceId, Integer voucherId);
     Invoice createInvoiceFromOrder(Order order);
 }
