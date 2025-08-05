@@ -30,6 +30,7 @@ export function loadCalledItems(tableId) {
                 data.forEach(item => {
                     const div = document.createElement("div");
                     div.classList.add("border-bottom", "py-2");
+                    div.setAttribute("data-id", item.id);
 
                     let statusBadge = getStatusBadge(item.status);
                     let actions = getActionButtons(item);
@@ -120,3 +121,6 @@ function markAsServed(itemId) {
 }
 
 window.markAsServed = markAsServed;
+
+window.getStatusBadge = getStatusBadge;
+window.getActionButtons = getActionButtons;
