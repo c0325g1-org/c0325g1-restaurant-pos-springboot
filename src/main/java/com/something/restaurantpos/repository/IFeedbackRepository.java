@@ -14,6 +14,11 @@ import java.util.List;
 public interface IFeedbackRepository extends JpaRepository<Feedback, String> {
     boolean existsById(String id);
 
+
+
+    @Query("SELECT f FROM Feedback f WHERE f.rating = 5 ORDER BY f.createdAt DESC")
+    List<Feedback> findTop5FiveStarFeedbacks(Pageable pageable);
+
     @Query("""
     SELECT f FROM Feedback f
     LEFT JOIN Order o ON f.id = o.feedbackToken
@@ -34,6 +39,6 @@ public interface IFeedbackRepository extends JpaRepository<Feedback, String> {
     Page<Feedback> searchDeleted(@Param("keyword") String keyword, Pageable pageable);
 
     long countByDeleted(boolean deleted);
-    @Query("SELECT f FROM Feedback f WHERE f.rating = 5 ORDER BY f.createdAt DESC")
-    List<Feedback> findTop5FiveStarFeedbacks(Pageable pageable);
+
+
 }
