@@ -28,4 +28,7 @@ public class Employee extends AuditMetadata {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+    
+    @Column(name = "enable", nullable = false)
+    private Boolean enable = true;
 }

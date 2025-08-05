@@ -11,6 +11,7 @@ public class RedirectService {
         for (GrantedAuthority authority : authorities) {
             String role = authority.getAuthority();
             return switch (role) {
+                case "ROLE_QUẢN_TRỊ" -> "redirect:/admin/dashboard";
                 case "ROLE_QUẢN_LÝ" -> "redirect:/manager/dashboard";
                 case "ROLE_THU_NGÂN" -> "redirect:/cashier/dashboard";
                 case "ROLE_PHỤC_VỤ" -> "redirect:/waiter/dashboard";
