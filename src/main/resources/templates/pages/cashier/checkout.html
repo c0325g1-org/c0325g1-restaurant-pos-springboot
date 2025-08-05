@@ -67,14 +67,6 @@
             </div>
 
 
-
-            <!-- Số tiền thanh toán -->
-            <div class="mb-4">
-                <label class="form-label">Số tiền thanh toán</label>
-                <input type="number" class="form-control" name="amount" min="0"
-                       th:value="${invoice.totalAmount}" required/>
-            </div>
-
             <!-- Nút xác nhận + in + tải -->
             <div class="d-flex justify-content-between align-items-center">
                 <a th:href="@{/cashier/invoices}" class="btn btn-outline-secondary">Quay lại</a>
