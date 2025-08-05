@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,6 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
@@ -24,15 +26,17 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(config -> config
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/img/**", "/uploads/feedbacks/**").permitAll()
-                        .requestMatchers("/login", "/register", "/forgot-password", "/reset-password").permitAll()
+                        .requestMatchers("/login", "/register", "/forgot-password","/home", "/reset-password").permitAll()
                         .requestMatchers("/feedback/verify", "/feedback/submit", "/feedback/success").permitAll()
                         .requestMatchers("/feedback/**").permitAll()
                         .requestMatchers("/profile/**").authenticated()
                         // PHÂN QUYỀN
-                        .requestMatchers("/manager/**").hasRole("QUẢN_LÝ")
-                        .requestMatchers("/cashier/**").hasAnyRole("THU_NGÂN", "QUẢN_LÝ")
-                        .requestMatchers("/waiter/**").hasRole("PHỤC_VỤ")
-                        .requestMatchers("/kitchen/**").hasRole("BẾP")
+                        .requestMatchers("/admin/**").hasRole("QUẢN_TRỊ")
+                        .requestMatchers("/manager/**").hasAnyRole("QUẢN_LÝ", "QUẢN_TRỊ")
+                        .requestMatchers("/cashier/**").hasAnyRole("THU_NGÂN", "QUẢN_LÝ", "QUẢN_TRỊ")
+                        .requestMatchers("/waiter/**").hasAnyRole("PHỤC_VỤ", "QUẢN_TRỊ")
+                        .requestMatchers("/kitchen/**").hasAnyRole("BẾP", "QUẢN_TRỊ")
+
                         .anyRequest().authenticated()
                 )
                 // CẤU HÌNH FORM LOGIN
