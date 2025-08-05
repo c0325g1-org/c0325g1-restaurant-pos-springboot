@@ -291,7 +291,7 @@
                     const pdf = new jspdf.jsPDF({
                         orientation: 'portrait',
                         unit: 'mm',
-                        format: [mmWidth, mmHeight-40]
+                        format: [mmWidth, mmHeight-35]
                     });
 
                     pdf.addImage(imgData, 'PNG', 0, 0, mmWidth, mmHeight);
