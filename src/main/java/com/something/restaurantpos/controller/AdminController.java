@@ -1,16 +1,27 @@
 package com.something.restaurantpos.controller;
 
+import com.something.restaurantpos.dto.EmployeeDTO;
+import com.something.restaurantpos.dto.EmployeeUpdateDTO;
 import com.something.restaurantpos.entity.Employee;
 import com.something.restaurantpos.entity.Role;
+import com.something.restaurantpos.mapper.EmployeeMapper;
 import com.something.restaurantpos.repository.IEmployeeRepository;
 import com.something.restaurantpos.repository.IRoleRepository;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Valid;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Set;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +40,9 @@ public class AdminController {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private EmployeeMapper employeeMapper;
 
     @GetMapping("")
     public String adminHome() {
@@ -71,6 +85,8 @@ public class AdminController {
         model.addAttribute("employeeName", "Admin");
         model.addAttribute("employees", employees);
         model.addAttribute("roles", roles);
+        model.addAttribute("employeeDTO", new EmployeeDTO());
+        model.addAttribute("employeeUpdateDTO", new EmployeeUpdateDTO());
         
         return "pages/admin/employees";
     }
@@ -99,38 +115,54 @@ public class AdminController {
     }
     
     @PostMapping("/employees/add")
-    public String addEmployee(@RequestParam String name,
-                             @RequestParam String username,
-                             @RequestParam String email,
-                             @RequestParam String password,
-                             @RequestParam Integer roleId,
-                             RedirectAttributes redirectAttributes) {
+    public String addEmployee(@ModelAttribute("employeeDTO") @Valid EmployeeDTO employeeDTO,
+                             BindingResult result,
+                             RedirectAttributes redirectAttributes,
+                             Model model) {
         try {
+            // Kiểm tra validation errors
+            if (result.hasErrors()) {
+                List<Role> roles = roleRepository.findAll();
+                model.addAttribute("roles", roles);
+                model.addAttribute("pageTitle", "Quản lý Nhân viên");
+                model.addAttribute("employeeName", "Admin");
+                return "pages/admin/employees";
+            }
+            
             // Kiểm tra username đã tồn tại chưa
-            if (employeeRepository.findByUsername(username).isPresent()) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Username đã tồn tại");
-                return "redirect:/admin/employees";
+            if (employeeRepository.findByUsername(employeeDTO.getUsername()).isPresent()) {
+                result.rejectValue("username", "error.username", "Username đã tồn tại");
+                List<Role> roles = roleRepository.findAll();
+                model.addAttribute("roles", roles);
+                model.addAttribute("pageTitle", "Quản lý Nhân viên");
+                model.addAttribute("employeeName", "Admin");
+                return "pages/admin/employees";
             }
             
             // Kiểm tra email đã tồn tại chưa
-            if (employeeRepository.findByEmail(email).isPresent()) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Email đã tồn tại");
-                return "redirect:/admin/employees";
+            if (employeeRepository.findByEmail(employeeDTO.getEmail()).isPresent()) {
+                result.rejectValue("email", "error.email", "Email đã tồn tại");
+                List<Role> roles = roleRepository.findAll();
+                model.addAttribute("roles", roles);
+                model.addAttribute("pageTitle", "Quản lý Nhân viên");
+                model.addAttribute("employeeName", "Admin");
+                return "pages/admin/employees";
             }
             
             // Tìm role
-            Role role = roleRepository.findById(roleId).orElse(null);
+            Role role = roleRepository.findById(employeeDTO.getRoleId()).orElse(null);
             if (role == null) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Vai trò không hợp lệ");
-                return "redirect:/admin/employees";
+                result.rejectValue("roleId", "error.roleId", "Vai trò không hợp lệ");
+                List<Role> roles = roleRepository.findAll();
+                model.addAttribute("roles", roles);
+                model.addAttribute("pageTitle", "Quản lý Nhân viên");
+                model.addAttribute("employeeName", "Admin");
+                return "pages/admin/employees";
             }
             
             // Tạo employee mới
-            Employee employee = new Employee();
-            employee.setName(name);
-            employee.setUsername(username);
-            employee.setEmail(email);
-            employee.setPassword(passwordEncoder.encode(password));
+            Employee employee = employeeMapper.toEntity(employeeDTO);
+            employee.setPassword(passwordEncoder.encode(employeeDTO.getPassword()));
             employee.setRole(role);
             employee.setEnable(true);
             
@@ -176,8 +208,54 @@ public class AdminController {
                                 @RequestParam String email,
                                 @RequestParam(required = false) String password,
                                 @RequestParam Integer roleId,
-                                RedirectAttributes redirectAttributes) {
+                                RedirectAttributes redirectAttributes,
+                                Model model) {
         try {
+            // Tạo DTO để validate
+            EmployeeUpdateDTO employeeUpdateDTO = new EmployeeUpdateDTO();
+            employeeUpdateDTO.setId(id);
+            employeeUpdateDTO.setName(name);
+            employeeUpdateDTO.setUsername(username);
+            employeeUpdateDTO.setEmail(email);
+            employeeUpdateDTO.setRoleId(roleId);
+            
+            // Chỉ validate password nếu có nhập
+            if (password != null && !password.trim().isEmpty()) {
+                employeeUpdateDTO.setPassword(password);
+            }
+            
+            // Validate DTO (chỉ validate các field bắt buộc)
+            ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+            Validator validator = factory.getValidator();
+            Set<ConstraintViolation<EmployeeUpdateDTO>> violations = validator.validate(employeeUpdateDTO);
+            
+            // Nếu có password được nhập, validate password riêng
+            if (password != null && !password.trim().isEmpty()) {
+                EmployeeUpdateDTO passwordDTO = new EmployeeUpdateDTO();
+                passwordDTO.setPassword(password);
+                Set<ConstraintViolation<EmployeeUpdateDTO>> passwordViolations = validator.validateProperty(passwordDTO, "password");
+                violations.addAll(passwordViolations);
+            }
+            
+            if (!violations.isEmpty()) {
+                // Có lỗi validation
+                List<Role> roles = roleRepository.findAll();
+                model.addAttribute("roles", roles);
+                model.addAttribute("pageTitle", "Quản lý Nhân viên");
+                model.addAttribute("employeeName", "Admin");
+                model.addAttribute("employees", employeeRepository.findAllWithRole());
+                model.addAttribute("employeeDTO", new EmployeeDTO());
+                model.addAttribute("employeeUpdateDTO", new EmployeeUpdateDTO());
+                
+                // Thêm thông báo lỗi
+                StringBuilder errorMessage = new StringBuilder();
+                for (ConstraintViolation<EmployeeUpdateDTO> violation : violations) {
+                    errorMessage.append(violation.getMessage()).append("; ");
+                }
+                redirectAttributes.addFlashAttribute("errorMessage", errorMessage.toString());
+                return "redirect:/admin/employees";
+            }
+            
             Employee employee = employeeRepository.findById(id).orElse(null);
             if (employee == null) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy nhân viên");
