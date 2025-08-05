@@ -210,17 +210,6 @@
     <div class="text-center p-3 shadow logo-wrapper">
         <img th:src="@{'/img/logo.png'}" alt="Logo" width="100%" style="max-width: 106px; filter: drop-shadow(2px 4px 6px black);">
     </div>
-    <!-- Admin Menu -->
-    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/admin/dashboard}" class="nav-link"><i class="bi bi-speedometer2"></i> <span>Trang chủ</span></a>
-    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/admin/employees}" class="nav-link"><i class="bi bi-people"></i> <span>Nhân viên</span></a>
-    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/manager/menu_items}" class="nav-link"><i class="bi bi-card-list"></i> <span>Món ăn</span></a>
-    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/manager/menu_category}" class="nav-link"><i class="bi bi-tags"></i> <span>Danh mục Món</span></a>
-    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/manager/vouchers}" class="nav-link"><i class="bi bi-percent"></i> <span>% Mã giảm giá</span></a>
-                    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/feedback}" class="nav-link"><i class="bi bi-chat-dots"></i> <span>Phản hồi KH</span></a>
-                        <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/waiter/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
-    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/cashier/invoices}" class="nav-link"><i class="bi bi-receipt"></i> <span>Hoá đơn</span></a>
-    
-    <!-- Manager Menu -->
     <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/dashboard}" class="nav-link"><i class="bi bi-speedometer2"></i> <span>Trang chủ</span></a>
     <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/menu_items}" class="nav-link"><i class="bi bi-card-list"></i> <span>Món ăn</span></a>
     <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/menu_category}" class="nav-link"><i class="bi bi-tags"></i> <span>Danh mục Món</span></a>
@@ -255,6 +244,7 @@
 
 <div id="toast-noti-container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;"></div>
 <audio id="notificationSound" src="https://www.myinstants.com/media/sounds/notification_o14egLP.mp3"></audio>
+
 
 <th:block layout:fragment="modal"></th:block>
 
