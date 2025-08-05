@@ -45,6 +45,11 @@
             z-index: 1050;
         }
 
+        #notification-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
         .sidebar.collapsed-desktop {
             width: 72px;
         }
@@ -211,10 +216,10 @@
     <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/manager/menu_items}" class="nav-link"><i class="bi bi-card-list"></i> <span>Món ăn</span></a>
     <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/manager/menu_category}" class="nav-link"><i class="bi bi-tags"></i> <span>Danh mục Món</span></a>
     <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/manager/vouchers}" class="nav-link"><i class="bi bi-percent"></i> <span>% Mã giảm giá</span></a>
-                    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/feedback}" class="nav-link"><i class="bi bi-chat-dots"></i> <span>Phản hồi KH</span></a>
-                        <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/waiter/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
+    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/feedback}" class="nav-link"><i class="bi bi-chat-dots"></i> <span>Phản hồi KH</span></a>
+    <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/waiter/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
     <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/cashier/invoices}" class="nav-link"><i class="bi bi-receipt"></i> <span>Hoá đơn</span></a>
-    
+
     <!-- Manager Menu -->
     <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/dashboard}" class="nav-link"><i class="bi bi-speedometer2"></i> <span>Trang chủ</span></a>
     <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/menu_items}" class="nav-link"><i class="bi bi-card-list"></i> <span>Món ăn</span></a>
@@ -224,6 +229,7 @@
     <a sec:authorize="hasAnyRole('THU_NGÂN', 'QUẢN_LÝ')" th:href="@{/cashier/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
     <a sec:authorize="hasAnyRole('THU_NGÂN', 'QUẢN_LÝ')" th:href="@{/cashier/invoices}" class="nav-link"><i class="bi bi-receipt"></i> <span>Hoá đơn</span></a>
     <a sec:authorize="hasRole('PHỤC_VỤ')" th:href="@{/waiter/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
+    <a sec:authorize="hasRole('PHỤC_VỤ')" th:href="@{/feedback}" class="nav-link"><i class="bi bi-bag"></i> <span>Phản hồi KH</span></a>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -234,62 +240,8 @@
                 <i class="bi bi-list-task"></i>
             </button>
             <div class="flex-grow-1"></div>
-            <div class="dropdown me-4">
-                <button class="btn position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                    <i class="bi bi-bell fs-4"></i>
-                    <span class="notification-count position-absolute translate-middle badge rounded-pill bg-danger"
-                          style="top: 8px; left: 40px;">5</span>
-                </button>
-                <div class="dropdown-menu dropdown-menu-end p-0 border-0 shadow" aria-labelledby="notificationDropdown"
-                     style="min-width: 350px; max-width: 400px;">
-                    <div class="py-2 px-3 border-bottom"><strong>Thông báo</strong></div>
-                    <div class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
-                        <a href="#" class="list-group-item list-group-item-action gap-3">
-                            <div class="d-flex justify-content-between">
-                                <strong>Nhà bếp <span class="badge text-bg-info">Thông tin</span></strong>
-                                <small class="text-muted">Vài giây trước</small>
-                            </div>
-                            <div class="text-muted small">Món xxx, yyy bàn 3 đã sẵn sàng</div>
-                        </a>
-                    </div>
-                    <div class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
-                        <a href="#" class="list-group-item list-group-item-action gap-3">
-                            <div class="d-flex justify-content-between">
-                                <strong>Nhà bếp <span class="badge text-bg-info">Thông tin</span></strong>
-                                <small class="text-muted">5 phút trước</small>
-                            </div>
-                            <div class="text-muted small">Món zzz bàn 1 đã sẵn sàng</div>
-                        </a>
-                    </div>
-                    <div class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
-                        <a href="#" class="list-group-item list-group-item-action gap-3">
-                            <div class="d-flex justify-content-between">
-                                <strong>Nhà bếp <span class="badge text-bg-info">Thông tin</span></strong>
-                                <small class="text-muted">12:12</small>
-                            </div>
-                            <div class="text-muted small">Món aaa bàn 1 đang chế biến</div>
-                        </a>
-                    </div>
-                    <div class="text-center p-2 border-top">
-                        <a href="/messages" class="text-decoration-none">Xem toàn bộ thông báo</a>
-                    </div>
-                </div>
-            </div>
-            <div class="d-flex align-items-center ms-auto gap-3">
-                <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                        <span sec:authentication="name" class="fw-bold me-2 fs-6"></span>
-                        <img src="https://i.pravatar.cc/40?img=11" class="rounded-circle" width="36" height="36">
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow">
-                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">Hồ sơ</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
-                    </ul>
-                </div>
-            </div>
+            <div th:replace="~{fragments/shared/notification :: notification}"></div>
+            <div th:replace="~{fragments/shared/user_action :: userAction}"></div>
         </div>
     </nav>
 
@@ -300,83 +252,11 @@
     <footer class="border-top">&copy; 2025 Hệ thống POS nhà hàng</footer>
 </div>
 
-<!-- Profile Modal -->
-<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-secondary text-white">
-                <h5 class="modal-title ">
-                    <i class="fas fa-id-badge me-2"></i>Thông tin nhân viên
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="text-center mb-4">
-                    <div class="rounded-circle bg-light border d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
-                        <i class="fas fa-user fa-3x text-secondary"></i>
-                    </div>
-                    <h4 class="mt-3 mb-0" id="profileName">Đang tải...</h4>
-                    <small class="text-muted" id="profileRole">Đang tải...</small>
-                </div>
+<div th:replace="~{fragments/shared/profile_modal :: profileModal}"></div>
 
-                    <div class="row g-4">
-                        <!-- Cột trái: Thông tin cá nhân -->
-                        <div class="col-md-6 border-end pe-4">
-                            <h6 class="text-primary mb-3 text-center">
-                                <i class="fas fa-user-cog me-2"></i>Thông tin cá nhân
-                            </h6>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item d-flex justify-content-between d-none">
-                                    <strong>Mã nhân viên:</strong>
-                                    <span id="profileId">-</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between">
-                                    <strong>Tên đăng nhập:</strong>
-                                    <span id="profileUsername">-</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between">
-                                    <strong>Email:</strong>
-                                    <span id="profileEmail">-</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between">
-                                    <strong>Vai trò:</strong>
-                                    <span id="profileRoleValue">-</span>
-                                </li>
-                            </ul>
-                        </div>
+<div id="toast-noti-container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;"></div>
+<audio id="notificationSound" src="https://www.myinstants.com/media/sounds/notification_o14egLP.mp3"></audio>
 
-                        <!-- Cột phải: Hệ thống -->
-                        <div class="col-md-6 ps-4">
-                            <h6 class="text-primary mb-3 text-center">
-                                <i class="fas fa-tools me-2"></i>Hệ thống
-                            </h6>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item d-flex justify-content-between">
-                                    <strong>Ngày tạo:</strong>
-                                    <span id="profileCreatedAt">-</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between">
-                                    <strong>Cập nhật lần cuối:</strong>
-                                    <span id="profileUpdatedAt">-</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between">
-                                    <strong>Trạng thái:</strong>
-                                    <span id="profileStatus" class="badge bg-secondary">-</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-            </div>
-            <div class="modal-footer border-top-0">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-1"></i>Đóng
-                </button>
-            </div>
-        </div>
-    </div>
-
-</div>
 
 <th:block layout:fragment="modal"></th:block>
 
@@ -384,85 +264,7 @@
 
 <!-- SCRIPTS -->
 <th:block th:replace="~{fragments/shared/script :: script}"></th:block>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.getElementById('toggleSidebarBtn');
-        const mainContent = document.getElementById('mainContent');
 
-        toggleBtn.addEventListener('click', () => {
-            if (window.innerWidth < 992) {
-                sidebar.classList.toggle('show');
-            } else {
-                sidebar.classList.toggle('collapsed-desktop');
-                mainContent.classList.toggle('expanded');
-            }
-        });
-
-        // Close sidebar on outside click (mobile only)
-        window.addEventListener('click', function (e) {
-            if (window.innerWidth < 992 && sidebar.classList.contains('show')) {
-                if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
-                    sidebar.classList.remove('show');
-                }
-            }
-        });
-
-        // Profile Modal functionality
-        const profileModal = document.getElementById('profileModal');
-        if (profileModal) {
-            profileModal.addEventListener('show.bs.modal', function () {
-                loadProfileData();
-            });
-        }
-
-        function loadProfileData() {
-            fetch('/profile/data')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Update profile information
-                    document.getElementById('profileName').textContent = data.name || 'N/A';
-                    document.getElementById('profileRole').textContent = data.role || 'N/A';
-                    document.getElementById('profileId').textContent = data.id || 'N/A';
-                    document.getElementById('profileUsername').textContent = data.username || 'N/A';
-                    document.getElementById('profileEmail').textContent = data.email || 'N/A';
-                    document.getElementById('profileRoleValue').textContent = data.role || 'N/A';
-                    
-                    // Format dates
-                    if (data.createdAt) {
-                        const createdDate = new Date(data.createdAt);
-                        document.getElementById('profileCreatedAt').textContent = createdDate.toLocaleString('vi-VN');
-                    }
-                    
-                    if (data.updatedAt) {
-                        const updatedDate = new Date(data.updatedAt);
-                        document.getElementById('profileUpdatedAt').textContent = updatedDate.toLocaleString('vi-VN');
-                    }
-                    
-                    // Update status
-                    const statusElement = document.getElementById('profileStatus');
-                    if (data.deleted) {
-                        statusElement.textContent = 'Đã xóa';
-                        statusElement.className = 'status-badge status-inactive';
-                    } else {
-                        statusElement.textContent = 'Hoạt động';
-                        statusElement.className = 'status-badge status-active';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading profile data:', error);
-                    // Show error message
-                    document.getElementById('profileName').textContent = 'Lỗi tải dữ liệu';
-                    document.getElementById('profileRole').textContent = 'Vui lòng thử lại';
-                });
-        }
-    });
-</script>
 <th:block layout:fragment="script"></th:block>
 </body>
 </html>

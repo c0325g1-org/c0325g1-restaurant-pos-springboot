@@ -69,6 +69,7 @@
         <tr>
             <th>STT</th>
             <th>Mã</th>
+            <th>Ảnh</th>
             <th>Mô tả</th>
             <th>Giảm (%)</th>
             <th>Hiệu lực từ</th>
@@ -82,6 +83,12 @@
             <td th:text="${status.count}">1</td>
             <td th:text="${v.code}">ABC123</td>
             <td th:text="${v.description}">Khuyến mãi sinh nhật</td>
+            <td>
+                <img th:src="${v.image != null} ? ${v.image} : '@{/images/default-voucher.png}'"
+                     alt="Ảnh voucher"
+                     class="img-thumbnail"
+                     style="max-height: 60px; max-width: 60px;">
+            </td>
             <td th:text="${v.discountPercent + '%'}">10%</td>
             <td th:text="${#temporals.format(v.validFrom, 'dd/MM/yyyy HH:mm')}">01/08/2025</td>
             <td th:text="${#temporals.format(v.validTo, 'dd/MM/yyyy HH:mm')}">15/08/2025</td>

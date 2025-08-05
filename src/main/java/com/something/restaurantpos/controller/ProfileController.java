@@ -2,6 +2,7 @@ package com.something.restaurantpos.controller;
 
 import com.something.restaurantpos.entity.Employee;
 import com.something.restaurantpos.repository.IEmployeeRepository;
+import com.something.restaurantpos.service.IEmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,7 +22,7 @@ import java.util.Optional;
 public class ProfileController {
 
     @Autowired
-    private IEmployeeRepository employeeRepository;
+    private IEmployeeService employeeService;
 
     @GetMapping("/data")
     @ResponseBody
@@ -33,7 +34,7 @@ public class ProfileController {
         }
 
         String username = authentication.getName();
-        Optional<Employee> employeeOpt = employeeRepository.findByUsername(username);
+        Optional<Employee> employeeOpt = employeeService.findByUsername(username);
         
         if (employeeOpt.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Không tìm thấy thông tin nhân viên"));

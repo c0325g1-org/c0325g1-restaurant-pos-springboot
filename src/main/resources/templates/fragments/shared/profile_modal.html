@@ -1,0 +1,80 @@
+<!-- Profile Modal -->
+<div th:fragment="profileModal" class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title ">
+                    <i class="fas fa-id-badge me-2"></i>Thông tin nhân viên
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <div class="rounded-circle bg-light border d-inline-flex align-items-center justify-content-center"
+                         style="width: 100px; height: 100px;">
+                        <i class="fas fa-user fa-3x text-secondary"></i>
+                    </div>
+                    <h4 class="mt-3 mb-0" id="profileName">Đang tải...</h4>
+                    <small class="text-muted" id="profileRole">Đang tải...</small>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Cột trái: Thông tin cá nhân -->
+                    <div class="col-md-6 border-end pe-4">
+                        <h6 class="text-primary mb-3 text-center">
+                            <i class="fas fa-user-cog me-2"></i>Thông tin cá nhân
+                        </h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between d-none">
+                                <strong>Mã nhân viên:</strong>
+                                <span id="profileId">-</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong>Tên đăng nhập:</strong>
+                                <span id="profileUsername">-</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong>Email:</strong>
+                                <span id="profileEmail">-</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong>Vai trò:</strong>
+                                <span id="profileRoleValue">-</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Cột phải: Hệ thống -->
+                    <div class="col-md-6 ps-4">
+                        <h6 class="text-primary mb-3 text-center">
+                            <i class="fas fa-tools me-2"></i>Hệ thống
+                        </h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong>Ngày tạo:</strong>
+                                <span id="profileCreatedAt">-</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong>Cập nhật lần cuối:</strong>
+                                <span id="profileUpdatedAt">-</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong>Trạng thái:</strong>
+                                <span id="profileStatus" class="badge bg-secondary">-</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer border-top-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>

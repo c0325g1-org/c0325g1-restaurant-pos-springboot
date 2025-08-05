@@ -16,7 +16,7 @@
                 <button type="submit" class="btn btn-success d-flex align-items-center">
                     <i class="bi bi-search me-1"></i> Tìm kiếm
                 </button>
-                <th:block sec:authorize="hasRole('QUẢN TRỊ')">
+                <th:block sec:authorize="hasRole('QUẢN_TRỊ')">
                     <a class="btn btn-danger" th:href="@{/feedback/trash}">
                         <i class="bi bi-trash"></i>
                         Thùng rác
@@ -33,7 +33,7 @@
         <div th:if="${error}" class="alert alert-warning" th:text="${message}"></div>
         <div class="table-responsive">
             <form method="post" th:action="@{/feedback/delete-multiple}" id="bulkDeleteForm">
-                <th:block sec:authorize="hasRole('QUẢN TRỊ')">
+                <th:block sec:authorize="hasRole('QUẢN_TRỊ')">
                     <div class="d-flex gap-2 mb-3">
                         <button type="submit" class="btn btn-danger"
                                 onclick="return confirm('Bạn có chắc chắn muốn xoá các đánh giá đã chọn?')">
@@ -45,7 +45,7 @@
                 <table class="table table-bordered table-hover table-striped align-middle">
                     <thead class="table-dark text-center">
                     <tr>
-                        <th:block sec:authorize="hasRole('QUẢN TRỊ')">
+                        <th:block sec:authorize="hasRole('QUẢN_TRỊ')">
                             <th><input type="checkbox" id="selectAll"
                                        style="opacity: 0; position: absolute; pointer-events: none;"></th>
                         </th:block>
@@ -66,7 +66,7 @@
                     </tr>
                     <tr class="text-center" th:each="feedback, iterStat : ${feedbacks}"
                         th:unless="${#lists.isEmpty(feedbacks)}">
-                        <th:block sec:authorize="hasRole('QUẢN TRỊ')">
+                        <th:block sec:authorize="hasRole('QUẢN_TRỊ')">
                             <td><input type="checkbox" name="selectedIds" th:value="${feedback.id}"
                                        class="feedback-checkbox">
                             </td>
@@ -89,7 +89,7 @@
                                     th:attr="data-bs-target='#modalFeedback__' + ${feedback.id}" title="Xem chi tiết">
                                 <i class="bi bi-pencil-square"></i>
                             </button>
-                            <th:block sec:authorize="hasRole('QUẢN TRỊ')">
+                            <th:block sec:authorize="hasRole('QUẢN_TRỊ')">
                                 <button type="button"
                                         class="btn btn-outline-danger btn-sm"
                                         th:attr="data-bs-toggle='modal', data-bs-target='#modalDeleteFeedback__' + ${feedback.id}"
@@ -149,7 +149,7 @@
                     </div>
                 </div>
             </th:block>
-            <th:block sec:authorize="hasRole('QUẢN TRỊ')">
+            <th:block sec:authorize="hasRole('QUẢN_TRỊ')">
 
                 <th:block th:each="feedback : ${feedbacks}">
                     <!-- Modal xác nhận xoá -->

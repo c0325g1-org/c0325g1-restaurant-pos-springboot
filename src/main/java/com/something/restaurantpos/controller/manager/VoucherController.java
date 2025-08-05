@@ -4,6 +4,7 @@ import com.something.restaurantpos.dto.VoucherDTO;
 import com.something.restaurantpos.entity.Voucher;
 import com.something.restaurantpos.mapper.VoucherMapper;
 import com.something.restaurantpos.service.IVoucherService;
+import com.something.restaurantpos.service.impl.CloudinaryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ public class VoucherController {
 
     private final IVoucherService voucherService;
     private final VoucherMapper voucherMapper;
+    private final CloudinaryService cloudinaryService;
     private int pageSize = 10;
 
     @GetMapping
@@ -73,11 +75,22 @@ public class VoucherController {
                        BindingResult result,
                        RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) return "pages/manager/vouchers/form";
-        Voucher voucher = voucherMapper.toEntity(voucherDTO);
-        voucher.setId(null);
-        voucherService.save(voucher);
-        redirectAttributes.addFlashAttribute("successMessage", "Thêm mã giảm giá thành công!");
-        return "redirect:/manager/vouchers";
+        try {
+            if (voucherDTO.getImageFile() != null && !voucherDTO.getImageFile().isEmpty()) {
+                String imageUrl = cloudinaryService.uploadImage(voucherDTO.getImageFile());
+                voucherDTO.setImage(imageUrl);
+            }
+
+            Voucher voucher = voucherMapper.toEntity(voucherDTO);
+            voucher.setId(null);
+            voucherService.save(voucher);
+            redirectAttributes.addFlashAttribute("successMessage", "Thêm mã giảm giá thành công!");
+            return "redirect:/manager/vouchers";
+
+        } catch (Exception e) {
+            result.rejectValue("imageFile", null, "Tải ảnh thất bại: " + e.getMessage());
+            return "pages/manager/vouchers/form";
+        }
     }
 
     @GetMapping("{id}/edit")
@@ -94,11 +107,27 @@ public class VoucherController {
                          RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) return "pages/manager/vouchers/form";
         voucherService.findByIdOrThrow(id);
-        Voucher voucher = voucherMapper.toEntity(voucherDTO);
-        voucher.setId(id);
-        voucherService.save(voucher);
-        redirectAttributes.addFlashAttribute("successMessage", "Cập nhật mã giảm giá thành công!");
-        return "redirect:/manager/vouchers";
+        try {
+            Voucher oldVoucher = voucherService.findByIdOrThrow(id);
+
+            if (voucherDTO.getImageFile() != null && !voucherDTO.getImageFile().isEmpty()) {
+                String imageUrl = cloudinaryService.uploadImage(voucherDTO.getImageFile());
+                voucherDTO.setImage(imageUrl);
+            } else {
+                voucherDTO.setImage(oldVoucher.getImage()); // giữ ảnh cũ nếu không upload ảnh mới
+            }
+
+            Voucher voucher = voucherMapper.toEntity(voucherDTO);
+            voucher.setId(id);
+            voucherService.save(voucher);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật mã giảm giá thành công!");
+            return "redirect:/manager/vouchers";
+
+        } catch (Exception e) {
+            result.rejectValue("imageFile", null, "Cập nhật ảnh thất bại: " + e.getMessage());
+            return "pages/manager/vouchers/form";
+        }
+
     }
 
     @PostMapping("{id}/delete")

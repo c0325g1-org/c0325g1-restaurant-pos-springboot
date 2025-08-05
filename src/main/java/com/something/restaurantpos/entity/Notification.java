@@ -25,4 +25,8 @@ public class Notification extends AuditMetadata {
     public enum NotificationType {
         INFO, WARNING, ERROR
     }
+
+    @ManyToOne
+    @JoinColumn(name = "sender_employee_id")
+    private Employee senderEmployee;
 }
