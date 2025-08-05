@@ -22,5 +22,6 @@ public class InvoiceDto {
     private List<OrderItemDTO> orderItems;  // ✅ Danh sách món
     private Boolean paid;
     private String note;
-    // ✅ Ghi chú
+    private VoucherDTO voucher;
+    private BigDecimal discountedTotalAmount;
 }
