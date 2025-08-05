@@ -43,7 +43,7 @@
             </td>
             <td th:text="${feedback.content}"></td>
             <td>
-                <th:block sec:authorize="hasRole('QUẢN TRỊ')">
+                <th:block sec:authorize="hasRole('QUẢN_TRỊ')">
 
                     <form th:action="@{/feedback/restore}" method="post" class="d-inline">
                         <input type="hidden" name="id" th:value="${feedback.id}"/>
@@ -66,7 +66,7 @@
     </table>
 
     <!-- Modal xác nhận xoá vĩnh viễn -->
-    <th:block sec:authorize="hasRole('QUẢN TRỊ')">
+    <th:block sec:authorize="hasRole('QUẢN_TRỊ')">
 
         <th:block th:each="feedback : ${feedbacks}">
             <div class="modal fade" th:id="'deleteModal__' + ${feedback.id}" tabindex="-1" aria-hidden="true">
