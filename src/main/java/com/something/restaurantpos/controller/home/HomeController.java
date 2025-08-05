@@ -40,7 +40,7 @@ public class HomeController {
     @GetMapping("")
     public String homePage(Model model) {
         model.addAttribute("bookingDTO", new BookingDTO());
-//        model.addAllAttributes("voucher",voucherService.findAll());
+        model.addAttribute("vouchers",voucherService.findAllByOrderByCreatedAtDesc(PageRequest.of(0,3)));
         model.addAttribute("menuItems", menuItemService.findMenuItemOrderByTotalQuantityDesc());
         model.addAttribute("feedbacks", feedbackService.findTop5FiveStarFeedbacks(PageRequest.of(0, 5)));
         return "pages/home/homePage";

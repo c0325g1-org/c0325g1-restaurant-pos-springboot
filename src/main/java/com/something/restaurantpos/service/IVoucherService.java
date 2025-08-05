@@ -10,4 +10,5 @@ import java.util.List;
 public interface IVoucherService extends IService<Voucher> {
     Page<Voucher> search(String keyword, Boolean status, Integer percent, Pageable pageable);
     List<Voucher> findAllValid();
+    Page<Voucher> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }
