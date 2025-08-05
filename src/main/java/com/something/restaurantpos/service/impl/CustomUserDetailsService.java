@@ -25,10 +25,17 @@ public class CustomUserDetailsService implements UserDetailsService {
         Employee employee = employeeRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
-        // Nếu mật khẩu chưa được mã hóa (không bắt đầu bằng $2a$)
-        if (employee.getPassword() != null && !employee.getPassword().startsWith("$2a$")) {
-            String encoded = passwordEncoder.encode(employee.getPassword());
-            employee.setPassword(encoded);
+        // Kiểm tra trạng thái kích hoạt
+        if (!employee.getEnable()) {
+            throw new UsernameNotFoundException("Tài khoản đã bị vô hiệu hóa");
+        }
+
+        // Xử lý mã hóa mật khẩu nếu chưa được mã hóa
+        String password = employee.getPassword();
+        if (password != null && !password.startsWith("$2a$")) {
+            // Nếu mật khẩu chưa mã hóa, thì mã hóa và lưu lại
+            password = passwordEncoder.encode(password);
+            employee.setPassword(password);
             employeeRepository.save(employee);
         }
 
