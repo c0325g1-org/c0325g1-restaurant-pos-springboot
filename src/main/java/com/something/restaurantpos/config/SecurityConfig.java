@@ -31,10 +31,12 @@ public class SecurityConfig {
                         .requestMatchers("/feedback/**").permitAll()
                         .requestMatchers("/profile/**").authenticated()
                         // PHÂN QUYỀN
-                        .requestMatchers("/manager/**").hasRole("QUẢN_LÝ")
-                        .requestMatchers("/cashier/**").hasAnyRole("THU_NGÂN", "QUẢN_LÝ")
-                        .requestMatchers("/waiter/**").hasRole("PHỤC_VỤ")
-                        .requestMatchers("/kitchen/**").hasRole("BẾP")
+                        .requestMatchers("/admin/**").hasRole("QUẢN_TRỊ")
+                        .requestMatchers("/manager/**").hasAnyRole("QUẢN_LÝ", "QUẢN_TRỊ")
+                        .requestMatchers("/cashier/**").hasAnyRole("THU_NGÂN", "QUẢN_LÝ", "QUẢN_TRỊ")
+                        .requestMatchers("/waiter/**").hasAnyRole("PHỤC_VỤ", "QUẢN_TRỊ")
+                        .requestMatchers("/kitchen/**").hasAnyRole("BẾP", "QUẢN_TRỊ")
+
                         .anyRequest().authenticated()
                 )
                 // CẤU HÌNH FORM LOGIN

@@ -1,0 +1,45 @@
+    <html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.thymeleaf.org">
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<div layout:fragment="content">
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-receipt" style="font-size: 2rem;"></i>
+                    <h5 class="card-title mt-2">Hóa đơn hôm nay</h5>
+                    <p class="card-text">123</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-currency-dollar" style="font-size: 2rem;"></i>
+                    <h5 class="card-title mt-2">Doanh thu hôm nay</h5>
+                    <p class="card-text">2.300.000đ</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-box-seam" style="font-size: 2rem;"></i>
+                    <h5 class="card-title mt-2">Món đang bán</h5>
+                    <p class="card-text">48</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-people" style="font-size: 2rem;"></i>
+                                         <h5 class="card-title mt-2">Nhân viên</h5>
+                     <p class="card-text" th:text="${enabledEmployees} + '/' + ${totalEmployees}">15/15</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html> 
