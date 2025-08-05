@@ -12,8 +12,8 @@ public class FeedbackDTO extends BaseDTO {
     @Size(max = 100, message = "Họ tên tối đa 100 ký tự")
     private String customerName;
 
-    @NotBlank(message = "Số điện thoại không được để trống")
-    @Pattern(regexp = "^\\+?\\d{7,15}$", message = "Số điện thoại không hợp lệ")
+    @NotBlank(message = "sdt không được để trống")
+    @Pattern(regexp = "^(0|\\+84)[0-9]{9}$", message = "Số điện thoại phải bắt đầu bằng 0 hoặc +84 và có đúng 9 chữ số sau đó")
     private String customerPhone;
 
     @NotNull(message = "Vui lòng chọn số sao đánh giá")

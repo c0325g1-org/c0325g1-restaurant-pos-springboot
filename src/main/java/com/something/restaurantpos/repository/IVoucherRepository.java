@@ -32,4 +32,5 @@ public interface IVoucherRepository extends JpaRepository<Voucher, Integer> {
             "AND v.validFrom <= :now " +
             "AND v.validTo >= :now")
     List<Voucher> findAllValid(@Param("now") LocalDateTime now);
+    Page<Voucher> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }

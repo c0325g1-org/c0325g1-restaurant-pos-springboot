@@ -7,7 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer"/>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
     <title>Responsive Nav với Dropdown</title>
@@ -520,12 +521,13 @@
         button.place-btn {
             background-color: #ea5f1f;
         }
+
         .place-btn {
             font-weight: bold;
             border: none;
             border-radius: 30px;
             padding: 12px 20px;
-            background: #ea5f1f ;
+            background: #ea5f1f;
             color: #fff;
             cursor: pointer;
             position: absolute;
@@ -553,9 +555,119 @@
             transform: translateX(-10px);
             transition: transform .25s ease, opacity .25s ease;
         }
+
+
+        /*đặt bàn*/
+        /* overlay mờ */
+        #backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 10000;
+            display: none;
+        }
+
+        /* modal đơn giản */
+        #bookingModal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(.9);
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem 1.25rem;
+            width: 320px;
+            max-width: 90%;
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.3);
+            z-index: 10001;
+            display: none;
+            transition: transform .25s ease, opacity .25s ease;
+        }
+
+        #bookingModal.show {
+            display: block;
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        #bookingModal .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        #bookingModal h3 {
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        #bookingModal .form-group {
+            margin-bottom: 0.75rem;
+        }
+
+        #bookingModal input, #bookingModal select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        #bookingModal button.submit {
+            width: 100%;
+            padding: 10px;
+            background: #ea5f1f;
+            border: none;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        form .form-group {
+            margin-bottom: 1rem;
+        }
+
+        form .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        form input,
+        form textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        form input:focus,
+        form textarea:focus {
+            border-color: #6c63ff;
+            box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
+            outline: none;
+        }
+
+        form textarea {
+            resize: vertical;
+            min-height: 80px;
+            max-height: 200px;
+            line-height: 1.5;
+        }
+
     </style>
 </head>
 <body>
+<th:block th:replace="~{fragments/shared/toast :: toast}"></th:block>
 <nav class="navbar navbar-expand-lg ">
     <div class="container-fluid">
         <img th:src="@{'/img/logo.png'}" class="navbar-brand" width="100pxn">
@@ -592,11 +704,11 @@
 
             </ul>
         </div>
-<!--        <div class="d-flex justify-content-end">-->
-<!--            <button type="button" class="btn btn-light grow-on-hover accent-btn" style="font-weight: bold">-->
-<!--                <i class="fa-solid fa-utensils"></i>-->
-<!--            </button>-->
-<!--        </div>-->
+        <!--        <div class="d-flex justify-content-end">-->
+        <!--            <button type="button" class="btn btn-light grow-on-hover accent-btn" style="font-weight: bold">-->
+        <!--                <i class="fa-solid fa-utensils"></i>-->
+        <!--            </button>-->
+        <!--        </div>-->
 
 
     </div>
@@ -627,16 +739,16 @@
 <!--    </button>-->
 <!--</div>-->
 
-<div class="feedback-carousel slick-fade" id="voucherSlider">
-    <div class="slide">
-        <img th:src="@{'/img/vocher.jpg'}" class="d-block w-100" alt="Voucher 1">
+<div class="feedback-carousel slick-fade" id="voucherSlider" >
+    <div class="slide" th:each="voucher, status : ${vouchers}">
+        <img th:src="${voucher.image}" class="d-block w-100" alt="Voucher 1">
     </div>
-    <div class="slide">
-        <img th:src="@{'/img/vocher1.jpg'}" class="d-block w-100" alt="Voucher 2">
-    </div>
-    <div class="slide">
-        <img th:src="@{'/img/vocher2.png'}" class="d-block w-100" alt="Voucher 3">
-    </div>
+<!--    <div class="slide">-->
+<!--        <img th:src="@{'/img/vocher1.jpg'}" class="d-block w-100" alt="Voucher 2">-->
+<!--    </div>-->
+<!--    <div class="slide">-->
+<!--        <img th:src="@{'/img/vocher2.png'}" class="d-block w-100" alt="Voucher 3">-->
+<!--    </div>-->
 </div>
 
 <div class="favorites-section">
@@ -694,7 +806,62 @@
         </button>
     </div>
 </div>
+<!-- overlay mờ -->
+<div id="backdrop"></div>
 
+<!-- modal đặt bàn -->
+<div id="bookingModal" aria-label="Form đặt bàn">
+    <button class="close-btn" aria-label="Đóng">&times;</button>
+    <h3>Đặt bàn</h3>
+    <form th:object="${bookingDTO}" th:action="@{/home/booking}" method="post">
+
+        <div class="form-group">
+            <label for="customerName" class="form-label">Họ tên</label>
+            <input type="text" id="customerName" th:field="*{name}" placeholder="Nhập tên" >
+            <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+
+        </div>
+        <div class="form-group">
+            <label for="phone" class="form-label">Số điện thoại</label>
+            <input type="tel" id="phone" th:field="*{phone}" placeholder="0987xxxxxx" >
+            <div class="text-danger small" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+
+        </div>
+        <div class="form-group">
+            <label for="email" class="form-label">Địa chỉ email </label>
+            <input type="email" id="email" th:field="*{email}" placeholder="Nhập địa chỉ email" >
+            <div class="text-danger small" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+
+        </div>
+        <div class="form-group">
+            <label for="datetime" class="form-label">Ngày & giờ</label>
+            <input type="datetime-local" th:field="*{dateTime}" id="datetime" >
+            <div class="text-danger small" th:if="${#fields.hasErrors('dateTime')}" th:errors="*{dateTime}"></div>
+
+        </div>
+        <div class="form-group">
+            <label for="people" class="form-label">Số khách</label>
+            <input type="number" th:field="*{people}" id="people" >
+            <div class="text-danger small" th:if="${#fields.hasErrors('people')}" th:errors="*{people}"></div>
+
+        </div>
+        <div class="form-group">
+            <label for="note" class="form-label">Ghi chú</label>
+            <textarea id="note" th:field="*{note}" placeholder="Nhập ghi chú" rows="3" style="resize: vertical;"></textarea>
+            <div class="text-danger small" th:if="${#fields.hasErrors('note')}" th:errors="*{note}"></div>
+        </div>
+
+        <!--        <div class="form-group">-->
+<!--            <label for="note" class="form-label">Ghi chú</label>-->
+<!--            <textarea type="text" id="note" th:field="*{note}" placeholder="nhập ghi chú" required></textarea>-->
+<!--            <input type="text" th:field="*{note}" id="note" placeholder="nhập ghi chú">-->
+<!--            <div class="text-danger small" th:if="${#fields.hasErrors('note')}" th:errors="*{note}"></div>-->
+
+<!--        </div>-->
+<!--        -->
+        <button class="submit" id="submitBooking">Xác nhận</button>
+    </form>
+</div>
 <footer class="bg-dark text-white mt-5">
     <div class="container py-4">
         <div class="row" style="display: flex">
@@ -732,6 +899,16 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
 
+        const showToast = (id) => {
+            const toastEl = document.getElementById(id);
+            if (toastEl) {
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+        };
+        showToast('successToast');
+        showToast('errorToast');
+
         const btnIcon = document.getElementById('toggleBtn');
         const placeBtn = document.getElementById('placeBtn');
         let visible = false;
@@ -757,7 +934,61 @@
             }
         });
     });
+    const btnIcon = document.getElementById('toggleBtn');
+    const placeBtn = document.getElementById('placeBtn');
+    const backdrop = document.getElementById('backdrop');
+    const modal = document.getElementById('bookingModal');
+    const closeBtn = modal.querySelector('.close-btn');
 
+    let state = 0; // 0=icon,1=placeBtn visible,2=modal open
+
+    function showPlaceBtn() {
+        placeBtn.classList.add('show');
+        btnIcon.classList.add('hidden');
+        state = 1;
+    }
+
+    function openModal() {
+        backdrop.style.display = 'block';
+        modal.classList.add('show');
+        state = 2;
+    }
+
+    function resetAll() {
+        placeBtn.classList.remove('show');
+        btnIcon.classList.remove('hidden');
+        backdrop.style.display = 'none';
+        modal.classList.remove('show');
+        state = 0;
+    }
+
+    btnIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (state === 0) {
+            showPlaceBtn();
+        } else if (state === 1) {
+            openModal();
+        } else {
+            resetAll();
+        }
+    });
+
+    placeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (state === 1) openModal();
+    });
+
+    backdrop.addEventListener('click', resetAll);
+    closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        resetAll();
+    });
+
+    document.addEventListener('click', (e) => {
+        if (state !== 0 && !modal.contains(e.target) && !placeBtn.contains(e.target) && !btnIcon.contains(e.target)) {
+            resetAll();
+        }
+    });
 
     $(function () {
         $('#feedbackSlider').slick({
@@ -800,6 +1031,7 @@
             dots: false,
             infinite: true
         });
+
     });
 </script>
 

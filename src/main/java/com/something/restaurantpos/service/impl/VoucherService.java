@@ -76,6 +76,10 @@ public class VoucherService implements IVoucherService {
         return voucherRepository.findAllValid(LocalDateTime.now());
     }
 
+    @Override
+    public Page<Voucher> findAllByOrderByCreatedAtDesc(Pageable pageable) {
+        return voucherRepository.findAllByOrderByCreatedAtDesc(pageable);
+    }
 
 
     @Override
