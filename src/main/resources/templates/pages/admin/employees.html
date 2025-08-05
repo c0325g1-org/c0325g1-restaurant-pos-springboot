@@ -1,0 +1,326 @@
+<html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.thymeleaf.org">
+<head>
+    <title>Nhân viên - Admin</title>
+    <script>
+        function toggleEmployeeStatus(employeeId) {
+            document.getElementById('toggleEmployeeId').value = employeeId;
+            var modal = new bootstrap.Modal(document.getElementById('toggleStatusModal'));
+            modal.show();
+        }
+
+        function confirmToggleStatus() {
+            var employeeId = document.getElementById('toggleEmployeeId').value;
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/employees/toggle-status';
+            
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'employeeId';
+            input.value = employeeId;
+            
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function editEmployee(id) {
+            // Tìm employee trong danh sách
+            const employeeRow = document.querySelector(`tr[data-employee-id="${id}"]`);
+            if (employeeRow) {
+                const name = employeeRow.querySelector('td:nth-child(2)').textContent.trim();
+                const username = employeeRow.querySelector('td:nth-child(3)').textContent.trim();
+                const email = employeeRow.querySelector('td:nth-child(4)').textContent.trim();
+                const roleName = employeeRow.querySelector('td:nth-child(5) .badge').textContent.trim();
+                
+                // Tìm role ID dựa trên role name
+                const roleSelect = document.getElementById('editRoleId');
+                let roleId = '';
+                for (let option of roleSelect.options) {
+                    if (option.textContent.trim() === roleName) {
+                        roleId = option.value;
+                        break;
+                    }
+                }
+                
+                // Điền dữ liệu vào form
+                document.getElementById('editEmployeeId').value = id;
+                document.getElementById('editName').value = name;
+                document.getElementById('editUsername').value = username;
+                document.getElementById('editEmail').value = email;
+                document.getElementById('editRoleId').value = roleId;
+                
+                // Cập nhật action URL
+                document.getElementById('editEmployeeForm').action = `/admin/employees/${id}/update`;
+                
+                var modal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
+                modal.show();
+            }
+        }
+
+        function deleteEmployee(id) {
+            // Tìm employee trong danh sách để kiểm tra trạng thái
+            const employeeRow = document.querySelector(`tr[data-employee-id="${id}"]`);
+            if (employeeRow) {
+                const status = employeeRow.querySelector('td:nth-child(7) .badge').textContent.trim();
+                const roleName = employeeRow.querySelector('td:nth-child(5) .badge').textContent.trim();
+                
+                // Kiểm tra xem có phải admin không
+                if (roleName === 'QUẢN_TRỊ') {
+                    alert('Không thể xóa tài khoản quản trị!');
+                    return;
+                }
+                
+                // Kiểm tra xem nhân viên có đang hoạt động không
+                if (status === 'Đã kích hoạt') {
+                    alert('Không thể xóa nhân viên đang hoạt động. Vui lòng vô hiệu hóa trước!');
+                    return;
+                }
+                
+                // Điền ID vào form và hiển thị modal
+                document.getElementById('deleteEmployeeId').value = id;
+                document.getElementById('deleteEmployeeForm').action = `/admin/employees/${id}/delete`;
+                
+                var modal = new bootstrap.Modal(document.getElementById('deleteEmployeeModal'));
+                modal.show();
+            }
+        }
+
+
+
+        function showSuccessMessage(message) {
+            var alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="bi bi-check-circle me-2"></i>
+                <span>${message}</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            var contentDiv = document.querySelector('[layout\\:fragment="content"]');
+            contentDiv.insertBefore(alertDiv, contentDiv.firstChild);
+
+            setTimeout(function() {
+                var bsAlert = new bootstrap.Alert(alertDiv);
+                bsAlert.close();
+            }, 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+    </script>
+</head>
+<div layout:fragment="content">
+    <!-- Success/Error Messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        <span th:text="${successMessage}">Thành công</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <span th:text="${errorMessage}">Lỗi</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+            <i class="bi bi-plus-circle me-2"></i>Thêm nhân viên
+        </button>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Họ tên</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Vai trò</th>
+                            <th>Ngày tạo</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="employee : ${employees}" th:attr="data-employee-id=${employee.id}">
+                            <td th:text="${employee.id}">1</td>
+                            <td th:text="${employee.name}">Nguyễn Văn A</td>
+                            <td th:text="${employee.username}">nv1</td>
+                            <td th:text="${employee.email}">email@example.com</td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${employee.role.name == 'QUẢN_LÝ' ? 'bg-success' : (employee.role.name == 'THU_NGÂN' ? 'bg-warning' : (employee.role.name == 'PHỤC_VỤ' ? 'bg-info' : (employee.role.name == 'BẾP' ? 'bg-danger' : (employee.role.name == 'QUẢN_TRỊ' ? 'bg-dark' : 'bg-secondary'))))}"
+                                      th:text="${employee.role.name}">Vai trò</span>
+                            </td>
+                            <td th:text="${#temporals.format(employee.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2024</td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${employee.enable ? 'bg-success' : 'bg-danger'}"
+                                      th:text="${employee.enable ? 'Đã kích hoạt' : 'Chưa kích hoạt'}">Trạng thái</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary me-1" 
+                                        th:onclick="'editEmployee(' + ${employee.id} + ')'">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm" 
+                                        th:classappend="${employee.enable ? 'btn-outline-warning' : 'btn-outline-success'}"
+                                        th:onclick="'toggleEmployeeStatus(' + ${employee.id} + ')'"
+                                        th:title="${employee.enable ? 'Vô hiệu hóa tài khoản' : 'Kích hoạt tài khoản'}">
+                                    <i class="bi" th:classappend="${employee.enable ? 'bi-toggle-on' : 'bi-toggle-off'}"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" 
+                                        th:onclick="'deleteEmployee(' + ${employee.id} + ')'">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Employee Modal -->
+    <div class="modal fade" id="addEmployeeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm nhân viên mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEmployeeForm" action="/admin/employees/add" method="post">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Họ tên</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mật khẩu</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="roleId" class="form-label">Vai trò</label>
+                            <select class="form-select" id="roleId" name="roleId" required>
+                                <option value="">Chọn vai trò</option>
+                                <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.name}">Vai trò</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" form="addEmployeeForm" class="btn btn-primary">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Employee Modal -->
+    <div class="modal fade" id="editEmployeeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chỉnh sửa nhân viên</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editEmployeeForm" method="post">
+                        <input type="hidden" id="editEmployeeId" name="id">
+                        <div class="mb-3">
+                            <label for="editName" class="form-label">Họ tên</label>
+                            <input type="text" class="form-control" id="editName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="editUsername" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPassword" class="form-label">Mật khẩu mới (để trống nếu không đổi)</label>
+                            <input type="password" class="form-control" id="editPassword" name="password" placeholder="Nhập mật khẩu mới nếu muốn thay đổi">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editRoleId" class="form-label">Vai trò</label>
+                            <select class="form-select" id="editRoleId" name="roleId" required>
+                                <option value="">Chọn vai trò</option>
+                                <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.name}">Vai trò</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" form="editEmployeeForm" class="btn btn-primary">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteEmployeeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xác nhận xóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn xóa nhân viên này?</p>
+                    <p class="text-muted">Hành động này không thể hoàn tác.</p>
+                    <form id="deleteEmployeeForm" method="post">
+                        <input type="hidden" id="deleteEmployeeId" name="id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" form="deleteEmployeeForm" class="btn btn-danger">Xóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toggle Status Confirmation Modal -->
+    <div class="modal fade" id="toggleStatusModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xác nhận thay đổi trạng thái</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="toggleStatusMessage">Bạn có chắc chắn muốn vô hiệu hóa tài khoản này?</p>
+                    <input type="hidden" id="toggleEmployeeId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-warning" onclick="confirmToggleStatus()">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html> 
