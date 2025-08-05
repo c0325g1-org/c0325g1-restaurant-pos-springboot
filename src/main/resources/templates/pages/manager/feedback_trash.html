@@ -1,0 +1,118 @@
+<html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Thùng rác đánh giá - Quản lý</title>
+</head>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Thùng rác đánh giá</h2>
+        <a class="btn btn-outline-primary" th:href="@{/feedback}">
+            <i class="bi bi-arrow-left-circle"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    <div th:if="${feedbacks.size() == 0}" class="alert alert-info text-center">
+        Hiện không có đánh giá nào trong thùng rác.
+    </div>
+
+    <table th:if="${feedbacks.size() > 0}" class="table table-hover table-striped shadow-sm rounded bg-white">
+        <thead class="table-dark text-center">
+        <tr>
+            <th>STT</th>
+            <th>Khách hàng</th>
+            <th>Số điện thoại</th>
+            <th>Ngày</th>
+            <th>Đánh giá</th>
+            <th>Nội dung</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody class="align-middle text-center">
+        <tr th:each="feedback, iterStat : ${feedbacks}">
+            <td th:text="${iterStat.count}">1</td>
+            <td th:text="${feedback.customerName}"></td>
+            <td th:text="${feedback.customerPhone}"></td>
+            <td th:text="${#temporals.format(feedback.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+            <td th:title="${feedback.rating + ' sao'}">
+                <span th:each="i : ${#numbers.sequence(1, feedback.rating)}">
+                    <i class="bi bi-star-fill text-warning"></i>
+                </span>
+                <span th:if="${feedback.rating < 5}"
+                      th:each="i : ${#numbers.sequence(1, 5 - feedback.rating)}">
+                    <i class="bi bi-star text-secondary"></i>
+                </span>
+            </td>
+            <td th:text="${feedback.content}"></td>
+            <td>
+                <th:block sec:authorize="hasRole('QUẢN TRỊ')">
+
+                    <form th:action="@{/feedback/restore}" method="post" class="d-inline">
+                        <input type="hidden" name="id" th:value="${feedback.id}"/>
+                        <button type="submit" class="btn btn-outline-success btn-sm me-1" title="Khôi phục">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </button>
+                    </form>
+
+                    <button type="button"
+                            class="btn btn-outline-danger btn-sm"
+                            data-bs-toggle="modal"
+                            th:attr="data-bs-target='#deleteModal__' + ${feedback.id}"
+                            title="Xoá vĩnh viễn">
+                        <i class="bi bi-trash3"></i>
+                    </button>
+                </th:block>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Modal xác nhận xoá vĩnh viễn -->
+    <th:block sec:authorize="hasRole('QUẢN TRỊ')">
+
+        <th:block th:each="feedback : ${feedbacks}">
+            <div class="modal fade" th:id="'deleteModal__' + ${feedback.id}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <form th:action="@{/feedback/destroy}" method="post">
+                        <input type="hidden" name="id" th:value="${feedback.id}">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Xác nhận xoá vĩnh viễn</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Đóng"></button>
+                            </div>
+                            <div class="modal-body">
+                                Bạn có chắc chắn muốn <strong>xóa vĩnh viễn</strong> đánh giá của khách hàng
+                                <strong th:text="${feedback.customerName}">[Tên khách]</strong> không?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn btn-danger">Xoá vĩnh viễn</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </th:block>
+    </th:block>
+
+    <!-- Phân trang -->
+    <nav th:if="${feedbackPage.totalPages > 1}" aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${feedbackPage.first} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/feedback/trash(page=${feedbackPage.number - 1}, keyword=${keyword})}">Trước</a>
+            </li>
+            <li th:each="pageNum : ${#numbers.sequence(0, feedbackPage.totalPages - 1)}"
+                class="page-item"
+                th:classappend="${pageNum == feedbackPage.number} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/feedback/trash(page=${pageNum}, keyword=${keyword})}"
+                   th:text="${pageNum + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${feedbackPage.last} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/feedback/trash(page=${feedbackPage.number + 1}, keyword=${keyword})}">Sau</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+</html>
