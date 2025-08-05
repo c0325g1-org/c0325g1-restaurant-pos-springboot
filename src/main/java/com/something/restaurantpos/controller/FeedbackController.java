@@ -147,7 +147,7 @@ public class FeedbackController {
         return "pages/manager/feedback_success";
     }
 
-    @PreAuthorize("hasRole('QUẢN TRỊ')")
+    @PreAuthorize("hasRole('QUẢN_TRỊ')")
     @PostMapping("/delete")
     public String deleteFeedback(@RequestParam("id") String id) {
         Feedback feedback = feedbackService.findById(id);
@@ -158,7 +158,7 @@ public class FeedbackController {
         return "redirect:/feedback";
     }
 
-    @PreAuthorize("hasRole('QUẢN TRỊ')")
+    @PreAuthorize("hasRole('QUẢN_TRỊ')")
     @PostMapping("/delete-multiple")
     public String deleteMultiple(@RequestParam(value = "selectedIds", required = false) List<String> ids,
                                  Model model) {
@@ -168,7 +168,7 @@ public class FeedbackController {
         return "redirect:/feedback";
     }
 
-    @PreAuthorize("hasRole('QUẢN TRỊ')")
+    @PreAuthorize("hasRole('QUẢN_TRỊ')")
     @GetMapping("/trash")
     public String trash(@RequestParam(defaultValue = "0") int page,
                         @RequestParam(defaultValue = "") String keyword,
@@ -181,14 +181,14 @@ public class FeedbackController {
         return "pages/manager/feedback_trash";
     }
 
-    @PreAuthorize("hasRole('QUẢN TRỊ')")
+    @PreAuthorize("hasRole('QUẢN_TRỊ')")
     @PostMapping("/restore")
     public String restore(@RequestParam("id") String id) {
         feedbackService.restoreById(id);
         return "redirect:/feedback/trash";
     }
 
-    @PreAuthorize("hasRole('QUẢN TRỊ')")
+    @PreAuthorize("hasRole('QUẢN_TRỊ')")
     @PostMapping("/destroy")
     public String destroy(@RequestParam("id") String id) {
         feedbackService.destroyById(id);
