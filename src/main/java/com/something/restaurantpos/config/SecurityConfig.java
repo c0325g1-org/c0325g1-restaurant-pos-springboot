@@ -24,7 +24,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(config -> config
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/img/**", "/uploads/feedbacks/**").permitAll()
-                        .requestMatchers("/login", "/register", "/forgot-password", "/reset-password").permitAll()
+                        .requestMatchers("/login", "/register", "/forgot-password","/home", "/reset-password").permitAll()
                         .requestMatchers("/feedback/verify", "/feedback/submit", "/feedback/success").permitAll()
                         .requestMatchers("/feedback/**").permitAll()
                         .requestMatchers("/profile/**").authenticated()

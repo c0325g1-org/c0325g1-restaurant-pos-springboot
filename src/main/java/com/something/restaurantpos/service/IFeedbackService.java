@@ -14,4 +14,5 @@ public interface IFeedbackService{
     Feedback findById(String id);
     void save(Feedback feedback);
     Page<Feedback> search(String name, Pageable pageable);
+    List<Feedback> findTop5FiveStarFeedbacks(Pageable pageable);
 }

@@ -39,4 +39,11 @@ public class FeedbackService implements IFeedbackService {
     public Page<Feedback> search(String name, Pageable pageable) {
         return feedbackRepository.search(name, pageable);
     }
+
+    @Override
+    public List<Feedback> findTop5FiveStarFeedbacks(Pageable pageable) {
+        return feedbackRepository.findTop5FiveStarFeedbacks(pageable);
+    }
+
+
 }
