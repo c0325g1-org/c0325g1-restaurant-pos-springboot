@@ -8,9 +8,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface IFeedbackRepository extends JpaRepository<Feedback, String> {
     boolean existsById(String id);
+
+
+   
+    @Query("SELECT f FROM Feedback f WHERE f.rating = 5 ORDER BY f.createdAt DESC")
+    List<Feedback> findTop5FiveStarFeedbacks(Pageable pageable);
 
     @Query("""
     SELECT f FROM Feedback f
@@ -32,5 +39,6 @@ public interface IFeedbackRepository extends JpaRepository<Feedback, String> {
     Page<Feedback> searchDeleted(@Param("keyword") String keyword, Pageable pageable);
 
     long countByDeleted(boolean deleted);
+
 
 }

@@ -42,6 +42,8 @@ public class FeedbackService implements IFeedbackService {
     }
 
     @Override
+    public List<Feedback> findTop5FiveStarFeedbacks(Pageable pageable) {
+        return feedbackRepository.findTop5FiveStarFeedbacks(pageable);
     public void deleteMultipleByIds(List<String> ids) {
         for (String id : ids) {
             Feedback feedback = feedbackRepository.findById(id).orElse(null);
@@ -79,6 +81,7 @@ public class FeedbackService implements IFeedbackService {
     @Override
     public long countByDeleted(boolean deleted) {
         return feedbackRepository.countByDeleted(true);
+
     }
 
 

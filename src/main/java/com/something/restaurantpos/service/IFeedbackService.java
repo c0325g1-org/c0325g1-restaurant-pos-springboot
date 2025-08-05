@@ -14,10 +14,14 @@ public interface IFeedbackService{
     Feedback findById(String id);
     void save(Feedback feedback);
     Page<Feedback> search(String name, Pageable pageable);
+
+    List<Feedback> findTop5FiveStarFeedbacks(Pageable pageable);
+
     void deleteMultipleByIds(List<String> ids);
     boolean existsIncludingDeleted(String id);
     Page<Feedback> searchDeleted(String keyword, Pageable pageable);
     void restoreById(String id);
     void destroyById(String id);
     long countByDeleted(boolean deleted);
+
 }
