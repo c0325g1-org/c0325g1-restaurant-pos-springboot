@@ -1,0 +1,30 @@
+<div th:fragment="sidebar" class="sidebar">
+    <h5 class="text-center py-3 border-bottom">Admin</h5>
+    <a th:href="@{/admin}" class="d-block text-white px-3 py-2 text-decoration-none">
+        <i class="bi bi-speedometer2"></i> Trang chủ
+    </a>
+    <a th:href="@{/admin/employees}" class="d-block text-white px-3 py-2 text-decoration-none">
+        <i class="bi bi-people"></i> Nhân viên
+    </a>
+    <a th:href="@{/manager/menu_items}" class="d-block text-white px-3 py-2 text-decoration-none">
+        <i class="bi bi-card-list"></i> Món ăn
+    </a>
+    <a th:href="@{/manager/menu_category}" class="d-block text-white px-3 py-2 text-decoration-none">
+        <i class="bi bi-tags"></i> Danh mục Món
+    </a>
+    <a th:href="@{/manager/vouchers}" class="d-block text-white px-3 py-2 text-decoration-none">
+        <i class="bi bi-percent"></i> % Mã giảm giá
+    </a>
+    <a th:href="@{/manager/feedback_list}" class="d-block text-white px-3 py-2 text-decoration-none">
+        <i class="bi bi-chat-dots"></i> Phản hồi KH
+    </a>
+                    <a th:href="@{/waiter/tables}" class="d-block text-white px-3 py-2 text-decoration-none">
+        <i class="bi bi-table"></i> Bàn ăn
+    </a>
+    <a th:href="@{/cashier/invoices}" class="d-block text-white px-3 py-2 text-decoration-none">
+        <i class="bi bi-receipt"></i> Hoá đơn
+    </a>
+    <a th:href="@{/logout}" class="d-block text-white px-3 py-2 text-decoration-none">
+        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+    </a>
+</div> 
