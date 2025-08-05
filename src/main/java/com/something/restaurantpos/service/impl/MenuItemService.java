@@ -66,6 +66,11 @@ public class MenuItemService implements IMenuItemService {
     }
 
     @Override
+    public List<MenuItem> findMenuItemOrderByTotalQuantityDesc() {
+        return menuItemRepository.findMenuItemOrderByTotalQuantityDesc();
+    }
+
+    @Override
     public void restore(Integer id) {
         MenuItem menuItem = findByIdOrThrow(id);
         menuItem.restore();

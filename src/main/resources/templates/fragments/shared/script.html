@@ -1,21 +1,281 @@
 <th:block th:fragment="script">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment/locale/vi.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const showToast = (id) => {
-                const toastEl = document.getElementById(id);
-                if (toastEl) {
-                    const toast = new bootstrap.Toast(toastEl);
-                    toast.show();
-                }
-            };
-            showToast('successToast');
-            showToast('errorToast');
+        // === Global flags ===
+        let canPlaySound = false;
+        let empId = null;
+        const notificationQueue = [];
+        let isSpeaking = false;
 
+        // === Audio unlock on first interaction ===
+        function unlockAudio() {
+            if (!canPlaySound) {
+                const audio = document.getElementById("notificationSound");
+                audio.play().then(() => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    canPlaySound = true;
+                    console.log("🔓 Âm thanh đã được bật sau tương tác");
+                }).catch(err => console.warn("Không thể phát âm thanh ngay:", err));
+            }
+        }
+
+        [
+            'click',
+            'mousemove',
+            'mousedown',
+            'mouseup',
+            'keydown',
+            'keyup',
+            'touchstart',
+            'touchend',
+            'scroll',
+            'focus'
+        ].forEach(evt => {
+            document.addEventListener(evt, unlockAudio, { once: true });
+        });
+
+        // === DOM Ready ===
+        document.addEventListener('DOMContentLoaded', async function () {
+            setupToast();
+            setupTooltip();
+            setupSidebarToggle();
+            await loadProfileData();
+            connectWebSocket();
+            reloadNotificationList();
+            setupProfileModalTrigger();
+        });
+
+        // === Toast ===
+        function setupToast() {
+            ['successToast', 'errorToast'].forEach(showToast);
+        }
+
+        function showToast(id) {
+            const toastEl = document.getElementById(id);
+            if (toastEl) new bootstrap.Toast(toastEl).show();
+        }
+
+        // === Tooltip ===
+        function setupTooltip() {
             const tooltipTriggerList = document.querySelectorAll('a[title],button[title]');
             tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
-        });
+        }
+
+        // === Sidebar Toggle ===
+        function setupSidebarToggle() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggleSidebarBtn');
+            const mainContent = document.getElementById('mainContent');
+
+            toggleBtn?.addEventListener('click', () => {
+                if (window.innerWidth < 992) {
+                    sidebar.classList.toggle('show');
+                } else {
+                    sidebar.classList.toggle('collapsed-desktop');
+                    mainContent.classList.toggle('expanded');
+                }
+            });
+
+            window.addEventListener('click', function (e) {
+                if (window.innerWidth < 992 && sidebar?.classList.contains('show')) {
+                    if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                        sidebar.classList.remove('show');
+                    }
+                }
+            });
+        }
+
+        // === Profile Data ===
+        async function loadProfileData() {
+            try {
+                const res = await fetch('/profile/data');
+                if (!res.ok) throw new Error('Network response was not ok');
+                const data = await res.json();
+
+                empId = data.id;
+                const setText = (id, value) => document.getElementById(id).textContent = value || 'N/A';
+
+                setText('profileName', data.name);
+                setText('profileRole', data.role);
+                setText('profileId', data.id);
+                setText('profileUsername', data.username);
+                setText('profileEmail', data.email);
+                setText('profileRoleValue', data.role);
+
+                if (data.createdAt)
+                    setText('profileCreatedAt', new Date(data.createdAt).toLocaleString('vi-VN'));
+                if (data.updatedAt)
+                    setText('profileUpdatedAt', new Date(data.updatedAt).toLocaleString('vi-VN'));
+
+                const status = document.getElementById('profileStatus');
+                status.textContent = data.deleted ? 'Đã xóa' : 'Hoạt động';
+                status.className = data.deleted ? 'status-badge status-inactive' : 'status-badge status-active';
+
+            } catch (err) {
+                console.error('Error loading profile data:', err);
+                document.getElementById('profileName').textContent = 'Lỗi tải dữ liệu';
+                document.getElementById('profileRole').textContent = 'Vui lòng thử lại';
+            }
+        }
+
+        function setupProfileModalTrigger() {
+            const modal = document.getElementById('profileModal');
+            modal?.addEventListener('show.bs.modal', loadProfileData);
+        }
+
+        // === Notifications ===
+        function reloadNotificationList() {
+            const container = document.getElementById("notification-container");
+            const unreadBadge = document.getElementById("unreadCount");
+
+            fetch(`/notifications/lasted`).then(res => res.json()).then(data => {
+                container.innerHTML = "";
+                let unreadCount = 0;
+
+                if (data.length === 0) {
+                    container.innerHTML = "<small class='text-center d-block my-2'>Chưa có thông báo nào!</small>";
+                    unreadBadge.style.display = 'none';
+                    return;
+                }
+
+                data.forEach(item => {
+                    const timeAgo = moment(item.createdAt).fromNow();
+                    const readClass = item.read ? '' : 'fw-bold';
+                    if (!item.read) unreadCount++;
+
+                    const div = document.createElement("div");
+                    div.className = "list-group list-group-flush";
+                    div.innerHTML = `
+                <a href="#" class="list-group-item list-group-item-action gap-3 ${readClass}" data-id="${item.notificationReceiverId}">
+                    <div class="d-flex justify-content-between">
+                        <strong>${item.senderName} <span class="badge text-bg-info">${item.senderRole}</span></strong>
+                        <small class="text-muted notification-time">${timeAgo}</small>
+                    </div>
+                    <div class="text-muted small">${item.message}</div>
+                </a>`;
+
+                    div.querySelector('a').addEventListener('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const id = this.getAttribute('data-id');
+                        if (this.classList.contains('fw-bold')) {
+                            fetch(`/notifications/${id}/read`, {method: 'PUT'})
+                                .then(res => {
+                                    if (res.ok) {
+                                        this.classList.remove('fw-bold');
+                                        unreadCount = Math.max(0, unreadCount - 1);
+                                        unreadBadge.textContent = unreadCount;
+                                        unreadBadge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+                                    }
+                                });
+                        }
+                    });
+
+                    container.appendChild(div);
+                });
+
+                unreadBadge.textContent = unreadCount;
+                unreadBadge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+            });
+        }
+
+        function connectWebSocket() {
+            const socket = new SockJS('/ws');
+            const stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, () => {
+                if (!empId) return console.warn("empId is not available");
+
+                stompClient.subscribe(`/topic/user.${empId}`, message => {
+                    const noti = JSON.parse(message.body);
+                    console.log("📩 Notification nhận:", noti);
+                    showNotificationToast(noti);
+                    enqueueNotificationSpeech(noti.message);
+                    reloadNotificationList();
+                });
+            });
+        }
+
+        function showNotificationToast(noti) {
+            const container = document.getElementById("toast-noti-container");
+            const toastId = `toast-${Date.now()}`;
+            const timeAgo = moment(noti.createdAt).fromNow();
+
+            const toastEl = document.createElement("div");
+            toastEl.className = "toast align-items-center border-0 show mb-2";
+            toastEl.id = toastId;
+            toastEl.setAttribute("role", "alert");
+            toastEl.setAttribute("aria-live", "assertive");
+            toastEl.setAttribute("aria-atomic", "true");
+            toastEl.innerHTML = `
+        <div class="toast-header">
+            <i class="bi bi-bell fs-5 me-2"></i>
+            <strong class="me-auto">${noti.senderName || 'Thông báo'}</strong>
+            <small>${timeAgo}</small>
+            <button type="button" class="btn-close ms-2 mb-1" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">${noti.message}</div>`;
+
+            container.appendChild(toastEl);
+            const bsToast = new bootstrap.Toast(toastEl, {delay: 5000});
+            bsToast.show();
+            toastEl.addEventListener("hidden.bs.toast", () => toastEl.remove());
+        }
+
+        // === Google TTS ===
+        function enqueueNotificationSpeech(text) {
+            notificationQueue.push(text);
+            processSpeechQueue();
+        }
+
+        async function processSpeechQueue() {
+            if (isSpeaking || notificationQueue.length === 0) return;
+            isSpeaking = true;
+            await speakWithGoogleTTS(notificationQueue.shift());
+            isSpeaking = false;
+            processSpeechQueue();
+        }
+
+        async function speakWithGoogleTTS(text) {
+            if (!canPlaySound) {
+                console.warn("Âm thanh chưa được bật do thiếu tương tác người dùng.");
+                return; // Hoặc push lại vào queue nếu cần
+            }
+            const url = `/api/tts`;
+
+            const requestBody = {
+                input: {text},
+                voice: {languageCode: "vi-VN", name: "vi-VN-Wavenet-A"},
+                audioConfig: {audioEncoding: "MP3"}
+            };
+
+            try {
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(requestBody)
+                });
+                const data = await res.json();
+                const audio = new Audio("data:audio/mp3;base64," + data.audioContent);
+
+                if (canPlaySound) {
+                    const sound = document.getElementById("notificationSound");
+                    sound.currentTime = 0;
+                    sound.play().catch(e => console.warn("Không thể phát âm:", e));
+                }
+
+                audio.play();
+                return new Promise(resolve => audio.onended = resolve);
+            } catch (err) {
+                console.error("TTS failed:", err);
+            }
+        }
     </script>
 </th:block>
 

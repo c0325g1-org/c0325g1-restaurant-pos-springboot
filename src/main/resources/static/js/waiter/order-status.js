@@ -60,7 +60,9 @@ export function loadServedItems(tableId) {
         .then(res => res.json())
         .then(data => {
             const container = document.getElementById("served-items");
+            const actionContainer = document.getElementById("served-actions");
             container.innerHTML = "";
+            actionContainer.innerHTML = "";
             if (data.length > 0) {
                 data.forEach(item => {
                     const div = document.createElement("div");
@@ -68,6 +70,17 @@ export function loadServedItems(tableId) {
                     div.innerHTML = `<span>${item.menuItem.name}</span><span>${item.quantity} × ${item.price.toLocaleString()}đ</span>`;
                     container.appendChild(div);
                 });
+
+                const btn = document.createElement("button");
+                btn.className = "btn btn-success mt-3";
+                btn.textContent = "Yêu cầu thanh toán";
+                btn.setAttribute("data-bs-toggle", "modal");
+                btn.setAttribute("data-bs-target", "#billTypeModal");
+                actionContainer.appendChild(btn);
+
+                // Gắn tableId vào nút confirm trong modal
+                const confirmBtn = document.getElementById("confirmBillTypeBtn");
+                confirmBtn.dataset.tableId = tableId;
             } else {
                 container.innerHTML = "<p>Danh sách món đã phục vụ đang trống!</p>";
             }
