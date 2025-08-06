@@ -35,4 +35,5 @@ public interface IVoucherRepository extends JpaRepository<Voucher, Integer> {
     Page<Voucher> findAllByOrderByCreatedAtDesc(Pageable pageable);
     Voucher findTopByIsActiveTrueAndValidToAfterOrderByCreatedAtDesc(LocalDateTime now);
 
+    Page<Voucher> findByValidToAfter(LocalDateTime now, Pageable pageable);
 }

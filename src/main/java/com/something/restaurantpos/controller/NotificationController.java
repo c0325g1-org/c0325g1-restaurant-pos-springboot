@@ -8,8 +8,10 @@ import com.something.restaurantpos.service.INotificationReceiverService;
 import com.something.restaurantpos.service.INotificationService;
 import com.something.restaurantpos.service.impl.DiningTableService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,7 @@ public class NotificationController {
     private final INotificationReceiverService notificationReceiverService;
     private final IEmployeeService employeeService;
     private final DiningTableService diningTableService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @GetMapping
     public ResponseEntity<List<NotificationDTO>> findAll(Authentication authentication) {
@@ -56,8 +59,8 @@ public class NotificationController {
                 new NotificationDTO(
                         notificationReceiver.getId(),
                         notificationReceiver.getNotification().getMessage(),
-                        notificationReceiver.getNotification().getSenderEmployee().getName(),
-                        notificationReceiver.getNotification().getSenderEmployee().getRole().getName(),
+                        notificationReceiver.getNotification().getSenderEmployee() != null ? notificationReceiver.getNotification().getSenderEmployee().getName() : "Hệ thống",
+                        notificationReceiver.getNotification().getSenderEmployee() != null ? notificationReceiver.getNotification().getSenderEmployee().getRole().getName() : "",
                         notificationReceiver.getNotification().getCreatedAt(),
                         notificationReceiver.getNotification().getType(),
                         notificationReceiver.getIsRead())).toList();

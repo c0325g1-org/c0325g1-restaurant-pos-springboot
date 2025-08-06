@@ -105,45 +105,41 @@ public class KitchenController {
 
 
     @PostMapping("/dashboard/item/{id}/status")
+    @ResponseBody
     @Transactional
-    public String updateItemStatusWithUndo(
+    public OrderItemStatusNotificationDTO updateItemStatusWithAjax(
             @PathVariable Integer id,
-            @RequestParam("status") OrderItem.ItemStatus status,
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam("filter") String filter,
-            RedirectAttributes redirectAttributes
+            @RequestParam("status") OrderItem.ItemStatus status
     ) {
-
         OrderItem item = orderItemService.findById(id).orElseThrow();
         OrderItem.ItemStatus oldStatus = item.getStatus();
+
+        // Xác định thông điệp
         String statusMessage;
-        if (status == OrderItem.ItemStatus.COOKING) {
-            statusMessage = "đang chế biến";
-        } else if (status == OrderItem.ItemStatus.READY) {
-            statusMessage = "đã sẵn sàng";
-        } else if (status == OrderItem.ItemStatus.SERVED) {
-            statusMessage = "đã hoàn thành";
-        } else {
-            statusMessage = "đã cập nhật";
+        switch (status) {
+            case COOKING -> statusMessage = "đang chế biến";
+            case READY -> statusMessage = "đã sẵn sàng";
+            case SERVED -> statusMessage = "đã hoàn thành";
+            default -> statusMessage = "đã cập nhật";
         }
+
         String message = "Món " + item.getMenuItem().getName() + " " + statusMessage;
+
+        // Cập nhật trạng thái món
         kitchenService.updateItemStatus(id, status);
 
+        // Gửi thông báo qua WebSocket
         OrderItemStatusNotificationDTO notificationDTO = new OrderItemStatusNotificationDTO();
         notificationDTO.setOrderItem(item);
         notificationDTO.setMessage(message);
 
-        notificationService.create(message,Notification.NotificationType.INFO,Role.UserRole.ROLE_WAITER);
+        notificationService.create(message, Notification.NotificationType.INFO, Role.UserRole.ROLE_WAITER);
         notificationService.sendToUser(notificationDTO, Role.UserRole.ROLE_WAITER);
 
-        // Gửi flash message với trạng thái cũ để hiển thị Undo
-        redirectAttributes.addFlashAttribute("undoItemId", id);
-        redirectAttributes.addFlashAttribute("undoOldStatus", oldStatus);
-        redirectAttributes.addFlashAttribute("undoFilter", filter);
-        redirectAttributes.addFlashAttribute("undoDate", date.toString());
-
-        return "redirect:/kitchen/dashboard?filter=" + filter + "&date=" + date;
+        // Trả về dữ liệu JSON để xử lý trên client
+        return notificationDTO;
     }
+
     @PostMapping("/dashboard/item/{id}/undo")
     @Transactional
     public String undoItemStatus(
