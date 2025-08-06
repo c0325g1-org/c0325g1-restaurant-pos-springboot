@@ -59,8 +59,8 @@ public class NotificationController {
                 new NotificationDTO(
                         notificationReceiver.getId(),
                         notificationReceiver.getNotification().getMessage(),
-                        notificationReceiver.getNotification().getSenderEmployee().getName(),
-                        notificationReceiver.getNotification().getSenderEmployee().getRole().getName(),
+                        notificationReceiver.getNotification().getSenderEmployee() != null ? notificationReceiver.getNotification().getSenderEmployee().getName() : "Hệ thống",
+                        notificationReceiver.getNotification().getSenderEmployee() != null ? notificationReceiver.getNotification().getSenderEmployee().getRole().getName() : "",
                         notificationReceiver.getNotification().getCreatedAt(),
                         notificationReceiver.getNotification().getType(),
                         notificationReceiver.getIsRead())).toList();
