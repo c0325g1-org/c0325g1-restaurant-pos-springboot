@@ -78,8 +78,8 @@ public class HomeController {
         Booking booking = new Booking();
         BeanUtils.copyProperties(bookingDTO, booking);
         bookingService.save(booking);
-        notificationService.create(message, Notification.NotificationType.INFO, Role.UserRole.ROLE_MANAGER);
-        notificationService.sendToUser(notificationDTO, Role.UserRole.ROLE_MANAGER);
+        notificationService.create(message, Notification.NotificationType.INFO, Role.UserRole.ROLE_HOST);
+        notificationService.sendToUser(notificationDTO, Role.UserRole.ROLE_HOST);
 
         return ResponseEntity.ok("success");
     }
