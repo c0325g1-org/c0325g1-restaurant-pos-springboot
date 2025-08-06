@@ -40,10 +40,6 @@ public class KitChenService implements IKitchenService {
         boolean allServed = orderItems.stream()
                 .allMatch(i -> i.getStatus() == OrderItem.ItemStatus.SERVED);
 
-        if (allServed) {
-            order.setStatus(Order.OrderStatus.CLOSED);
-            orderRepository.save(order);
-        }
     }
 
     @Override
