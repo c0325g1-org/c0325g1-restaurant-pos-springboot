@@ -133,28 +133,47 @@
 
                                 <span class="badge bg-primary rounded-pill" th:text="'x' + ${item.quantity}">x1</span>
                             </div>
-                            <form th:action="@{'/kitchen/dashboard/item/' + ${item.id} + '/status'}" method="post"
-                                  onsubmit="playNotify()">
-                                <input type="hidden" name="date" th:value="${currentDate}"/>
-                                <input type="hidden" name="filter" th:value="${currentFilter}"/>
+<!--                            <form th:action="@{'/kitchen/dashboard/item/' + ${item.id} + '/status'}" method="post"-->
+<!--                                  onsubmit="playNotify()">-->
+<!--                                <input type="hidden" name="date" th:value="${currentDate}"/>-->
+<!--                                <input type="hidden" name="filter" th:value="${currentFilter}"/>-->
 
-                                <input type="hidden" name="status" th:if="${item.status.name() == 'NEW'}"
-                                       value="COOKING"/>
-                                <input type="hidden" name="status" th:if="${item.status.name() == 'COOKING'}"
-                                       value="READY"/>
-                                <input type="hidden" name="status" th:if="${item.status.name() == 'READY'}"
-                                       value="SERVED"/>
+<!--                                <input type="hidden" name="status" th:if="${item.status.name() == 'NEW'}"-->
+<!--                                       value="COOKING"/>-->
+<!--                                <input type="hidden" name="status" th:if="${item.status.name() == 'COOKING'}"-->
+<!--                                       value="READY"/>-->
+<!--                                <input type="hidden" name="status" th:if="${item.status.name() == 'READY'}"-->
+<!--                                       value="SERVED"/>-->
 
-                                <button type="submit" th:if="${item.status.name() == 'NEW'}"
-                                        class="btn btn-outline-warning btn-sm">Bắt đầu
-                                </button>
-                                <button type="submit" th:if="${item.status.name() == 'COOKING'}"
-                                        class="btn btn-outline-success btn-sm">Sẵn sàng
-                                </button>
-                                <button type="submit" th:if="${item.status.name() == 'READY'}"
-                                        class="btn btn-success btn-sm">Đã sẵn sàng
-                                </button>
+<!--                                <button type="submit" th:if="${item.status.name() == 'NEW'}"-->
+<!--                                        class="btn btn-outline-warning btn-sm">Bắt đầu-->
+<!--                                </button>-->
+<!--                                <button type="submit" th:if="${item.status.name() == 'COOKING'}"-->
+<!--                                        class="btn btn-outline-success btn-sm">Sẵn sàng-->
+<!--                                </button>-->
+<!--                                <button type="submit" th:if="${item.status.name() == 'READY'}"-->
+<!--                                        class="btn btn-success btn-sm">Đã sẵn sàng-->
+<!--                                </button>-->
+<!--                            </form>-->
+                            <form onsubmit="return false;">
+                                <input type="hidden" name="status" th:if="${item.status.name() == 'NEW'}" value="COOKING" />
+                                <input type="hidden" name="status" th:if="${item.status.name() == 'COOKING'}" value="READY" />
+                                <input type="hidden" name="status" th:if="${item.status.name() == 'READY'}" value="SERVED" />
+
+                                <button type="button" th:if="${item.status.name() == 'NEW'}"
+                                        class="btn btn-outline-warning btn-sm"
+                                        th:attr="onclick='updateItemStatus(' + ${item.id} + ', \'COOKING\')'">Bắt đầu</button>
+
+                                <button type="button" th:if="${item.status.name() == 'COOKING'}"
+                                        class="btn btn-outline-success btn-sm"
+                                        th:attr="onclick='updateItemStatus(' + ${item.id} + ', \'READY\')'">Sẵn sàng</button>
+
+                                <button type="button" th:if="${item.status.name() == 'READY'}"
+                                        class="btn btn-success btn-sm"
+                                        th:attr="onclick='updateItemStatus(' + ${item.id} + ', \'SERVED\')'">Đã sẵn sàng</button>
                             </form>
+
+
                             <form th:action="@{'/kitchen/hide/orderItem'}" method="post"
                                   th:if="${item.deleted == false and item.status.name() == 'CANCELED'}">
                                 <input type="hidden" name="orderId" th:value="${item.id}"/>
@@ -440,5 +459,122 @@
 
 
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".update-status-btn").forEach(button => {
+                button.addEventListener("click", function (event) {
+                    event.preventDefault(); // Ngăn chặn hành vi mặc định
+                    const itemId = this.dataset.id;
+                    const nextStatus = this.dataset.status;
+
+                    fetch(`/kitchen/dashboard/item/${itemId}/status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: `status=${nextStatus}`
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log("✅ AJAX cập nhật thành công:", data);
+
+                            const li = document.querySelector(`li[data-item-id="${itemId}"]`);
+                            if (!li) return;
+
+                            // Cập nhật class hiển thị màu nền
+                            li.className = "list-group-item list-group-item-" + data.orderItem.status.toLowerCase();
+
+                            // Cập nhật nội dung nút tiếp theo (nếu còn)
+                            const btn = li.querySelector(".update-status-btn");
+                            if (btn) {
+                                if (data.orderItem.status === 'COOKING') {
+                                    btn.textContent = "Sẵn sàng";
+                                    btn.className = "btn btn-outline-success btn-sm update-status-btn";
+                                    btn.dataset.status = "READY";
+                                } else if (data.orderItem.status === 'READY') {
+                                    btn.textContent = "Đã sẵn sàng";
+                                    btn.className = "btn btn-success btn-sm update-status-btn";
+                                    btn.dataset.status = "SERVED";
+                                } else if (data.orderItem.status === 'SERVED') {
+                                    btn.remove(); // Ẩn nút khi hoàn thành
+                                }
+                            }
+
+                            playNotify(); // phát âm thanh
+                        })
+                        .catch(error => {
+                            console.error("❌ Lỗi khi cập nhật món:", error);
+                            alert("Không thể cập nhật trạng thái món.");
+                        });
+                });
+            });
+
+        });
+        function updateItemStatus(itemId, newStatus) {
+            fetch(`/kitchen/dashboard/item/${itemId}/status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ status: newStatus })
+            })
+                // .then(response => response.json())
+                .then(data => {
+                    console.log('Cập nhật thành công:', data);
+
+                    const listItem = document.querySelector(`li[data-item-id="${itemId}"]`);
+                    if (!listItem) return;
+
+                    // Xóa các class trạng thái cũ
+                    listItem.classList.remove('list-group-item-new', 'list-group-item-cooking', 'list-group-item-ready', 'list-group-item-served');
+
+                    // Thêm class mới
+                    const statusClass = `list-group-item-${newStatus.toLowerCase()}`;
+                    listItem.classList.add(statusClass);
+
+                    // Cập nhật nút bấm tương ứng
+                    let buttonHtml = '';
+                    if (newStatus === 'NEW') {
+                        buttonHtml = `<button class="btn btn-outline-warning btn-sm" onclick="updateItemStatus(${itemId}, 'COOKING')">Bắt đầu</button>`;
+                    } else if (newStatus === 'COOKING') {
+                        buttonHtml = `<button class="btn btn-outline-success btn-sm" onclick="updateItemStatus(${itemId}, 'READY')">Sẵn sàng</button>`;
+                    } else if (newStatus === 'READY') {
+                        buttonHtml = `<button class="btn btn-success btn-sm" onclick="updateItemStatus(${itemId}, 'SERVED')">Đã sẵn sàng</button>`;
+                    }
+
+                    listItem.querySelector('form').innerHTML = buttonHtml;
+                })
+                .catch(error => {
+                    console.error('Lỗi khi cập nhật:', error);
+                });
+        }
+
+        function showUndoAlert(itemId, oldStatus) {
+            const undoDiv = document.createElement("div");
+            undoDiv.className = "alert alert-info alert-dismissible fade show";
+            undoDiv.setAttribute("role", "alert");
+            undoDiv.innerHTML = `
+        Đã thay đổi trạng thái món.
+        <form method="post" action="/kitchen/dashboard/item/${itemId}/undo" style="display:inline;">
+            <input type="hidden" name="status" value="${oldStatus}">
+            <input type="hidden" name="date" value="${new Date().toISOString().split("T")[0]}">
+            <input type="hidden" name="filter" value="ALL">
+            <button type="submit" class="btn btn-link p-0 m-0 align-baseline">Hoàn tác</button>
+        </form>
+    `;
+
+            const contentDiv = document.querySelector("div[layout\\:fragment='content']");
+            contentDiv.insertBefore(undoDiv, contentDiv.firstChild);
+
+            setTimeout(() => {
+                undoDiv.classList.remove("show");
+                undoDiv.classList.add("hide");
+            }, 3000);
+        }
+
+
+    </script>
+
 </th:block>
 </html>
