@@ -26,8 +26,13 @@ public class NotificationDTO {
         Employee employee = CurrentUserUtil.getCurrentEmployee();
         this.notificationType = Notification.NotificationType.INFO;
         this.read = false;
-        this.senderName = Objects.requireNonNull(employee).getName();
-        this.senderRole = Objects.requireNonNull(employee).getRole().getName();
+        if (employee != null) {
+            this.senderName = Objects.requireNonNull(employee).getName();
+            this.senderRole = Objects.requireNonNull(employee).getRole().getName();
+        } else {
+            this.senderName = "Hệ thống";
+            this.senderRole = "";
+        }
         this.createdAt = LocalDateTime.now();
     }
 }
