@@ -135,11 +135,11 @@
         </tbody>
     </table>
 
-    <div class="invoice-summary mt-1">
+    <div class="invoice-summary mt-1 " style="font-size: 14px">
         Tổng cộng:
         <span th:text="${#numbers.formatDecimal(invoice.totalAmount, 1, 'POINT', 0, 'COMMA')} + ' VND'"></span>
     </div>
-    <div class="invoice-summary mt-1" th:if="${invoice.voucher != null}">
+    <div class="invoice-summary mt-1" th:if="${invoice.voucher != null}" style="font-size: 14px">
         Mã (
         <label th:text="${invoice.voucher.discountPercent + '%'}"></label>
         ):
@@ -147,7 +147,7 @@
     </div>
 
 
-    <div class="invoice-summary mt-1">
+    <div class="invoice-summary mt-1" style="font-size: 14px">
         Tổng hóa đơn:
         <span th:if="${invoice.voucher != null}"
               th:text="${#numbers.formatDecimal(invoice.totalAmount - (invoice.totalAmount * invoice.voucher.discountPercent / 100), 1, 'POINT', 0, 'COMMA')} + ' VND'">
