@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
 
@@ -31,4 +32,20 @@ public interface IMenuItemRepository extends JpaRepository<MenuItem,Integer> {
 
     @Query("SELECT COUNT(m) FROM MenuItem m WHERE m.deleted = false AND m.isAvailable = true")
     long countSellingItems();
+
+    @Query("""
+    SELECT mi.name, SUM(oi.quantity) AS totalSold
+    FROM OrderItem oi
+    JOIN oi.menuItem mi
+    JOIN oi.order o
+    WHERE 
+        o.deleted = false AND o.status = 'CLOSED'
+        AND mi.deleted = false AND mi.isAvailable = true
+        AND o.createdAt BETWEEN :startOfMonth AND :endOfMonth
+    GROUP BY mi.name
+    ORDER BY totalSold DESC
+""")
+    List<Object[]> getTopSellingItemsThisMonth(@Param("startOfMonth") LocalDateTime start,
+                                               @Param("endOfMonth") LocalDateTime end);
+
 }

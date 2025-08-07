@@ -257,7 +257,7 @@
                 } else if (fieldName === 'email') {
                     if (!value) {
                         showFieldError(field, 'Email không được để trống');
-                    } else if (!/^\w+@[a-z]{5,7}(\.[a-z]{2,3}){1,2}$/.test(value)) {
+                    } else if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(value)) {
                         showFieldError(field, 'Email không đúng định dạng');
                     } else {
                         clearFieldError(field);

@@ -5,7 +5,6 @@ import com.something.restaurantpos.entity.Booking;
 import com.something.restaurantpos.entity.DiningTable;
 import com.something.restaurantpos.service.IBookingService;
 import com.something.restaurantpos.service.IDiningTableService;
-import com.something.restaurantpos.service.impl.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,15 +18,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/host")
-public class HostController {
+@RequestMapping("/agent")
+public class AgentController {
     private final IBookingService bookingService;
     private final IDiningTableService diningTableService;
     private int pageSize = 10;
@@ -52,7 +50,7 @@ public class HostController {
         model.addAttribute("sort", sort);
         model.addAttribute("trashCount", trashCount);
 
-        return "pages/host/list";
+        return "pages/agent/list";
     }
 
 
@@ -62,28 +60,28 @@ public class HostController {
         Pageable pageable = PageRequest.of(page, pageSize, Sort.by("createdAt").descending());
         Page<Booking> trashBookings = bookingService.findTrash(pageable);
         model.addAttribute("bookings", trashBookings);
-        return "pages/host/trash";
+        return "pages/agent/trash";
     }
 
     @PostMapping("{id}/delete")
     public String delete(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         bookingService.softDelete(id);
         redirectAttributes.addFlashAttribute("successMessage", "Đã chuyển booking vào thùng rác!");
-        return "redirect:/host/booking-list";
+        return "redirect:/agent/booking-list";
     }
 
     @PostMapping("{id}/restore")
     public String restore(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         bookingService.restore(id);
         redirectAttributes.addFlashAttribute("successMessage", "Khôi phục booking thành công!");
-        return "redirect:/host/trash";
+        return "redirect:/agent/trash";
     }
 
     @PostMapping("{id}/destroy")
     public String destroy(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         bookingService.deleteById(id);
         redirectAttributes.addFlashAttribute("successMessage", "Xóa vĩnh viễn booking!");
-        return "redirect:/host/trash";
+        return "redirect:/agent/trash";
     }
 
     @GetMapping("/api/available-tables")
@@ -133,7 +131,7 @@ public class HostController {
 
         if (booking == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy booking #" + id);
-            return "redirect:/host/booking-list";
+            return "redirect:/agent/booking-list";
         }
 
         Booking.BookingStatus currentStatus = booking.getStatus();
@@ -147,7 +145,7 @@ public class HostController {
         booking.setStatus(newStatus);
         bookingService.save(booking);
         redirectAttributes.addFlashAttribute("successMessage", "Cập nhật trạng thái thành công.");
-        return "redirect:/host/booking-list";
+        return "redirect:/agent/booking-list";
     }
 
     @PostMapping("/assignTable")
@@ -159,12 +157,12 @@ public class HostController {
 
         if (booking == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy booking #" + bookingId);
-            return "redirect:/host/booking-list";
+            return "redirect:/agent/booking-list";
         }
 
         if (table == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy bàn #" + tableId);
-            return "redirect:/host/booking-list";
+            return "redirect:/agent/booking-list";
         }
 
         LocalDateTime targetTime = booking.getDateTime();
@@ -178,7 +176,7 @@ public class HostController {
                     table.getName() + " đã được đặt trong khung giờ từ "
                             + start.format(DateTimeFormatter.ofPattern("HH:mm"))
                             + " đến " + end.format(DateTimeFormatter.ofPattern("HH:mm")) + ".");
-            return "redirect:/host/booking-list";
+            return "redirect:/agent/booking-list";
         }
 
         booking.setTable(table);
@@ -186,14 +184,14 @@ public class HostController {
         bookingService.save(booking);
 
         redirectAttributes.addFlashAttribute("successMessage", "Đã gán bàn \"" + table.getName() + "\" cho khách \"" + booking.getName() + "\".");
-        return "redirect:/host/booking-list";
+        return "redirect:/agent/booking-list";
     }
 
     @PostMapping("/editBooking")
     public String updateBookingInfo(@ModelAttribute BookingUpdateRequest request, RedirectAttributes redirectAttributes) {
         bookingService.updateBookingInfo(request); // xử lý trong service
         redirectAttributes.addFlashAttribute("successMessage", "Cập nhật thông tin đặt bàn thành công!");
-        return "redirect:/host/booking-list";
+        return "redirect:/agent/booking-list";
     }
 
     @GetMapping("/dashboard")
@@ -213,6 +211,6 @@ public class HostController {
         model.addAttribute("selectedDate", date);
         model.addAttribute("tables", tables);
         model.addAttribute("bookings", bookings);
-        return "pages/host/tables-overview";
+        return "pages/agent/tables-overview";
     }
 }

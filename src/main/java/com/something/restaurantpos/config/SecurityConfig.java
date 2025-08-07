@@ -25,11 +25,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(config -> config
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/img/**","/home/**", "/uploads/feedbacks/**", "/home/booking","/home/homeSuccess").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/img/**","/home/**", "/uploads/feedbacks/**", "/home/booking","/home/homeSuccess", "/error/**").permitAll()
                         .requestMatchers("/login", "/register", "/forgot-password", "/reset-password").permitAll()
                         .requestMatchers("/feedback/verify", "/feedback/submit", "/feedback/success").permitAll()
                         .requestMatchers("/feedback/**").permitAll()
-                        .requestMatchers("/activate-account").permitAll()
+                        .requestMatchers("/activate-account", "/change-password-after-activation").permitAll()
                         .requestMatchers("/profile/**").authenticated()
                         // PHÂN QUYỀN
                         .requestMatchers("/admin/**").hasRole("QUẢN_TRỊ")
@@ -37,7 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/cashier/**").hasAnyRole("THU_NGÂN", "QUẢN_LÝ", "QUẢN_TRỊ")
                         .requestMatchers("/waiter/**").hasAnyRole("PHỤC_VỤ", "QUẢN_TRỊ")
                         .requestMatchers("/kitchen/**").hasAnyRole("BẾP", "QUẢN_TRỊ")
-                        .requestMatchers("/host/**").hasAnyRole("LỄ_TÂN", "QUẢN_LÝ")
+                        .requestMatchers("/agent/**").hasAnyRole("TỔNG_ĐÀI_VIÊN", "QUẢN_LÝ")
 
                         .anyRequest().authenticated()
                 )

@@ -47,4 +47,7 @@ public interface IBookingRepository extends JpaRepository<Booking,Integer> {
             @Param("end") LocalDateTime end,
             @Param("excludeId") Integer excludeId
     );
+
+    @Query("SELECT b FROM Booking b WHERE b.status = 'CONFIRMED' AND (b.reminded = false OR b.reminded IS NULL) AND b.dateTime BETWEEN :now AND :next15")
+    List<Booking> findUpcomingUnremindedBookings(@Param("now") LocalDateTime now, @Param("next15") LocalDateTime next15);
 }

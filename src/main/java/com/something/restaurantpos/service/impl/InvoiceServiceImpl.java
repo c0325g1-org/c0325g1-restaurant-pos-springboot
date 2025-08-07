@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -312,8 +313,14 @@ public class InvoiceServiceImpl implements IInvoiceService {
     }
 
     @Override
-    public List<Object[]> getRevenueBetweenDates(LocalDateTime start, LocalDateTime end) {
-        return invoiceRepository.getRevenueBetweenDates(start, end);
+    public Map<String, BigDecimal> getRevenueByDateRange(LocalDate start, LocalDate end) {
+        List<Object[]> results = invoiceRepository.sumRevenueByDateRange(start, end);
+        return results.stream()
+                .collect(Collectors.toMap(
+                        row -> ((LocalDate) row[0]).toString(),
+                        row -> (BigDecimal) row[1]
+                ));
     }
+
 }
     
