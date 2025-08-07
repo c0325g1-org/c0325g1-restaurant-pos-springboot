@@ -56,4 +56,6 @@ public class Booking extends AuditMetadata {
             };
         }
     }
+
+    private Boolean reminded = false;
 }

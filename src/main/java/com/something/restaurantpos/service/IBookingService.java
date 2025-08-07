@@ -21,4 +21,6 @@ public interface IBookingService extends IService<Booking>{
     List<Booking> findByDate(LocalDate localDate);
     boolean isTableBookedBetween(DiningTable table, LocalDateTime start, LocalDateTime end, Integer excludeId);
     void updateBookingInfo(BookingUpdateRequest req);
+
+    List<Booking> findUpcomingUnremindedBookings(LocalDateTime now, LocalDateTime next15);
 }
