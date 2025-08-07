@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
@@ -28,6 +29,7 @@ public class AccountActivationService implements IAccountActivationService {
     private final IEmployeeRepository employeeRepository;
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -79,9 +81,8 @@ public class AccountActivationService implements IAccountActivationService {
         employee.setEnable(true);
         employeeRepository.save(employee);
         
-        // Đánh dấu token đã sử dụng
-        activationToken.setUsed(true);
-        activationTokenRepository.save(activationToken);
+        // Không đánh dấu token đã sử dụng ở đây, để có thể sử dụng cho thay đổi mật khẩu
+        // Token sẽ được đánh dấu used khi thay đổi mật khẩu
         
         return true;
     }
@@ -136,5 +137,38 @@ public class AccountActivationService implements IAccountActivationService {
         } catch (MessagingException e) {
             throw new RuntimeException("Không thể gửi email kích hoạt", e);
         }
+    }
+
+    @Override
+    @Transactional
+    public boolean changePasswordAfterActivation(String token, String newPassword) {
+        Optional<AccountActivationToken> tokenOpt = activationTokenRepository.findByToken(token);
+        
+        if (tokenOpt.isEmpty()) {
+            return false;
+        }
+        
+        AccountActivationToken activationToken = tokenOpt.get();
+        
+        // Kiểm tra token có hết hạn chưa
+        if (activationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            return false;
+        }
+        
+        // Kiểm tra tài khoản đã được kích hoạt chưa
+        if (!activationToken.getEmployee().getEnable()) {
+            return false;
+        }
+        
+        // Thay đổi mật khẩu
+        Employee employee = activationToken.getEmployee();
+        employee.setPassword(passwordEncoder.encode(newPassword));
+        employeeRepository.save(employee);
+        
+        // Đánh dấu token đã sử dụng hoàn toàn (cả kích hoạt và thay đổi mật khẩu)
+        activationToken.setUsed(true);
+        activationTokenRepository.save(activationToken);
+        
+        return true;
     }
 } 

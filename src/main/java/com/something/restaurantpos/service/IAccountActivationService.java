@@ -18,4 +18,9 @@ public interface IAccountActivationService {
      * Gửi lại email kích hoạt cho nhân viên
      */
     void resendActivationEmail(Integer employeeId);
+    
+    /**
+     * Thay đổi mật khẩu sau khi kích hoạt tài khoản
+     */
+    boolean changePasswordAfterActivation(String token, String newPassword);
 } 
