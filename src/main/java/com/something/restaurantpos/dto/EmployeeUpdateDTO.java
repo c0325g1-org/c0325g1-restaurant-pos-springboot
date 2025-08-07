@@ -25,14 +25,14 @@ public class EmployeeUpdateDTO extends BaseDTO {
     @NotBlank(message = "Email không được để trống")
     @Size(max = 100, message = "Email tối đa 100 ký tự")
     @Pattern(
-            regexp = "^\\w+@[a-z]{5,7}(\\.[a-z]{2,3}){1,2}$",
-            message = "Email không đúng định dạng"
+            regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$",
+            message = "Email không đúng định dạng (abc123@gmail.com)"
     )
     private String email;
 
     @Size(min = 3, max = 50, message = "Mật khẩu phải từ 3 đến 50 ký tự")
     @Pattern(
-            regexp = "^[a-z0-9]+$",
+            regexp = "^[a-z0-9]*$",
             message = "Mật khẩu chỉ được chứa chữ thường và số"
     )
     private String password;

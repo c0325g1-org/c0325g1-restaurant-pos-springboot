@@ -8,8 +8,14 @@ import com.something.restaurantpos.mapper.EmployeeMapper;
 import com.something.restaurantpos.repository.IEmployeeRepository;
 import com.something.restaurantpos.repository.IInvoiceRepository;
 import com.something.restaurantpos.repository.IRoleRepository;
+
+import com.something.restaurantpos.repository.IAccountActivationTokenRepository;
+import com.something.restaurantpos.entity.AccountActivationToken;
+import com.something.restaurantpos.service.IAccountActivationService;
+
 import com.something.restaurantpos.service.IInvoiceService;
 import com.something.restaurantpos.service.IMenuItemService;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 import jakarta.validation.Validation;
@@ -24,6 +30,17 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+
+
+import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -31,6 +48,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @Controller
 @RequestMapping("/admin")
@@ -49,6 +67,12 @@ public class AdminController {
     
     @Autowired
     private EmployeeMapper employeeMapper;
+    
+    @Autowired
+    private IAccountActivationTokenRepository activationTokenRepository;
+    
+    @Autowired
+    private IAccountActivationService activationService;
 
     @Autowired
     private IInvoiceService invoiceService;
@@ -183,11 +207,21 @@ public class AdminController {
             Employee employee = employeeMapper.toEntity(employeeDTO);
             employee.setPassword(passwordEncoder.encode(employeeDTO.getPassword()));
             employee.setRole(role);
-            employee.setEnable(true);
+            employee.setEnable(false); // Tài khoản chưa kích hoạt
             
-            employeeRepository.save(employee);
+            // Lưu employee và lấy employee đã được lưu (có ID)
+            Employee savedEmployee = employeeRepository.save(employee);
             
-            redirectAttributes.addFlashAttribute("successMessage", "Thêm nhân viên thành công");
+            // Tạo token kích hoạt và gửi email
+            try {
+                activationService.createActivationTokenAndSendEmail(savedEmployee);
+                redirectAttributes.addFlashAttribute("successMessage", 
+                    "Thêm nhân viên thành công! Email kích hoạt đã được gửi đến " + savedEmployee.getEmail());
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("warningMessage", 
+                    "Thêm nhân viên thành công nhưng không thể gửi email kích hoạt. Vui lòng kiểm tra cấu hình email.");
+            }
+            
             return "redirect:/admin/employees";
             
         } catch (Exception e) {
@@ -345,6 +379,14 @@ public class AdminController {
                 return "redirect:/admin/employees";
             }
             
+            // Xóa token kích hoạt trước (nếu có)
+            try {
+                activationTokenRepository.deleteByEmployeeId(id);
+            } catch (Exception e) {
+                // Log lỗi nhưng không dừng quá trình xóa
+                System.err.println("Lỗi khi xóa token kích hoạt: " + e.getMessage());
+            }
+            
             // Xóa nhân viên
             employeeRepository.delete(employee);
             
@@ -357,6 +399,163 @@ public class AdminController {
         }
     }
     
+    @GetMapping("/revenue")
+    
+
+    
+    @PostMapping("/employees/validate-field")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> validateField(@RequestBody Map<String, String> request) {
+        Map<String, Object> response = new HashMap<>();
+        String fieldName = request.get("fieldName");
+        String value = request.get("value");
+        String formType = request.get("formType");
+        String employeeId = request.get("employeeId");
+        
+        try {
+            boolean isValid = true;
+            String message = "";
+            
+            switch (fieldName) {
+                case "name":
+                    if (value == null || value.trim().isEmpty()) {
+                        isValid = false;
+                        message = "Họ tên không được để trống";
+                    } else if (value.trim().length() < 2) {
+                        isValid = false;
+                        message = "Họ tên phải có ít nhất 2 ký tự";
+                    } else if (!value.matches("^[a-zA-ZÀ-ỹ\\s]+$")) {
+                        isValid = false;
+                        message = "Họ tên chỉ được chứa chữ cái và khoảng trắng";
+                    }
+                    break;
+                    
+                case "username":
+                    if (value == null || value.trim().isEmpty()) {
+                        isValid = false;
+                        message = "Tên đăng nhập không được để trống";
+                    } else if (value.trim().length() < 3 || value.trim().length() > 50) {
+                        isValid = false;
+                        message = "Tên đăng nhập phải từ 3-50 ký tự";
+                    } else if (!value.matches("^[a-zA-Z0-9_]+$")) {
+                        isValid = false;
+                        message = "Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới";
+                    } else {
+                        // Kiểm tra trùng lặp username
+                        Optional<Employee> existingEmployee = employeeRepository.findByUsername(value.trim());
+                        if (existingEmployee.isPresent()) {
+                            if ("edit".equals(formType) && employeeId != null) {
+                                // Trong form edit, kiểm tra trừ nhân viên hiện tại
+                                if (!existingEmployee.get().getId().toString().equals(employeeId)) {
+                                    isValid = false;
+                                    message = "Tên đăng nhập đã tồn tại";
+                                }
+                            } else {
+                                // Trong form add hoặc không có employeeId
+                                isValid = false;
+                                message = "Tên đăng nhập đã tồn tại";
+                            }
+                        }
+                    }
+                    break;
+                    
+                case "email":
+                    if (value == null || value.trim().isEmpty()) {
+                        isValid = false;
+                        message = "Email không được để trống";
+                    } else if (!value.matches("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")) {
+                        isValid = false;
+                        message = "Email không đúng định dạng";
+                    } else {
+                        // Kiểm tra trùng lặp email
+                        Optional<Employee> existingEmployee = employeeRepository.findByEmail(value.trim());
+                        if (existingEmployee.isPresent()) {
+                            if ("edit".equals(formType) && employeeId != null) {
+                                // Trong form edit, kiểm tra trừ nhân viên hiện tại
+                                if (!existingEmployee.get().getId().toString().equals(employeeId)) {
+                                    isValid = false;
+                                    message = "Email đã tồn tại";
+                                }
+                            } else {
+                                // Trong form add hoặc không có employeeId
+                                isValid = false;
+                                message = "Email đã tồn tại";
+                            }
+                        }
+                    }
+                    break;
+                    
+                case "password":
+                    if ("add".equals(formType)) {
+                        // Trong form add, password bắt buộc
+                        if (value == null || value.trim().isEmpty()) {
+                            isValid = false;
+                            message = "Mật khẩu không được để trống";
+                        } else if (value.trim().length() < 3 || value.trim().length() > 50) {
+                            isValid = false;
+                            message = "Mật khẩu phải từ 3-50 ký tự";
+                        } else if (!value.matches("^[a-z0-9]+$")) {
+                            isValid = false;
+                            message = "Mật khẩu chỉ được chứa chữ thường và số";
+                        }
+                    } else {
+                        // Trong form edit, password optional
+                        if (value != null && !value.trim().isEmpty()) {
+                            if (value.trim().length() < 3 || value.trim().length() > 50) {
+                                isValid = false;
+                                message = "Mật khẩu phải từ 3-50 ký tự";
+                            } else if (!value.matches("^[a-z0-9]+$")) {
+                                isValid = false;
+                                message = "Mật khẩu chỉ được chứa chữ thường và số";
+                            }
+                        }
+                    }
+                    break;
+                    
+                case "roleId":
+                    if (value == null || value.trim().isEmpty()) {
+                        isValid = false;
+                        message = "Vui lòng chọn vai trò";
+                    } else {
+                        try {
+                            Integer roleId = Integer.parseInt(value);
+                            Role role = roleRepository.findById(roleId).orElse(null);
+                            if (role == null) {
+                                isValid = false;
+                                message = "Vai trò không hợp lệ";
+                            }
+                        } catch (NumberFormatException e) {
+                            isValid = false;
+                            message = "Vai trò không hợp lệ";
+                        }
+                    }
+                    break;
+                    
+                case "id":
+                    // Field id không cần validate, luôn hợp lệ
+                    isValid = true;
+                    message = "";
+                    break;
+                    
+                default:
+                    isValid = false;
+                    message = "Trường không hợp lệ: " + fieldName;
+                    break;
+            }
+            
+            response.put("valid", isValid);
+            response.put("message", message);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            response.put("valid", false);
+            response.put("message", "Có lỗi xảy ra: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+
     @GetMapping("/revenue")
     @ResponseBody
     public Map<String, BigDecimal> getRevenueByDateRange(

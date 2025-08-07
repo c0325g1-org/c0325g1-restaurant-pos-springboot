@@ -102,4 +102,9 @@ public class BookingService implements IBookingService {
 
         bookingRepository.save(booking);
     }
+
+    @Override
+    public List<Booking> findUpcomingUnremindedBookings(LocalDateTime now, LocalDateTime next15) {
+        return bookingRepository.findUpcomingUnremindedBookings(now, next15);
+    }
 }

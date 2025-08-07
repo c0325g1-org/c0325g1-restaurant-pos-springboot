@@ -5,7 +5,7 @@
 <div layout:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">Thùng rác</h2>
-        <a class="btn btn-outline-primary" th:href="@{/host/booking-list}">
+        <a class="btn btn-outline-primary" th:href="@{/agent/booking-list}">
             <i class="bi bi-arrow-left-circle"></i> Quay lại danh sách
         </a>
     </div>
@@ -46,7 +46,7 @@
                 </span>
             </td>
             <td>
-                <form th:action="@{/host/{id}/restore(id=${b.id})}" method="post" class="d-inline">
+                <form th:action="@{/agent/{id}/restore(id=${b.id})}" method="post" class="d-inline">
                     <button type="submit" class="btn btn-outline-success btn-sm me-1"
                             title="Khôi phục"
                             th:attr="data-bs-title='Khôi phục booking ' + ${b.id}"
@@ -70,17 +70,17 @@
     <nav th:if="${bookings.totalPages > 1}" aria-label="Page navigation">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${bookings.first} ? 'disabled'">
-                <a class="page-link" th:href="@{/host/trash(page=${bookings.number - 1})}">Trước</a>
+                <a class="page-link" th:href="@{/agent/trash(page=${bookings.number - 1})}">Trước</a>
             </li>
             <li th:each="pageNum : ${#numbers.sequence(0, bookings.totalPages - 1)}"
                 class="page-item"
                 th:classappend="${pageNum == bookings.number} ? 'active'">
                 <a class="page-link"
-                   th:href="@{/host/trash(page=${pageNum})}"
+                   th:href="@{/agent/trash(page=${pageNum})}"
                    th:text="${pageNum + 1}">1</a>
             </li>
             <li class="page-item" th:classappend="${bookings.last} ? 'disabled'">
-                <a class="page-link" th:href="@{/host/trash(page=${bookings.number + 1})}">Sau</a>
+                <a class="page-link" th:href="@{/agent/trash(page=${bookings.number + 1})}">Sau</a>
             </li>
         </ul>
     </nav>
@@ -99,7 +99,7 @@
                 const id = button.getAttribute('data-id');
                 const title = button.getAttribute('data-title');
                 deleteModal.querySelector('#modalTitle').textContent = title;
-                deleteModal.querySelector('#deleteForm').setAttribute('action', '/host/' + id + '/destroy');
+                deleteModal.querySelector('#deleteForm').setAttribute('action', '/agent/' + id + '/destroy');
             });
         });
     </script>

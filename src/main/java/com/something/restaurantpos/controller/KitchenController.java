@@ -123,7 +123,7 @@ public class KitchenController {
             default -> statusMessage = "đã cập nhật";
         }
 
-        String message = "Món " + item.getMenuItem().getName() + " " + statusMessage;
+        String message = item.getOrder().getTable().getName() + ": Món " + item.getMenuItem().getName() + " " + statusMessage;
 
         // Cập nhật trạng thái món
         kitchenService.updateItemStatus(id, status);

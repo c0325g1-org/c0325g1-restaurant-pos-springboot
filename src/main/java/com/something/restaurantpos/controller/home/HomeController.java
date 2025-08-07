@@ -42,24 +42,11 @@ public class HomeController {
     @GetMapping("")
     public String homePage(Model model) {
         model.addAttribute("bookingDTO", new BookingDTO());
-        model.addAttribute("vouchers", voucherService.findByValidToAfter(LocalDateTime.now(), PageRequest.of(0, 3)));
+        model.addAttribute("vouchers", voucherService.findByValidToAfter(LocalDateTime.now(), PageRequest.of(0, 5)));
         model.addAttribute("menuItems", menuItemService.findMenuItemOrderByTotalQuantityDesc());
         model.addAttribute("feedbacks", feedbackService.findTop5FiveStarFeedbacks(PageRequest.of(0, 5)));
         return "pages/home/homePage";
     }
-
-//    @PostMapping("/booking")
-//    public String save(@Validated @ModelAttribute BookingDTO bookingDTO,
-//                       BindingResult bindingResult, RedirectAttributes attribute) throws IOException {
-//        if (bindingResult.hasErrors()) {
-//            return "pages/home/homePage";
-//        }
-//
-//        Booking booking = new Booking();
-//        BeanUtils.copyProperties(bookingDTO, booking);
-//        bookingService.save(booking);
-//        return "pages/home/homeSuccess";
-//    }
 
     @PostMapping("/booking")
     @ResponseBody
@@ -78,8 +65,8 @@ public class HomeController {
         Booking booking = new Booking();
         BeanUtils.copyProperties(bookingDTO, booking);
         bookingService.save(booking);
-        notificationService.create(message, Notification.NotificationType.INFO, Role.UserRole.ROLE_HOST);
-        notificationService.sendToUser(notificationDTO, Role.UserRole.ROLE_HOST);
+        notificationService.create(message, Notification.NotificationType.INFO, Role.UserRole.ROLE_AGENT);
+        notificationService.sendToUser(notificationDTO, Role.UserRole.ROLE_AGENT);
 
         return ResponseEntity.ok("success");
     }
