@@ -221,15 +221,15 @@
     <a sec:authorize="hasRole('QUẢN_TRỊ')" th:href="@{/cashier/invoices}" class="nav-link"><i class="bi bi-receipt"></i> <span>Hoá đơn</span></a>
 
     <!-- Manager Menu -->
+    <a sec:authorize="hasRole('PHỤC_VỤ')" th:href="@{/waiter/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
+
     <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/dashboard}" class="nav-link"><i class="bi bi-speedometer2"></i> <span>Trang chủ</span></a>
     <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/menu_items}" class="nav-link"><i class="bi bi-card-list"></i> <span>Món ăn</span></a>
     <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/menu_category}" class="nav-link"><i class="bi bi-tags"></i> <span>Danh mục Món</span></a>
     <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/manager/vouchers}" class="nav-link"><i class="bi bi-percent"></i> <span>Mã giảm giá</span></a>
-    <a sec:authorize="hasRole('QUẢN_LÝ')" th:href="@{/feedback}" class="nav-link"><i class="bi bi-rss"></i> <span>Phản hồi KH</span></a>
+    <a sec:authorize="hasAnyRole('QUẢN_LÝ', 'PHỤC_VỤ')" th:href="@{/feedback}" class="nav-link"><i class="bi bi-rss"></i> <span>Phản hồi KH</span></a>
     <a sec:authorize="hasAnyRole('THU_NGÂN', 'QUẢN_LÝ')" th:href="@{/cashier/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
     <a sec:authorize="hasAnyRole('THU_NGÂN', 'QUẢN_LÝ')" th:href="@{/cashier/invoices}" class="nav-link"><i class="bi bi-receipt"></i> <span>Hoá đơn</span></a>
-    <a sec:authorize="hasRole('PHỤC_VỤ')" th:href="@{/waiter/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
-    <a sec:authorize="hasRole('PHỤC_VỤ')" th:href="@{/feedback}" class="nav-link"><i class="bi bi-bag"></i> <span>Phản hồi KH</span></a>
 
     <a sec:authorize="hasAnyRole('TỔNG_ĐÀI_VIÊN', 'QUẢN_LÝ')" th:href="@{/agent/dashboard}" class="nav-link"><i class="bi bi-table"></i> <span>Tổng quan</span></a>
     <a sec:authorize="hasAnyRole('TỔNG_ĐÀI_VIÊN', 'QUẢN_LÝ')" th:href="@{/agent/booking-list}" class="nav-link"><i class="bi bi-card-list"></i> <span>Đặt bàn</span></a>

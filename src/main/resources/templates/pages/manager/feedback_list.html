@@ -56,7 +56,7 @@
                         <th scope="col">Số điện thoại</th>
                         <th scope="col">Nhân viên</th>
                         <th scope="col">Đánh giá</th>
-                        <th scope="col">Ghi chú</th>
+                        <th scope="col" style="max-width: 400px">Ghi chú</th>
                         <th scope="col">Hành động</th>
                     </tr>
                     </thead>
@@ -83,11 +83,11 @@
                                   th:each="i : ${#numbers.sequence(1, 5 - feedback.rating)}"><i
                                     class="bi bi-star text-secondary"></i></span>
                         </td>
-                        <td th:text="${feedback.content}"></td>
+                        <td th:text="${feedback.content}" style="max-width: 400px"></td>
                         <td>
                             <button type="button" class="btn btn-outline-primary btn-sm me-1" data-bs-toggle="modal"
                                     th:attr="data-bs-target='#modalFeedback__' + ${feedback.id}" title="Xem chi tiết">
-                                <i class="bi bi-pencil-square"></i>
+                                <i class="bi bi-eye"></i>
                             </button>
                             <th:block sec:authorize="hasRole('QUẢN_TRỊ')">
                                 <button type="button"
