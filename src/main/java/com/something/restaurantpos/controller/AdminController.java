@@ -399,10 +399,6 @@ public class AdminController {
         }
     }
     
-    @GetMapping("/revenue")
-    
-
-    
     @PostMapping("/employees/validate-field")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> validateField(@RequestBody Map<String, String> request) {
