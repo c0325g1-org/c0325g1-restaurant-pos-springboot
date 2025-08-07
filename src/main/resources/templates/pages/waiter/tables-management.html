@@ -28,14 +28,11 @@
                           th:text="${table.status}">
                     </span>
 
-                    <form th:action="@{/waiter/tables/{id}/change-status(id=${table.id})}" method="post" class="mt-2">
-                        <select name="status" class="form-select form-select-sm mb-2">
-                            <option value="EMPTY" th:if="${table.status.name() != 'EMPTY'}">Trống</option>
-                            <option value="RESERVED" th:if="${table.status.name() != 'RESERVED'}">Đặt trước</option>
-                            <option value="SERVING" th:if="${table.status.name() != 'SERVING'}">Đang phục vụ</option>
-                        </select>
-                        <button class="btn btn-sm btn-outline-primary w-100">Cập nhật</button>
-                    </form>
+                    <button class="btn btn-sm btn-outline-secondary w-100 mt-2"
+                            onclick="openStatusModal(this)"
+                            th:attr="data-id=${table.id}, data-current=${table.status.name()}">
+                        Cập nhật trạng thái
+                    </button>
 
                     <button class="btn btn-sm btn-success w-100 mt-2" onclick="handleOrder(this)"
                             th:attr="data-id=${table.id}, data-status=${table.status.name()}">Gọi món</button>
@@ -64,6 +61,29 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="statusForm" method="post" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cập nhật trạng thái bàn</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Chọn trạng thái mới cho bàn:</p>
+                    <input type="hidden" name="tableId" id="statusTableId">
+                    <select name="status" class="form-select" id="statusSelect">
+                        <option value="EMPTY">Trống</option>
+                        <option value="RESERVED">Đặt trước</option>
+                        <option value="SERVING">Đang phục vụ</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Cập nhật</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+                </div>
+            </form>
         </div>
     </div>
 </th:block>
@@ -95,6 +115,19 @@
             } else {
                 window.location.href = `/waiter/tables/go-to-order?tableId=${tableId}`;
             }
+        }
+        function openStatusModal(button) {
+            const tableId = button.dataset.id;
+            const currentStatus = button.dataset.current;
+
+            document.getElementById("statusTableId").value = tableId;
+            document.getElementById("statusSelect").value = currentStatus;
+
+            const form = document.getElementById("statusForm");
+            form.action = `/waiter/tables/${tableId}/change-status`;
+
+            const modal = new bootstrap.Modal(document.getElementById("statusModal"));
+            modal.show();
         }
     </script>
 </th:block>

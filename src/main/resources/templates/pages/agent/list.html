@@ -6,7 +6,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="fw-bold">Danh sách đặt bàn</h2>
         <div>
-            <a class="btn btn-danger me-2" th:href="@{/host/trash}">
+            <a class="btn btn-danger me-2" th:href="@{/agent/trash}">
                 <i class="bi bi-trash"></i>
                 Thùng rác
                 <span th:if="${trashCount > 0}">(<span th:text="${trashCount}">1</span>)</span>
@@ -14,7 +14,7 @@
         </div>
     </div>
 
-    <form class="row g-2 mb-3" method="get" th:action="@{/host/booking-list}">
+    <form class="row g-2 mb-3" method="get" th:action="@{/agent/booking-list}">
         <div class="col-md-3">
             <input type="text" class="form-control" name="keyword" placeholder="Tìm theo tên, số điện hoặc email"
                    th:value="${keyword}">
@@ -44,7 +44,7 @@
             <button type="submit" class="btn btn-outline-primary me-2">
                 <i class="bi bi-filter"></i> Lọc
             </button>
-            <a th:href="@{/host/booking-list}" class="btn btn-outline-secondary">
+            <a th:href="@{/agent/booking-list}" class="btn btn-outline-secondary">
                 <i class="bi bi-x-lg"></i> Xóa lọc
             </a>
         </div>
@@ -148,18 +148,18 @@
     <nav th:if="${bookings.totalPages > 1}" aria-label="Page navigation">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${bookings.first} ? 'disabled'">
-                <a class="page-link" th:href="@{/host/booking-list(page=${bookings.number - 1},
+                <a class="page-link" th:href="@{/agent/booking-list(page=${bookings.number - 1},
                   keyword=${param.keyword}, status=${param.status}, sort=${param.sort})}">Trước</a>
             </li>
             <li th:each="pageNum : ${#numbers.sequence(0, bookings.totalPages - 1)}"
                 class="page-item"
                 th:classappend="${pageNum == bookings.number} ? 'active'">
                 <a class="page-link"
-                   th:href="@{/host/booking-list(page=${pageNum}, keyword=${param.keyword}, status=${param.status}, sort=${param.sort})}"
+                   th:href="@{/agent/booking-list(page=${pageNum}, keyword=${param.keyword}, status=${param.status}, sort=${param.sort})}"
                    th:text="${pageNum + 1}">1</a>
             </li>
             <li class="page-item" th:classappend="${bookings.last} ? 'disabled'">
-                <a class="page-link" th:href="@{/host/booking-list(page=${bookings.number + 1},
+                <a class="page-link" th:href="@{/agent/booking-list(page=${bookings.number + 1},
                   keyword=${param.keyword}, status=${param.status}, sort=${param.sort})}">Sau</a>
             </li>
         </ul>
@@ -171,7 +171,7 @@
     <!-- Modal cập nhật trạng thái -->
     <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <form method="post" th:action="@{/host/updateStatus}" id="updateStatusForm">
+            <form method="post" th:action="@{/agent/updateStatus}" id="updateStatusForm">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Cập nhật trạng thái đặt bàn</h5>
@@ -202,7 +202,7 @@
     <!-- Modal chọn bàn -->
     <div class="modal fade" id="assignTableModal" tabindex="-1" aria-labelledby="assignTableModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <form method="post" th:action="@{/host/assignTable}" id="assignTableForm">
+            <form method="post" th:action="@{/agent/assignTable}" id="assignTableForm">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Chọn bàn cho khách</h5>
@@ -229,7 +229,7 @@
     </div>
     <div class="modal fade" id="editBookingModal" tabindex="-1" aria-labelledby="editBookingModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <form method="post" th:action="@{/host/editBooking}" id="editBookingForm"
+            <form method="post" th:action="@{/agent/editBooking}" id="editBookingForm"
                   class="needs-validation" novalidate>
                 <div class="modal-content">
                     <div class="modal-header">
@@ -295,7 +295,7 @@
                 const id = button.getAttribute('data-id');
                 const title = button.getAttribute('data-title');
                 deleteModal.querySelector('#modalTitle').textContent = title;
-                deleteModal.querySelector('#deleteForm').setAttribute('action', '/host/' + id + '/delete');
+                deleteModal.querySelector('#deleteForm').setAttribute('action', '/agent/' + id + '/delete');
             });
 
             const updateStatusModal = document.getElementById('updateStatusModal');
@@ -329,7 +329,7 @@
                 document.getElementById('bookingDate').value = bookingDate;
                 document.getElementById('request-datetime').innerText = bookingDateTime;
 
-                fetch(`/host/api/available-tables?date=${bookingDate}`)
+                fetch(`/agent/api/available-tables?date=${bookingDate}`)
                     .then(res => res.json())
                     .then(data => {
                         const tableSelect = document.getElementById('tableSelect');
