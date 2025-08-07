@@ -1,4 +1,4 @@
-    <html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.thymeleaf.org">
+<html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.thymeleaf.org">
 <head>
     <title>Admin Dashboard</title>
 </head>
@@ -9,7 +9,7 @@
                 <div class="card-body text-center">
                     <i class="bi bi-receipt" style="font-size: 2rem;"></i>
                     <h5 class="card-title mt-2">Hóa đơn hôm nay</h5>
-                    <p class="card-text">123</p>
+                    <p class="card-text" th:text="${invoiceToday}">0</p>
                 </div>
             </div>
         </div>
@@ -18,7 +18,8 @@
                 <div class="card-body text-center">
                     <i class="bi bi-currency-dollar" style="font-size: 2rem;"></i>
                     <h5 class="card-title mt-2">Doanh thu hôm nay</h5>
-                    <p class="card-text">2.300.000đ</p>
+                    <p class="card-text"
+                       th:text="${#numbers.formatDecimal(revenueToday, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</p>
                 </div>
             </div>
         </div>
@@ -27,7 +28,7 @@
                 <div class="card-body text-center">
                     <i class="bi bi-box-seam" style="font-size: 2rem;"></i>
                     <h5 class="card-title mt-2">Món đang bán</h5>
-                    <p class="card-text">48</p>
+                    <p class="card-text" th:text="${sellingItems}">0</p>
                 </div>
             </div>
         </div>
@@ -35,11 +36,84 @@
             <div class="card shadow-sm">
                 <div class="card-body text-center">
                     <i class="bi bi-people" style="font-size: 2rem;"></i>
-                                         <h5 class="card-title mt-2">Nhân viên</h5>
-                     <p class="card-text" th:text="${enabledEmployees} + '/' + ${totalEmployees}">15/15</p>
+                    <h5 class="card-title mt-2">Nhân viên</h5>
+                    <p class="card-text" th:text="${enabledEmployees} + '/' + ${totalEmployees}">15/15</p>
                 </div>
             </div>
         </div>
     </div>
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <label for="startDate" class="form-label">Từ ngày</label>
+            <input type="date" id="startDate" class="form-control">
+        </div>
+        <div class="col-md-3">
+            <label for="endDate" class="form-label">Đến ngày</label>
+            <input type="date" id="endDate" class="form-control">
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button class="btn btn-primary" onclick="loadChartData()">Xem biểu đồ</button>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <canvas id="revenueChart" height="100"></canvas>
+        </div>
+    </div>
+
+
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let revenueChart;
+
+    function loadChartData() {
+        const start = document.getElementById("startDate").value;
+        const end = document.getElementById("endDate").value;
+
+        if (!start || !end) {
+            alert("Vui lòng chọn ngày bắt đầu và ngày kết thúc!");
+            return;
+        }
+
+        fetch(`/admin/revenue-chart-data?start=${start}&end=${end}`)
+            .then(res => res.json())
+            .then(data => {
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+
+                // Xóa biểu đồ cũ nếu có
+                if (revenueChart) {
+                    revenueChart.destroy();
+                }
+
+                revenueChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.dates,
+                        datasets: [{
+                            label: 'Doanh thu (VNĐ)',
+                            data: data.revenues,
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function (value) {
+                                        return new Intl.NumberFormat('vi-VN').format(value) + 'đ';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+    }
+</script>
 </html> 

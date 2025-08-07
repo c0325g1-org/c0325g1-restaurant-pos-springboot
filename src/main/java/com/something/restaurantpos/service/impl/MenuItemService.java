@@ -92,4 +92,9 @@ public class MenuItemService implements IMenuItemService {
         return menuItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy món ăn"));
     }
+
+    @Override
+    public long countSellingItems() {
+        return menuItemRepository.countSellingItems();
+    }
 }

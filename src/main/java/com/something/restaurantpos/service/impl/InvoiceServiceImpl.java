@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -297,6 +298,22 @@ public class InvoiceServiceImpl implements IInvoiceService {
         invoice.setCreatedAt(LocalDateTime.now());
         invoice.setDeleted(false);
         return invoiceRepository.save(invoice);
+    }
+
+    // thống kê dashboard
+    @Override
+    public long countPaidInvoicesToday() {
+        return invoiceRepository.countPaidInvoicesToday();
+    }
+
+    @Override
+    public BigDecimal sumRevenueToday() {
+        return invoiceRepository.sumRevenueToday();
+    }
+
+    @Override
+    public List<Object[]> getRevenueBetweenDates(LocalDateTime start, LocalDateTime end) {
+        return invoiceRepository.getRevenueBetweenDates(start, end);
     }
 }
     

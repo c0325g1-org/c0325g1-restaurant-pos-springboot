@@ -11,4 +11,6 @@ public interface IMenuItemService extends IService<MenuItem> {
     MenuItem getById(Integer id);
     Page<MenuItem> search(String name, Integer idCategory, Pageable pageable);
     List<MenuItem> findMenuItemOrderByTotalQuantityDesc();
+    long countSellingItems();
 }
+
