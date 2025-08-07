@@ -26,7 +26,7 @@ public class EmployeeDTO extends BaseDTO {
     @Size(max = 100, message = "Email tối đa 100 ký tự")
     @Pattern(
             regexp = "^\\w+@[a-z]{5,7}(\\.[a-z]{2,3}){1,2}$",
-            message = "Email không đúng định dạng"
+            message = "Email không đúng định dạng (abc123@gmail.com)"
     )
     private String email;
 
