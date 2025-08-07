@@ -48,6 +48,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import com.something.restaurantpos.util.PasswordGenerator;
 
 
 @Controller
@@ -203,9 +204,12 @@ public class AdminController {
                 return "pages/admin/employees";
             }
             
+            // Tạo mật khẩu ngẫu nhiên
+            String randomPassword = PasswordGenerator.generatePassword();
+            
             // Tạo employee mới
             Employee employee = employeeMapper.toEntity(employeeDTO);
-            employee.setPassword(passwordEncoder.encode(employeeDTO.getPassword()));
+            employee.setPassword(passwordEncoder.encode(randomPassword));
             employee.setRole(role);
             employee.setEnable(false); // Tài khoản chưa kích hoạt
             
@@ -381,7 +385,8 @@ public class AdminController {
             
             // Xóa token kích hoạt trước (nếu có)
             try {
-                activationTokenRepository.deleteByEmployeeId(id);
+                // Sử dụng service thay vì gọi repository trực tiếp
+                activationService.deleteTokensByEmployeeId(id);
             } catch (Exception e) {
                 // Log lỗi nhưng không dừng quá trình xóa
                 System.err.println("Lỗi khi xóa token kích hoạt: " + e.getMessage());
@@ -482,24 +487,16 @@ public class AdminController {
                     break;
                     
                 case "password":
+                    // Trong form add, password không cần validate vì sẽ được tạo tự động
                     if ("add".equals(formType)) {
-                        // Trong form add, password bắt buộc
-                        if (value == null || value.trim().isEmpty()) {
-                            isValid = false;
-                            message = "Mật khẩu không được để trống";
-                        } else if (value.trim().length() < 3 || value.trim().length() > 50) {
-                            isValid = false;
-                            message = "Mật khẩu phải từ 3-50 ký tự";
-                        } else if (!value.matches("^[a-z0-9]+$")) {
-                            isValid = false;
-                            message = "Mật khẩu chỉ được chứa chữ thường và số";
-                        }
+                        isValid = true;
+                        message = "";
                     } else {
                         // Trong form edit, password optional
                         if (value != null && !value.trim().isEmpty()) {
-                            if (value.trim().length() < 3 || value.trim().length() > 50) {
+                            if (value.trim().length() < 6) {
                                 isValid = false;
-                                message = "Mật khẩu phải từ 3-50 ký tự";
+                                message = "Mật khẩu phải có ít nhất 6 ký tự";
                             } else if (!value.matches("^[a-z0-9]+$")) {
                                 isValid = false;
                                 message = "Mật khẩu chỉ được chứa chữ thường và số";

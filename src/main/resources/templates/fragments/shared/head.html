@@ -69,5 +69,191 @@
             opacity: 0.65;
             cursor: not-allowed;
         }
+        
+        /* Password Change Form Styles */
+        .password-icon-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .password-icon-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .password-icon-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .password-icon-circle i {
+            font-size: 2rem;
+            color: white;
+        }
+        
+        .password-form-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .password-field-group {
+            position: relative;
+            max-width: 250px !important;
+            margin: 0 auto !important;
+            width: 250px !important;
+        }
+        
+
+        
+        .password-field-group .form-label {
+            color: #495057;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .password-input {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        
+        .password-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            background: white;
+        }
+        
+        .password-toggle {
+            border: 2px solid #e9ecef;
+            border-left: none;
+            background: white;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+        
+        .password-toggle:hover {
+            background: #f8f9fa;
+            color: #495057;
+        }
+        
+        .password-toggle:focus {
+            box-shadow: none;
+        }
+        
+        .password-requirements {
+            margin-top: 0.5rem;
+            padding: 8px 12px;
+            background: #e3f2fd;
+            border-radius: 6px;
+            border-left: 4px solid #2196f3;
+            max-width: 250px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            width: 250px !important;
+        }
+        
+        .password-requirements small {
+            color: #1976d2;
+            font-size: 0.85rem;
+        }
+        
+        .password-actions {
+            margin-top: 2rem;
+            max-width: 250px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            width: 250px !important;
+        }
+        
+        .password-actions .btn {
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            width: 100% !important;
+        }
+        
+        .password-actions .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .password-actions .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-loading {
+            display: none;
+        }
+        
+        .btn:disabled .btn-text {
+            display: none;
+        }
+        
+        .btn:disabled .btn-loading {
+            display: inline-block;
+        }
+        
+        /* Input Group Focus States */
+        .input-group:focus-within .password-toggle {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        /* Ensure input groups respect container width */
+        .password-field-group .input-group {
+            width: 100% !important;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .password-form-container {
+                padding: 15px;
+                margin: 0 10px;
+            }
+            
+            .password-field-group {
+                max-width: 200px !important;
+                width: 200px !important;
+            }
+            
+            .password-requirements {
+                max-width: 200px !important;
+                width: 200px !important;
+            }
+            
+            .password-actions {
+                max-width: 200px !important;
+                width: 200px !important;
+            }
+            
+            .password-icon-circle {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .password-icon-circle i {
+                font-size: 1.5rem;
+            }
+        }
     </style>
 </th:block>
