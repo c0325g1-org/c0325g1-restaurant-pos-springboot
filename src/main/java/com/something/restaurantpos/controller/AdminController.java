@@ -6,6 +6,7 @@ import com.something.restaurantpos.entity.Employee;
 import com.something.restaurantpos.entity.Role;
 import com.something.restaurantpos.mapper.EmployeeMapper;
 import com.something.restaurantpos.repository.IEmployeeRepository;
+import com.something.restaurantpos.repository.IInvoiceRepository;
 import com.something.restaurantpos.repository.IRoleRepository;
 
 import com.something.restaurantpos.repository.IAccountActivationTokenRepository;
@@ -46,6 +47,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -75,6 +77,9 @@ public class AdminController {
     @Autowired
     private IInvoiceService invoiceService;
 
+    @Autowired
+    private IInvoiceRepository invoiceRepository;
+
     @GetMapping("")
     public String adminHome() {
         return "redirect:/admin/dashboard";
@@ -82,8 +87,7 @@ public class AdminController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        // Thống kê cơ bản
-        long totalEmployees = employeeRepository.countByDeletedFalse(); // tất cả nhân viên chưa xóa
+        long totalEmployees = employeeRepository.countByDeletedFalse(); 
         long enabledEmployees = employeeRepository.countByDeletedFalseAndEnableTrue();
         
         long totalManagers = employeeRepository.countByRoleId(1); // QUẢN_LÝ
@@ -355,7 +359,6 @@ public class AdminController {
     }
     
     @PostMapping("/employees/{id}/delete")
-    @Transactional
     public String deleteEmployee(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         try {
             Employee employee = employeeRepository.findById(id).orElse(null);
@@ -395,6 +398,8 @@ public class AdminController {
             return "redirect:/admin/employees";
         }
     }
+    
+    @GetMapping("/revenue")
     
 
     
@@ -551,26 +556,32 @@ public class AdminController {
     }
 
 
-    @GetMapping("/revenue-chart-data")
+    @GetMapping("/revenue")
     @ResponseBody
-    public Map<String, Object> getRevenueChartData(@RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
-                                                   @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
-        LocalDateTime startDateTime = start.atStartOfDay();
-        LocalDateTime endDateTime = end.atTime(23, 59, 59);
-        List<Object[]> data = invoiceService.getRevenueBetweenDates(startDateTime, endDateTime);
+    public Map<String, BigDecimal> getRevenueByDateRange(
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
 
-        List<String> dates = new ArrayList<>();
-        List<BigDecimal> revenues = new ArrayList<>();
+        List<Object[]> results = invoiceRepository.sumRevenueByDateRange(start, end);
+        return results.stream().collect(Collectors.toMap(
+                row -> ((java.sql.Date) row[0]).toLocalDate().toString(),
+                row -> (BigDecimal) row[1]
+        ));
+    }
 
-        for (Object[] row : data) {
-            dates.add(row[0].toString()); // yyyy-MM-dd
-            revenues.add((BigDecimal) row[1]);
+    @GetMapping("/top-items")
+    @ResponseBody
+    public Map<String, Integer> getTopSellingItemsThisMonth() {
+        LocalDateTime start = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+        LocalDateTime end = LocalDate.now().plusMonths(1).withDayOfMonth(1).atStartOfDay().minusNanos(1);
+
+        List<Object[]> result = menuItemService.getTopSellingItemsThisMonth(start, end);
+
+        Map<String, Integer> response = new LinkedHashMap<>();
+        for (Object[] row : result) {
+            response.put((String) row[0], ((Long) row[1]).intValue()); // tên món -> số lượng bán
         }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("dates", dates);
-        result.put("revenues", revenues);
-        return result;
+        return response;
     }
-    
 } 

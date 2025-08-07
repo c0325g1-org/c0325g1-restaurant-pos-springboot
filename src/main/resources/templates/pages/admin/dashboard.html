@@ -1,11 +1,28 @@
 <html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.thymeleaf.org">
 <head>
     <title>Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <style>
+        canvas {
+            max-width: 100% !important;
+            height: auto !important;
+        }
+
+        @media (max-width: 576px) {
+            #revenue-form {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+        }
+    </style>
 </head>
+
 <div layout:fragment="content">
+    <!-- Các thống kê nhanh -->
     <div class="row g-4">
-        <div class="col-md-6 col-lg-3">
-            <div class="card shadow-sm">
+        <div class="col-sm-6 col-md-6 col-lg-3">
+            <div class="card shadow-sm h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-receipt" style="font-size: 2rem;"></i>
                     <h5 class="card-title mt-2">Hóa đơn hôm nay</h5>
@@ -13,8 +30,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card shadow-sm">
+        <div class="col-sm-6 col-md-6 col-lg-3">
+            <div class="card shadow-sm h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-currency-dollar" style="font-size: 2rem;"></i>
                     <h5 class="card-title mt-2">Doanh thu hôm nay</h5>
@@ -23,8 +40,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card shadow-sm">
+        <div class="col-sm-6 col-md-6 col-lg-3">
+            <div class="card shadow-sm h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-box-seam" style="font-size: 2rem;"></i>
                     <h5 class="card-title mt-2">Món đang bán</h5>
@@ -32,8 +49,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card shadow-sm">
+        <div class="col-sm-6 col-md-6 col-lg-3">
+            <div class="card shadow-sm h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-people" style="font-size: 2rem;"></i>
                     <h5 class="card-title mt-2">Nhân viên</h5>
@@ -42,78 +59,183 @@
             </div>
         </div>
     </div>
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <label for="startDate" class="form-label">Từ ngày</label>
-            <input type="date" id="startDate" class="form-control">
+
+    <!-- Biểu đồ -->
+    <div class="row mt-4 g-4">
+        <!-- Biểu đồ cột doanh thu -->
+        <div class="col-md-8">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-3">Biểu đồ doanh thu theo ngày</h5>
+                    <form id="revenue-form" class="d-flex flex-column flex-sm-row gap-2 align-items-end mb-4">
+                        <div class="flex-grow-1">
+                            <label for="startDate" class="form-label mb-1">Từ ngày:</label>
+                            <input type="date" class="form-control" id="startDate" required>
+                        </div>
+                        <div class="flex-grow-1">
+                            <label for="endDate" class="form-label mb-1">Đến ngày:</label>
+                            <input type="date" class="form-control" id="endDate" required>
+                        </div>
+                        <div>
+                            <button type="button" id="btn-search" class="btn btn-primary px-4">Xem biểu đồ</button>
+                        </div>
+                    </form>
+
+                    <div style="position: relative; width: 100%; height: 320px;">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-3">
-            <label for="endDate" class="form-label">Đến ngày</label>
-            <input type="date" id="endDate" class="form-control">
-        </div>
-        <div class="col-md-3 d-flex align-items-end">
-            <button class="btn btn-primary" onclick="loadChartData()">Xem biểu đồ</button>
+
+        <!-- Biểu đồ tròn món bán chạy -->
+        <div class="col-md-4 d-flex justify-content-center">
+            <div class="card shadow-sm h-100 w-100" style="max-width: 360px;">
+                <div class="card-body d-flex flex-column align-items-center">
+                    <h5 class="card-title mb-3 text-center">Biểu đồ món bán chạy trong tháng</h5>
+                    <div class="ratio ratio-1x1 w-100">
+                        <canvas id="topItemsChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-    <div class="row mb-4">
-        <div class="col">
-            <canvas id="revenueChart" height="100"></canvas>
-        </div>
-    </div>
-
-
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    let revenueChart;
 
-    function loadChartData() {
-        const start = document.getElementById("startDate").value;
-        const end = document.getElementById("endDate").value;
+<!-- Script -->
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        let chart;
+        let topItemsChart;
 
-        if (!start || !end) {
-            alert("Vui lòng chọn ngày bắt đầu và ngày kết thúc!");
-            return;
+        function formatDate(date) {
+            let d = date.getDate();
+            let m = date.getMonth() + 1;
+            let y = date.getFullYear();
+            if (d < 10) d = '0' + d;
+            if (m < 10) m = '0' + m;
+            return `${y}-${m}-${d}`;
         }
 
-        fetch(`/admin/revenue-chart-data?start=${start}&end=${end}`)
-            .then(res => res.json())
-            .then(data => {
-                const ctx = document.getElementById('revenueChart').getContext('2d');
+        function chartHandler() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            const start = document.getElementById("startDate").value;
+            const end = document.getElementById("endDate").value;
 
-                // Xóa biểu đồ cũ nếu có
-                if (revenueChart) {
-                    revenueChart.destroy();
-                }
+            if (!start || !end) {
+                alert("Vui lòng chọn đầy đủ ngày bắt đầu và kết thúc.");
+                return;
+            }
 
-                revenueChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.dates,
-                        datasets: [{
-                            label: 'Doanh thu (VNĐ)',
-                            data: data.revenues,
-                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function (value) {
-                                        return new Intl.NumberFormat('vi-VN').format(value) + 'đ';
+            fetch(`/admin/revenue?start=${start}&end=${end}`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu doanh thu.");
+                    return response.json();
+                })
+                .then(data => {
+                    const labels = Object.keys(data);
+                    const values = Object.values(data);
+
+                    if (chart) chart.destroy();
+
+                    chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Doanh thu (VNĐ)',
+                                data: values,
+                                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: value => new Intl.NumberFormat('vi-VN').format(value) + ' đ'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: { display: true }
+                            },
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert("Đã có lỗi xảy ra khi hiển thị biểu đồ.");
+                });
+        }
+
+        function loadTopItemsChart() {
+            fetch("/admin/top-items")
+                .then(response => {
+                    if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu món bán chạy.");
+                    return response.json();
+                })
+                .then(data => {
+                    const labels = Object.keys(data);
+                    const values = Object.values(data);
+                    const ctx = document.getElementById('topItemsChart').getContext('2d');
+
+                    if (topItemsChart) topItemsChart.destroy();
+
+                    topItemsChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Số lượng bán',
+                                data: values,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.6)',
+                                    'rgba(54, 162, 235, 0.6)',
+                                    'rgba(255, 206, 86, 0.6)',
+                                    'rgba(75, 192, 192, 0.6)',
+                                    'rgba(153, 102, 255, 0.6)',
+                                    'rgba(255, 159, 64, 0.6)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { position: 'bottom' },
+                                tooltip: {
+                                    callbacks: {
+                                        label: ctx => `${ctx.label}: ${ctx.parsed} món`
                                     }
                                 }
                             }
                         }
-                    }
+                    });
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert("Đã có lỗi khi tải biểu đồ món bán chạy.");
                 });
-            });
-    }
-</script>
-</html> 
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+            document.getElementById("startDate").value = formatDate(firstDay);
+            document.getElementById("endDate").value = formatDate(lastDay);
+
+            chartHandler();
+            loadTopItemsChart();
+
+            document.getElementById("btn-search").addEventListener("click", chartHandler);
+        });
+    </script>
+</th:block>
+</html>
