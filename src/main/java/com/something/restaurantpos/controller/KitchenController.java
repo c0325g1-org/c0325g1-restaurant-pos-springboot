@@ -3,6 +3,7 @@ package com.something.restaurantpos.controller;
 import com.something.restaurantpos.dto.GroupedKitchenOrderDTO;
 import com.something.restaurantpos.dto.OrderItemStatusNotificationDTO;
 import com.something.restaurantpos.entity.Notification;
+import com.something.restaurantpos.entity.Order;
 import com.something.restaurantpos.entity.OrderItem;
 import com.something.restaurantpos.entity.Role;
 import com.something.restaurantpos.service.IKitchenService;
@@ -72,7 +73,7 @@ public class KitchenController {
         List<OrderItem> orderItems = new ArrayList<>();
         int currentIndex = 0;
         for (OrderItem item : allItems){
-            if (item.isDeleted()) {
+            if (item.isDeleted() || !item.getOrder().getStatus().equals(Order.OrderStatus.OPEN)) {
                 continue;
             }
             if (groupedKitchenOrderDTOS.isEmpty()){
@@ -132,7 +133,9 @@ public class KitchenController {
         OrderItemStatusNotificationDTO notificationDTO = new OrderItemStatusNotificationDTO();
         notificationDTO.setOrderItem(item);
         notificationDTO.setMessage(message);
-
+        if (status == OrderItem.ItemStatus.READY) {
+            notificationDTO.setSpeak(true);
+        }
         notificationService.create(message, Notification.NotificationType.INFO, Role.UserRole.ROLE_WAITER);
         notificationService.sendToUser(notificationDTO, Role.UserRole.ROLE_WAITER);
 

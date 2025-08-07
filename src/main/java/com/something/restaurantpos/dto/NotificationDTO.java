@@ -21,6 +21,7 @@ public class NotificationDTO {
     private LocalDateTime createdAt;
     private Notification.NotificationType notificationType;
     private boolean read;
+    private boolean speak;
 
     public NotificationDTO() {
         Employee employee = CurrentUserUtil.getCurrentEmployee();
@@ -34,5 +35,6 @@ public class NotificationDTO {
             this.senderRole = "";
         }
         this.createdAt = LocalDateTime.now();
+        this.speak = false;
     }
 }

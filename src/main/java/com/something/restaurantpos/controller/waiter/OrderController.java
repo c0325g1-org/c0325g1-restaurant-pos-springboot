@@ -27,6 +27,7 @@ public class OrderController {
     private final IMenuCategoryService menuCategoryService;
     private final IDiningTableService diningTableService;
     private final IOrderService orderService;
+    private final IOrderItemService orderItemService;
     private final MenuItemMapper menuItemMapper;
 
     @ModelAttribute("cartMap")
@@ -132,16 +133,26 @@ public class OrderController {
 
     @GetMapping("/called-items")
     public ResponseEntity<List<OrderItem>> getCalledItems(@RequestParam Integer tableId) {
+        Order order = orderService.findLastedOpenOrderByTableId(tableId).orElse(null);
         List<OrderItem.ItemStatus> statuses = List.of(
                 OrderItem.ItemStatus.NEW, OrderItem.ItemStatus.COOKING,
                 OrderItem.ItemStatus.READY, OrderItem.ItemStatus.CANCELED);
-        return ResponseEntity.ok(orderService.getOrderItemsByTableAndStatuses(tableId, statuses));
+        if (order != null) {
+            return ResponseEntity.ok(orderService.getOrderItemsByOrderAndStatuses(order.getId(), statuses));
+        } else {
+            return ResponseEntity.ok(List.of());
+        }
     }
 
     @GetMapping("/served-items")
     public ResponseEntity<List<OrderItem>> getServedItems(@RequestParam Integer tableId) {
-        return ResponseEntity.ok(orderService.getOrderItemsByTableAndStatuses(
-                tableId, List.of(OrderItem.ItemStatus.SERVED)));
+        Order order = orderService.findLastedOpenOrderByTableId(tableId).orElse(null);
+        List<OrderItem.ItemStatus> statuses = List.of(OrderItem.ItemStatus.SERVED);
+        if (order != null) {
+            return ResponseEntity.ok(orderService.getOrderItemsByOrderAndStatuses(order.getId(), statuses));
+        } else {
+            return ResponseEntity.ok(List.of());
+        }
     }
 
     @PostMapping("/cancel-item")

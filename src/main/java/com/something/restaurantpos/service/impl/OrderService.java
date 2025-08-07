@@ -91,6 +91,7 @@ public class OrderService implements IOrderService {
         notification.setOrderItems(orderItems);
         notification.setNewOrder(true);
         notification.setMessage(message);
+        notification.setSpeak(true);
         notificationService.create(message, Notification.NotificationType.INFO, Role.UserRole.ROLE_KITCHEN);
         notificationService.sendToUser(notification, Role.UserRole.ROLE_KITCHEN);
     }
@@ -134,8 +135,8 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public List<OrderItem> getOrderItemsByTableAndStatuses(Integer tableId, List<OrderItem.ItemStatus> statuses) {
-        return orderItemRepository.findAllByOrder_Table_IdAndStatusIn(tableId, statuses);
+    public List<OrderItem> getOrderItemsByOrderAndStatuses(Integer orderId, List<OrderItem.ItemStatus> statuses) {
+        return orderItemRepository.findAllByOrder_IdAndStatusIn(orderId, statuses);
     }
 
     @Override
@@ -157,6 +158,9 @@ public class OrderService implements IOrderService {
         String message = item.getOrder().getTable().getName() + ": Món " + item.getMenuItem().getName() + statusDisplayText;
         notification.setOrderItem(item);
         notification.setMessage(message);
+        if (itemStatus.equals(OrderItem.ItemStatus.CANCELED)) {
+            notification.setSpeak(true);
+        }
         notificationService.create(message, Notification.NotificationType.INFO, Role.UserRole.ROLE_KITCHEN);
         notificationService.sendToUser(notification, Role.UserRole.ROLE_KITCHEN);
         orderItemRepository.save(item);

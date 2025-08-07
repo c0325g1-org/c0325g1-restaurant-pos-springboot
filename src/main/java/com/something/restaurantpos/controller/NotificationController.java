@@ -63,7 +63,8 @@ public class NotificationController {
                         notificationReceiver.getNotification().getSenderEmployee() != null ? notificationReceiver.getNotification().getSenderEmployee().getRole().getName() : "",
                         notificationReceiver.getNotification().getCreatedAt(),
                         notificationReceiver.getNotification().getType(),
-                        notificationReceiver.getIsRead())).toList();
+                        notificationReceiver.getIsRead(),
+                        false)).toList();
         return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
@@ -85,6 +86,7 @@ public class NotificationController {
             String message = diningTable.getName() + " yêu cầu thanh toán với " + dto.getBillType();
             NotificationDTO notificationDTO = new NotificationDTO();
             notificationDTO.setMessage(message);
+            notificationDTO.setSpeak(true);
             notificationService.create(message, Notification.NotificationType.INFO, Role.UserRole.ROLE_CASHIER);
             notificationService.sendToUser(notificationDTO, Role.UserRole.ROLE_CASHIER);
             return ResponseEntity.ok().body(Map.of(
