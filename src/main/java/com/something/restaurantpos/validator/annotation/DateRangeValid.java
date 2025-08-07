@@ -14,8 +14,6 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = DateRangeValidator.class)
 public @interface DateRangeValid {
     String message() default "Ngày hết hạn phải sau hoặc bằng ngày bắt đầu";
-
     Class<?>[] groups() default {};
-
     Class<? extends Payload>[] payload() default {};
 }

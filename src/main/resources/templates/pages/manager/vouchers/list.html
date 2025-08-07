@@ -1,6 +1,22 @@
 <html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
 <head>
     <title>Mã giảm giá - Quản lý</title>
+    <style>
+
+        table th {
+            white-space: nowrap;
+        }
+
+        table td {
+            max-width: 200px;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+    </style>
 </head>
 <div layout:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -63,59 +79,62 @@
             </span>
     </div>
 
-    <table th:if="${vouchers.content.size() > 0}"
-           class="table table-hover table-striped shadow-sm rounded bg-white">
-        <thead class="table-dark text-center">
-        <tr>
-            <th>STT</th>
-            <th>Mã</th>
-            <th>Ảnh</th>
-            <th>Mô tả</th>
-            <th>Giảm (%)</th>
-            <th>Hiệu lực từ</th>
-            <th>Hiệu lực đến</th>
-            <th>Trạng thái</th>
-            <th>Hành động</th>
-        </tr>
-        </thead>
-        <tbody class="align-middle text-center">
-        <tr th:each="v, status : ${vouchers}">
-            <td th:text="${status.count}">1</td>
-            <td th:text="${v.code}">ABC123</td>
-            <td th:text="${v.description}">Khuyến mãi sinh nhật</td>
-            <td>
-                <img th:src="${v.image != null} ? ${v.image} : '@{/images/default-voucher.png}'"
-                     alt="Ảnh voucher"
-                     class="img-thumbnail"
-                     style="max-height: 60px; max-width: 60px;">
-            </td>
-            <td th:text="${v.discountPercent + '%'}">10%</td>
-            <td th:text="${#temporals.format(v.validFrom, 'dd/MM/yyyy HH:mm')}">01/08/2025</td>
-            <td th:text="${#temporals.format(v.validTo, 'dd/MM/yyyy HH:mm')}">15/08/2025</td>
-            <td>
+    <div class="table-container">
+        <table th:if="${vouchers.content.size() > 0}"
+               class="table table-hover table-striped shadow-sm rounded bg-white">
+            <thead class="table-dark text-center">
+            <tr>
+                <th>STT</th>
+                <th>Mã</th>
+                <th>Ảnh</th>
+                <th>Mô tả</th>
+                <th>Giảm (%)</th>
+                <th>Hiệu lực từ</th>
+                <th>Hiệu lực đến</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody class="align-middle text-center">
+            <tr th:each="v, status : ${vouchers}">
+                <td th:text="${status.count}">1</td>
+                <td th:text="${v.code}">ABC123</td>
+                <td>
+                    <img th:src="${v.image != null} ? ${v.image} : '@{/images/default-voucher.png}'"
+                         alt="Ảnh voucher"
+                         class="img-thumbnail"
+                         style="max-height: 60px; max-width: 60px;">
+                </td>
+                <td th:text="${v.description}">Khuyến mãi sinh nhật</td>
+                <td th:text="${v.discountPercent + '%'}">10%</td>
+                <td th:text="${#temporals.format(v.validFrom, 'dd/MM/yyyy HH:mm')}">01/08/2025</td>
+                <td th:text="${#temporals.format(v.validTo, 'dd/MM/yyyy HH:mm')}">15/08/2025</td>
+                <td>
                 <span th:text="${v.isActive ? 'Đang hoạt động' : 'Ngưng sử dụng'}"
                       th:classappend="${v.isActive} ? 'badge bg-success' : 'badge bg-secondary'"></span>
-            </td>
-            <td>
-                <a th:href="@{/manager/vouchers/{id}/edit(id=${v.id})}"
-                   class="btn btn-outline-primary btn-sm me-1"
-                   data-bs-toggle="tooltip"
-                   title="Sửa"
-                   th:attr="data-bs-title='Sửa voucher ' + ${v.code}">
-                    <i class="bi bi-pencil-square"></i>
-                </a>
-                <button type="button"
-                        class="btn btn-outline-danger btn-sm"
-                        data-bs-toggle="modal"
-                        data-bs-target="#deleteModal"
-                        title="Xoá"
-                        th:attr="data-id=${v.id}, data-title=${v.code}, data-bs-title='Xóa voucher ' + ${v.code}">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+                </td>
+                <td>
+                    <a th:href="@{/manager/vouchers/{id}/edit(id=${v.id})}"
+                       class="btn btn-outline-primary btn-sm me-1"
+                       data-bs-toggle="tooltip"
+                       title="Sửa"
+                       th:attr="data-bs-title='Sửa voucher ' + ${v.code}">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <button type="button"
+                            class="btn btn-outline-danger btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"
+                            title="Xoá"
+                            th:attr="data-id=${v.id}, data-title=${v.code}, data-bs-title='Xóa voucher ' + ${v.code}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
     <nav th:if="${vouchers.totalPages > 1}" aria-label="Page navigation">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${vouchers.first} ? 'disabled'">
