@@ -31,12 +31,7 @@ public class EmployeeDTO extends BaseDTO {
     private String email;
 
 
-    @NotBlank(message = "Mật khẩu không được để trống")
-    @Size(min = 3, max = 50, message = "Mật khẩu phải từ 3 đến 50 ký tự")
-    @Pattern(
-            regexp = "^[a-z0-9]+$",
-            message = "Mật khẩu chỉ được chứa chữ thường và số"
-    )
+    // Mật khẩu sẽ được tạo tự động, không cần nhập
     private String password;
 
 

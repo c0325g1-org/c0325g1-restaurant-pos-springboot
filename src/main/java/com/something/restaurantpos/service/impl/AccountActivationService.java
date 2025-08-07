@@ -171,4 +171,10 @@ public class AccountActivationService implements IAccountActivationService {
         
         return true;
     }
+    
+    @Override
+    @Transactional
+    public void deleteTokensByEmployeeId(Integer employeeId) {
+        activationTokenRepository.deleteByEmployeeId(employeeId);
+    }
 } 

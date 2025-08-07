@@ -108,8 +108,6 @@
                 modal.show();
             }
         }
-        
-
 
 
 
@@ -180,11 +178,6 @@
             function validateFieldWithAjax(field, formType, employeeId = null) {
                 const fieldName = field.name;
                 const value = field.value.trim();
-                
-                // Bỏ qua các field không cần validate
-                if (fieldName === 'id' || field.type === 'hidden') {
-                    return;
-                }
                 
                 // Nếu field trống, validate cơ bản trước
                 if (!value && fieldName !== 'password') {
@@ -257,16 +250,17 @@
                 } else if (fieldName === 'email') {
                     if (!value) {
                         showFieldError(field, 'Email không được để trống');
-                    } else if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(value)) {
+                    } else if (!/^\w+@[a-z]{5,7}(\.[a-z]{2,3}){1,2}$/.test(value)) {
                         showFieldError(field, 'Email không đúng định dạng');
                     } else {
                         clearFieldError(field);
                     }
                 } else if (fieldName === 'password') {
-                    if (!value && formType === 'add') {
-                        showFieldError(field, 'Mật khẩu không được để trống');
-                    } else if (value && (value.length < 3 || value.length > 50)) {
-                        showFieldError(field, 'Mật khẩu phải từ 3-50 ký tự');
+                    // Trong form add, password không cần validate
+                    if (formType === 'add') {
+                        clearFieldError(field);
+                    } else if (value && value.length < 6) {
+                        showFieldError(field, 'Mật khẩu phải có ít nhất 6 ký tự');
                     } else if (value && !/^[a-z0-9]+$/.test(value)) {
                         showFieldError(field, 'Mật khẩu chỉ được chứa chữ thường và số');
                     } else {
@@ -286,7 +280,7 @@
                     'name': 'Họ tên không được để trống',
                     'username': 'Tên đăng nhập không được để trống',
                     'email': 'Email không được để trống',
-                    'password': 'Mật khẩu không được để trống',
+                    'password': '',
                     'roleId': 'Vui lòng chọn vai trò'
                 };
                 return messages[fieldName] || 'Trường này không được để trống';
@@ -401,7 +395,6 @@
                                         th:onclick="'editEmployee(' + ${employee.id} + ')'">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-
                                 <button class="btn btn-sm" 
                                         th:classappend="${employee.enable ? 'btn-outline-warning' : 'btn-outline-success'}"
                                         th:onclick="'toggleEmployeeStatus(' + ${employee.id} + ')'"
@@ -445,12 +438,7 @@
                             <input type="email" class="form-control" id="email" name="email" th:field="*{email}">
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                         </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Mật khẩu</label>
-                            <input type="password" class="form-control" id="password" name="password" th:field="*{password}">
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
-                            <small class="form-text text-muted">Mật khẩu phải từ 3-50 ký tự, chỉ chứa chữ thường và số</small>
-                        </div>
+                        
                         <div class="mb-3">
                             <label for="roleId" class="form-label">Vai trò</label>
                             <select class="form-select" id="roleId" name="roleId" th:field="*{roleId}">
@@ -499,7 +487,7 @@
                             <label for="editPassword" class="form-label">Mật khẩu mới</label>
                             <input type="password" class="form-control" id="editPassword" name="password" placeholder="Nhập mật khẩu mới (để trống nếu không đổi)">
                             <div class="invalid-feedback" id="editPasswordError"></div>
-                            <small class="form-text text-muted">Mật khẩu phải từ 3-50 ký tự, chỉ chứa chữ thường và số</small>
+                            <small class="form-text text-muted">Mật khẩu phải có ít nhất 6 ký tự, chỉ chứa chữ thường và số</small>
                         </div>
                         <div class="mb-3">
                             <label for="editRoleId" class="form-label">Vai trò</label>

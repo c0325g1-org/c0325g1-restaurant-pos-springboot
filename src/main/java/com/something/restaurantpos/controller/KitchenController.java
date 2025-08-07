@@ -101,10 +101,6 @@ public class KitchenController {
         return groupedKitchenOrderDTOS;
     }
 
-
-
-
-
     @PostMapping("/dashboard/item/{id}/status")
     @ResponseBody
     @Transactional

@@ -46,4 +46,12 @@ public class ChangePasswordDTO {
     public void setConfirmPassword(String confirmPassword) {
         this.confirmPassword = confirmPassword;
     }
+    
+    // Custom validation for password matching
+    public String getPasswordMatchingError() {
+        if (newPassword != null && confirmPassword != null && !newPassword.equals(confirmPassword)) {
+            return "Mật khẩu xác nhận không khớp";
+        }
+        return null;
+    }
 } 

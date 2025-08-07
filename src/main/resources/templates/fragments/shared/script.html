@@ -186,11 +186,14 @@
                 
                 if (!isValid) return;
                 
-                // Disable submit button
+                // Disable submit button and show loading state
                 const submitBtn = document.getElementById('changePasswordBtn');
-                const originalText = submitBtn.innerHTML;
+                const btnText = submitBtn.querySelector('.btn-text');
+                const btnLoading = submitBtn.querySelector('.btn-loading');
+                
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+                btnText.classList.add('d-none');
+                btnLoading.classList.remove('d-none');
                 
                 try {
                     const response = await fetch('/profile/change-password', {
@@ -224,9 +227,10 @@
                     console.error('Error changing password:', error);
                     showErrorToast('Có lỗi xảy ra khi kết nối đến máy chủ');
                 } finally {
-                    // Re-enable submit button
+                    // Re-enable submit button and hide loading state
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
+                    btnText.classList.remove('d-none');
+                    btnLoading.classList.add('d-none');
                 }
             });
         }
@@ -265,6 +269,23 @@
                 if (toastBody) toastBody.textContent = message;
                 toastEl.style.display = 'block';
                 new bootstrap.Toast(toastEl).show();
+            }
+        }
+        
+        // === Password Toggle Visibility ===
+        function togglePasswordVisibility(fieldId) {
+            const field = document.getElementById(fieldId);
+            const toggleBtn = field.nextElementSibling;
+            const icon = toggleBtn.querySelector('i');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
             }
         }
         
