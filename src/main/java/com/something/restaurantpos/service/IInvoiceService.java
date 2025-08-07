@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IInvoiceService  extends IService<Invoice> {
@@ -23,4 +25,8 @@ public interface IInvoiceService  extends IService<Invoice> {
     void updateInvoiceWithItems(Integer id, InvoiceDto invoiceDto);
     void applyVoucher(Integer invoiceId, Integer voucherId);
     Invoice createInvoiceFromOrder(Order order);
+    long countPaidInvoicesToday();
+    BigDecimal sumRevenueToday();
+    List<Object[]> getRevenueBetweenDates(LocalDateTime start, LocalDateTime end);
+
 }

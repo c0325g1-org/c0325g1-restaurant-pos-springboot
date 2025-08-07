@@ -29,4 +29,6 @@ public interface IMenuItemRepository extends JpaRepository<MenuItem,Integer> {
     @Query("SELECT mi FROM OrderItem oi JOIN oi.menuItem mi  GROUP BY mi ORDER BY SUM(oi.quantity) DESC limit 6")
     List<MenuItem> findMenuItemOrderByTotalQuantityDesc();
 
+    @Query("SELECT COUNT(m) FROM MenuItem m WHERE m.deleted = false AND m.isAvailable = true")
+    long countSellingItems();
 }
