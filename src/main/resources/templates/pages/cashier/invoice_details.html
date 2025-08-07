@@ -107,10 +107,9 @@
 
 <div class="invoice-container" id="invoice-area">
     <div class="header-title text-uppercase">HÓA ĐƠN TẠM TÍNH</div>
-    <hr/>
-
+    <hr class="m-0">
     <div class="row">
-        <p class="text-center m-0"><strong>Bàn:</strong> <span th:text="${invoice.tableName}"></span></p>
+        <p class="text-center m-0"> <span style="font-weight: bold" th:text="${invoice.tableName}"></span></p>
         <p class="m-0"><strong>Nhân viên:</strong> <span th:text="${invoice.employeeName}"></span></p>
         <p><strong>Thời gian:</strong>
             <span th:text="${#temporals.format(invoice.orderTime, 'dd/MM/yyyy HH:mm')}"></span>

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -77,9 +78,10 @@ public class VoucherService implements IVoucherService {
     }
 
     @Override
-    public Page<Voucher> findAllByOrderByCreatedAtDesc(Pageable pageable) {
-        return voucherRepository.findAllByOrderByCreatedAtDesc(pageable);
+    public Page<Voucher> findByValidToAfter(LocalDateTime now, Pageable pageable) {
+        return voucherRepository.findByValidToAfter(now,pageable);
     }
+
 
 
     @Override

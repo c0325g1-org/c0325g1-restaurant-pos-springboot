@@ -500,11 +500,12 @@
 
 
         .accent-btn {
+            margin: 60px 40px;
             font-weight: bold;
             border: none;
             background: #ea5f1f;
             color: white;
-            padding: 12px 20px;
+            padding: 14px 22px;
             border-radius: 30px;
             text-decoration: none;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -523,10 +524,11 @@
         }
 
         .place-btn {
+            margin: 60px 40px;
             font-weight: bold;
             border: none;
             border-radius: 30px;
-            padding: 12px 20px;
+            padding: 14px 22px;
             background: #ea5f1f;
             color: #fff;
             cursor: pointer;
@@ -572,13 +574,16 @@
         #bookingModal {
             position: fixed;
             top: 50%;
-            left: 50%;
+            left: 48%;
             transform: translate(-50%, -50%) scale(.9);
             background: white;
             border-radius: 12px;
             padding: 1.5rem 1.25rem;
             width: 320px;
-            max-width: 90%;
+
+            /* Giới hạn chiều rộng tối đa */
+            /* Giới hạn chiều cao tối đa */
+            max-width: 80%;
             box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.3);
             z-index: 10001;
             display: none;
@@ -630,19 +635,20 @@
             cursor: pointer;
             margin-top: 8px;
         }
-        form .form-group {
+
+        .form-group {
             margin-bottom: 1rem;
         }
 
-        form .form-label {
+        .form-label {
             display: block;
             font-weight: 500;
             margin-bottom: 0.5rem;
         }
 
-        form input,
-        form textarea {
-            width: 100%;
+        .form-group input,
+        .form-group textarea {
+            width: 90%;
             padding: 10px 14px;
             border: 1px solid #ccc;
             border-radius: 8px;
@@ -650,27 +656,30 @@
             transition: border-color 0.3s, box-shadow 0.3s;
         }
 
-        form input:focus,
-        form textarea:focus {
+        .form-group input:focus,
+        .form-group textarea:focus {
             border-color: #6c63ff;
             box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
             outline: none;
         }
 
-        form textarea {
+        .form-group textarea {
             resize: vertical;
             min-height: 80px;
             max-height: 200px;
             line-height: 1.5;
         }
 
+        .navbar-brand {
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
 <th:block th:replace="~{fragments/shared/toast :: toast}"></th:block>
 <nav class="navbar navbar-expand-lg ">
     <div class="container-fluid">
-        <img th:src="@{'/img/logo.png'}" class="navbar-brand" width="100pxn">
+        <img th:src="@{'/img/logo.png'}" class="navbar-brand" width="120px">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
                 aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -739,16 +748,16 @@
 <!--    </button>-->
 <!--</div>-->
 
-<div class="feedback-carousel slick-fade" id="voucherSlider" >
+<div class="feedback-carousel slick-fade" id="voucherSlider">
     <div class="slide" th:each="voucher, status : ${vouchers}">
         <img th:src="${voucher.image}" class="d-block w-100" alt="Voucher 1">
     </div>
-<!--    <div class="slide">-->
-<!--        <img th:src="@{'/img/vocher1.jpg'}" class="d-block w-100" alt="Voucher 2">-->
-<!--    </div>-->
-<!--    <div class="slide">-->
-<!--        <img th:src="@{'/img/vocher2.png'}" class="d-block w-100" alt="Voucher 3">-->
-<!--    </div>-->
+    <!--    <div class="slide">-->
+    <!--        <img th:src="@{'/img/vocher1.jpg'}" class="d-block w-100" alt="Voucher 2">-->
+    <!--    </div>-->
+    <!--    <div class="slide">-->
+    <!--        <img th:src="@{'/img/vocher2.png'}" class="d-block w-100" alt="Voucher 3">-->
+    <!--    </div>-->
 </div>
 
 <div class="favorites-section">
@@ -784,7 +793,8 @@
                                   th:utext="${#strings.repeat('<i class=&quot;bi bi-star text-muted me-1&quot;></i>', 5 - feedback.rating)}"></span>
                         </div>
                         <p class="card-text" th:text="${feedback.content}"></p>
-                        <small class="text-muted" th:text="${feedback.createdAt}"></small>
+                        <small class="text-muted"
+                               th:text="${#temporals.format(feedback.createdAt, 'dd/MM/yyyy HH:mm')}"></small>
                     </div>
                     <img th:if="${feedback.imagePath}" th:src="${feedback.imagePath}"
                          class="card-img-bottom" alt="Ảnh khách"
@@ -813,54 +823,53 @@
 <div id="bookingModal" aria-label="Form đặt bàn">
     <button class="close-btn" aria-label="Đóng">&times;</button>
     <h3>Đặt bàn</h3>
-    <form th:object="${bookingDTO}" th:action="@{/home/booking}" method="post">
+    <div th:object="${bookingDTO}">
 
         <div class="form-group">
-            <label for="customerName" class="form-label">Họ tên</label>
-            <input type="text" id="customerName" th:field="*{name}" placeholder="Nhập tên" >
-            <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-
+            <label for="name" class="form-label">Họ tên</label>
+            <input type="text" id="name" th:field="*{name}" placeholder="Nhập tên">
+            <!--            <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>-->
+            <div class="text-danger small"></div>
         </div>
         <div class="form-group">
             <label for="phone" class="form-label">Số điện thoại</label>
-            <input type="tel" id="phone" th:field="*{phone}" placeholder="0987xxxxxx" >
-            <div class="text-danger small" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+            <input type="tel" id="phone" th:field="*{phone}" placeholder="0987xxxxxx">
+            <!--            <div class="text-danger small" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>-->
+            <div class="text-danger small"></div>
 
         </div>
         <div class="form-group">
             <label for="email" class="form-label">Địa chỉ email </label>
-            <input type="email" id="email" th:field="*{email}" placeholder="Nhập địa chỉ email" >
-            <div class="text-danger small" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+            <input type="email" id="email" th:field="*{email}" placeholder="Nhập địa chỉ email">
+            <!--            <div class="text-danger small" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>-->
+            <div class="text-danger small"></div>
 
         </div>
         <div class="form-group">
-            <label for="datetime" class="form-label">Ngày & giờ</label>
-            <input type="datetime-local" th:field="*{dateTime}" id="datetime" >
-            <div class="text-danger small" th:if="${#fields.hasErrors('dateTime')}" th:errors="*{dateTime}"></div>
+            <label for="dateTime" class="form-label">Ngày & giờ</label>
+            <input type="datetime-local" th:field="*{dateTime}" id="dateTime">
+            <!--            <div class="text-danger small" th:if="${#fields.hasErrors('dateTime')}" th:errors="*{dateTime}"></div>-->
+            <div class="text-danger small"></div>
 
         </div>
         <div class="form-group">
             <label for="people" class="form-label">Số khách</label>
-            <input type="number" th:field="*{people}" id="people" >
-            <div class="text-danger small" th:if="${#fields.hasErrors('people')}" th:errors="*{people}"></div>
+            <input type="number" th:field="*{people}" id="people">
+            <!--            <div class="text-danger small" th:if="${#fields.hasErrors('people')}" th:errors="*{people}"></div>-->
+            <div class="text-danger small"></div>
 
         </div>
         <div class="form-group">
             <label for="note" class="form-label">Ghi chú</label>
-            <textarea id="note" th:field="*{note}" placeholder="Nhập ghi chú" rows="3" style="resize: vertical;"></textarea>
-            <div class="text-danger small" th:if="${#fields.hasErrors('note')}" th:errors="*{note}"></div>
+            <textarea id="note" th:field="*{note}" placeholder="Nhập ghi chú" rows="3"
+                      style="resize: vertical;"></textarea>
+            <!--            <div class="text-danger small" th:if="${#fields.hasErrors('note')}" th:errors="*{note}"></div>-->
+            <div class="text-danger small"></div>
+
         </div>
 
-        <!--        <div class="form-group">-->
-<!--            <label for="note" class="form-label">Ghi chú</label>-->
-<!--            <textarea type="text" id="note" th:field="*{note}" placeholder="nhập ghi chú" required></textarea>-->
-<!--            <input type="text" th:field="*{note}" id="note" placeholder="nhập ghi chú">-->
-<!--            <div class="text-danger small" th:if="${#fields.hasErrors('note')}" th:errors="*{note}"></div>-->
-
-<!--        </div>-->
-<!--        -->
-        <button class="submit" id="submitBooking">Xác nhận</button>
-    </form>
+        <button class="submit" id="submitBooking" type="submit">Xác nhận</button>
+    </div>
 </div>
 <footer class="bg-dark text-white mt-5">
     <div class="container py-4">
@@ -868,15 +877,13 @@
             <!-- Thông tin liên hệ -->
             <div class="col-md-6">
                 <h2>Nhà Hàng LEON</h2>
-                <h5>Liên hệ</h5>
-                <p>📍 123 Đường Nguyễn Tất Thành,Đà Nẵng</p>
-                <p>📞 0123 456 789</p>
-                <p>✉️ nhahangleon@gmail.com</p>
+                <p><i class="fas fa-map-marker-alt text-danger"></i> 123 Đường Nguyễn Tất Thành,Đà Nẵng</p>
+                <p><i class="fas fa-phone text-danger"></i> 0123 456 789</p>
+                <p><i class="fas fa-envelope text-danger"></i> nhahangleon@gmail.com</p>
             </div>
 
             <!-- Google Map -->
             <div class="col-md-6">
-                <h5>Bản đồ</h5>
                 <div style="border-radius: 8px; overflow: hidden;">
                     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3833.7517910224838!2d108.20716137460022!3d16.078364939194337!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31421846431fd0fd%3A0x780138ba60fa3aa6!2zMjk1IE5ndXnhu4VuIFThuqV0IFRow6BuaCwgVGhhbmggQsOsbmgsIEjhuqNpIENow6J1LCDEkMOgIE7hurVuZyA1NTAwMDAsIFZp4buHdCBOYW0!5e0!3m2!1svi!2s!4v1754275438345!5m2!1svi!2s"
                             width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy"
@@ -896,7 +903,42 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 
+
 <script>
+    $('#submitBooking').click(function (e) {
+
+        const bookingData = {
+            name: $('#name').val(),
+            phone: $('#phone').val(),
+            email: $('#email').val(),
+            dateTime: $('#dateTime').val(),
+            people: $('#people').val(),
+            note: $('#note').val(),
+        };
+        $('.text-danger').text('');
+        $.ajax({
+            url: 'http://localhost:8080/home/booking',
+            type: 'post',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(bookingData),
+            success: function (response) {
+                if (response === "success") {
+                    window.location.href = "/home/homeSuccess";
+                }
+
+            },
+            error: function (xhr) {
+                if (xhr.status === 400) {
+                    const errors = xhr.responseJSON;
+                    for (const field in errors) {
+                        $(`#${field}`).next('.text-danger').text(errors[field]);
+                    }
+                } else {
+                    alert("đã xảy ra lỗi hệ thống");
+                }
+            }
+        });
+    });
     document.addEventListener('DOMContentLoaded', () => {
 
         const showToast = (id) => {
@@ -1033,6 +1075,9 @@
         });
 
     });
+    // AJAX
+
+
 </script>
 
 </body>

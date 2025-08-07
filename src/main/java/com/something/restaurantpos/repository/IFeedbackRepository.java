@@ -16,7 +16,7 @@ public interface IFeedbackRepository extends JpaRepository<Feedback, String> {
 
 
 
-    @Query("SELECT f FROM Feedback f WHERE f.rating = 5 ORDER BY f.createdAt DESC")
+    @Query("SELECT f FROM Feedback f WHERE f.rating = 5 and f.deleted=false ORDER BY f.createdAt DESC")
     List<Feedback> findTop5FiveStarFeedbacks(Pageable pageable);
 
     @Query("""
@@ -39,6 +39,4 @@ public interface IFeedbackRepository extends JpaRepository<Feedback, String> {
     Page<Feedback> searchDeleted(@Param("keyword") String keyword, Pageable pageable);
 
     long countByDeleted(boolean deleted);
-
-
 }
