@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -37,13 +38,18 @@
 
         .navbar {
             position: relative;
-            background-color: #ea5f1f !important; /* cam sáng */
+            background-color: #F57C00 !important; /* cam sáng */
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0;
             gap: 1rem;
             z-index: 999;
+        }
+
+        .navbar-toggler:focus {
+            outline: none !important;
+            box-shadow: none !important;
         }
 
         #carouselExampleFade {
@@ -170,7 +176,7 @@
             font-size: clamp(1.5rem, 2.5vw, 2.25rem);
             margin: 2rem 0;
             font-weight: 600;
-            color: var(--accent); /* màu chữ xanh */
+            color: #F57C00;
             position: relative;
             display: inline-block;
             padding: 0.5rem 1rem;
@@ -182,9 +188,9 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            height: 1.5px; /* mảnh hơn */
+            height: 2px; /* mảnh hơn */
             width: 100%; /* dài hơn chữ */
-            background: var(--accent);
+            background: #F57C00;
         }
 
         .favorite-title::before {
@@ -491,7 +497,7 @@
             margin: 40px 10px;
             font-weight: bold;
             border: none;
-            background: #ea5f1f;
+            background: #F57C00;
             color: white;
             padding: 14px 22px;
             border-radius: 30px;
@@ -508,7 +514,7 @@
         }
 
         button.place-btn {
-            background-color: #ea5f1f;
+            background-color: #F57C00;
         }
 
         .place-btn {
@@ -517,7 +523,7 @@
             border: none;
             border-radius: 30px;
             padding: 14px 22px;
-            background: #ea5f1f;
+            background: #F57C00;
             color: #fff;
             cursor: pointer;
             position: absolute;
@@ -615,7 +621,7 @@
         #bookingModal button.submit {
             width: 100%;
             padding: 10px;
-            background: #ea5f1f;
+            background: #F57C00;
             border: none;
             color: white;
             font-weight: 600;
@@ -636,7 +642,7 @@
 
         .form-group input,
         .form-group textarea {
-            width: 90%;
+            width: 100%;
             padding: 10px 14px;
             border: 1px solid #ccc;
             border-radius: 8px;
@@ -670,7 +676,7 @@
         <img th:src="@{'/img/logo.png'}" class="navbar-brand" width="120px">
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
                 aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+            <i class="bi bi-list text-white" style="font-size: 36px"></i>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav">
@@ -827,9 +833,9 @@
             <!-- Thông tin liên hệ -->
             <div class="col-md-6">
                 <h2>Nhà Hàng LEON</h2>
-                <p><i class="fas fa-map-marker-alt text-danger"></i> 123 Đường Nguyễn Tất Thành,Đà Nẵng</p>
-                <p><i class="fas fa-phone text-danger"></i> 0123 456 789</p>
-                <p><i class="fas fa-envelope text-danger"></i> nhahangleon@gmail.com</p>
+                <p><i class="fas fa-map-marker-alt me-1" style="color: #F57C00"></i> 123 Đường Nguyễn Tất Thành,Đà Nẵng</p>
+                <p><i class="fas fa-phone me-1" style="color: #F57C00"></i> 0123 456 789</p>
+                <p><i class="fas fa-envelope me-1" style="color: #F57C00"></i> nhahangleon@gmail.com</p>
             </div>
 
             <!-- Google Map -->
@@ -855,176 +861,178 @@
 
 
 <script>
-    $('#submitBooking').click(function (e) {
-
-        const bookingData = {
-            name: $('#name').val(),
-            phone: $('#phone').val(),
-            email: $('#email').val(),
-            dateTime: $('#dateTime').val(),
-            people: $('#people').val(),
-            note: $('#note').val(),
-        };
-        $('.text-danger').text('');
-        $.ajax({
-            url: 'http://localhost:8080/home/booking',
-            type: 'post',
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify(bookingData),
-            success: function (response) {
-                if (response === "success") {
-                    window.location.href = "/home/homeSuccess";
-                }
-
-            },
-            error: function (xhr) {
-                if (xhr.status === 400) {
-                    const errors = xhr.responseJSON;
-                    for (const field in errors) {
-                        $(`#${field}`).next('.text-danger').text(errors[field]);
-                    }
-                } else {
-                    alert("đã xảy ra lỗi hệ thống");
-                }
-            }
-        });
-    });
     document.addEventListener('DOMContentLoaded', () => {
+        $('#submitBooking').click(function (e) {
 
-        const showToast = (id) => {
-            const toastEl = document.getElementById(id);
-            if (toastEl) {
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-            }
-        };
-        // Toast chỉ hiển thị khi có message cụ thể
+            const bookingData = {
+                name: $('#name').val(),
+                phone: $('#phone').val(),
+                email: $('#email').val(),
+                dateTime: $('#dateTime').val(),
+                people: $('#people').val(),
+                note: $('#note').val(),
+            };
+            $('.text-danger').text('');
+            $.ajax({
+                url: 'http://localhost:8080/home/booking',
+                type: 'post',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(bookingData),
+                success: function (response) {
+                    if (response === "success") {
+                        window.location.href = "/home/homeSuccess";
+                    }
 
+                },
+                error: function (xhr) {
+                    if (xhr.status === 400) {
+                        const errors = xhr.responseJSON;
+                        for (const field in errors) {
+                            $(`#${field}`).next('.text-danger').text(errors[field]);
+                        }
+                    } else {
+                        alert("đã xảy ra lỗi hệ thống");
+                    }
+                }
+            });
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const showToast = (id) => {
+                const toastEl = document.getElementById(id);
+                if (toastEl) {
+                    const toast = new bootstrap.Toast(toastEl);
+                    toast.show();
+                }
+            };
+            showToast('successToast');
+            showToast('errorToast');
+
+            const btnIcon = document.getElementById('toggleBtn');
+            const placeBtn = document.getElementById('placeBtn');
+            let visible = false;
+
+            btnIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!visible) {
+                    placeBtn.classList.add('show');
+                    btnIcon.classList.add('hidden');
+                } else {
+                    placeBtn.classList.remove('show');
+                    btnIcon.classList.remove('hidden');
+                }
+                visible = !visible;
+            });
+
+            document.addEventListener('click', (e) => {
+                if (visible && !btnIcon.contains(e.target) && !placeBtn.contains(e.target)) {
+                    // ẩn placeBtn, hiện icon ngay
+                    placeBtn.classList.remove('show');
+                    btnIcon.classList.remove('hidden');
+                    visible = false;
+                }
+            });
+        });
         const btnIcon = document.getElementById('toggleBtn');
         const placeBtn = document.getElementById('placeBtn');
-        let visible = false;
+        const backdrop = document.getElementById('backdrop');
+        const modal = document.getElementById('bookingModal');
+        const closeBtn = modal.querySelector('.close-btn');
+
+        let state = 0; // 0=icon,1=placeBtn visible,2=modal open
+
+        function showPlaceBtn() {
+            placeBtn.classList.add('show');
+            btnIcon.classList.add('hidden');
+            state = 1;
+        }
+
+        function openModal() {
+            backdrop.style.display = 'block';
+            modal.classList.add('show');
+            state = 2;
+        }
+
+        function resetAll() {
+            placeBtn.classList.remove('show');
+            btnIcon.classList.remove('hidden');
+            backdrop.style.display = 'none';
+            modal.classList.remove('show');
+            state = 0;
+        }
 
         btnIcon.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (!visible) {
-                placeBtn.classList.add('show');
-                btnIcon.classList.add('hidden');
+            if (state === 0) {
+                showPlaceBtn();
+            } else if (state === 1) {
+                openModal();
             } else {
-                placeBtn.classList.remove('show');
-                btnIcon.classList.remove('hidden');
+                resetAll();
             }
-            visible = !visible;
+        });
+
+        placeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (state === 1) openModal();
+        });
+
+        backdrop.addEventListener('click', resetAll);
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            resetAll();
         });
 
         document.addEventListener('click', (e) => {
-            if (visible && !btnIcon.contains(e.target) && !placeBtn.contains(e.target)) {
-                // ẩn placeBtn, hiện icon ngay
-                placeBtn.classList.remove('show');
-                btnIcon.classList.remove('hidden');
-                visible = false;
+            if (state !== 0 && !modal.contains(e.target) && !placeBtn.contains(e.target) && !btnIcon.contains(e.target)) {
+                resetAll();
             }
         });
-    });
-    const btnIcon = document.getElementById('toggleBtn');
-    const placeBtn = document.getElementById('placeBtn');
-    const backdrop = document.getElementById('backdrop');
-    const modal = document.getElementById('bookingModal');
-    const closeBtn = modal.querySelector('.close-btn');
 
-    let state = 0; // 0=icon,1=placeBtn visible,2=modal open
-
-    function showPlaceBtn() {
-        placeBtn.classList.add('show');
-        btnIcon.classList.add('hidden');
-        state = 1;
-    }
-
-    function openModal() {
-        backdrop.style.display = 'block';
-        modal.classList.add('show');
-        state = 2;
-    }
-
-    function resetAll() {
-        placeBtn.classList.remove('show');
-        btnIcon.classList.remove('hidden');
-        backdrop.style.display = 'none';
-        modal.classList.remove('show');
-        state = 0;
-    }
-
-    btnIcon.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (state === 0) {
-            showPlaceBtn();
-        } else if (state === 1) {
-            openModal();
-        } else {
-            resetAll();
-        }
-    });
-
-    placeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (state === 1) openModal();
-    });
-
-    backdrop.addEventListener('click', resetAll);
-    closeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        resetAll();
-    });
-
-    document.addEventListener('click', (e) => {
-        if (state !== 0 && !modal.contains(e.target) && !placeBtn.contains(e.target) && !btnIcon.contains(e.target)) {
-            resetAll();
-        }
-    });
-
-    $(function () {
-        $('#feedbackSlider').slick({
-            slidesToShow: 3,               // desktop mặc định
-            slidesToScroll: 1,
-            autoplay: true,
-            speed: 2000,
-            autoplaySpeed: 2000,           // 3s mỗi lần chuyển
-            pauseOnHover: true,
-            arrows: true,
-            dots: false,
-            infinite: true,
-            responsive: [
-                {
-                    breakpoint: 992,           // dưới desktop (tablet lớn)
-                    settings: {
-                        slidesToShow: 2
+        $(function () {
+            $('#feedbackSlider').slick({
+                slidesToShow: 3,               // desktop mặc định
+                slidesToScroll: 1,
+                autoplay: true,
+                speed: 2000,
+                autoplaySpeed: 2000,           // 3s mỗi lần chuyển
+                pauseOnHover: true,
+                arrows: true,
+                dots: false,
+                infinite: true,
+                responsive: [
+                    {
+                        breakpoint: 992,           // dưới desktop (tablet lớn)
+                        settings: {
+                            slidesToShow: 2
+                        }
+                    },
+                    {
+                        breakpoint: 768,           // mobile
+                        settings: {
+                            slidesToShow: 1
+                        }
                     }
-                },
-                {
-                    breakpoint: 768,           // mobile
-                    settings: {
-                        slidesToShow: 1
-                    }
-                }
-            ]
-        });
-    });
-
-    $(function () {
-        $('#voucherSlider').slick({
-            slidesToShow: 1,
-            slidesToScroll: 1,
-            fade: true,               // hiệu ứng fade giống carousel-fade
-            cssEase: 'linear',
-            autoplay: true,
-            autoplaySpeed: 2000,      // tương đương data-bs-interval="2000"
-            pauseOnHover: false,      // không dừng khi hover
-            arrows: true,             // nút prev/next
-            dots: false,
-            infinite: true
+                ]
+            });
         });
 
-    });
+        $(function () {
+            $('#voucherSlider').slick({
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                fade: true,               // hiệu ứng fade giống carousel-fade
+                cssEase: 'linear',
+                autoplay: true,
+                autoplaySpeed: 2000,      // tương đương data-bs-interval="2000"
+                pauseOnHover: false,      // không dừng khi hover
+                arrows: true,             // nút prev/next
+                dots: false,
+                infinite: true
+            });
 
+        });
+    })
 </script>
 
 </body>
