@@ -23,33 +23,46 @@
             border-color: #0d6efd;
             box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
         }
+
+        .thumbnail {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <div layout:fragment="content">
     <div class="form-wrapper bg-white p-4 rounded shadow-sm">
         <h2 class="form-title mb-4" th:text="${voucher.id == null ? 'Thêm mới mã giảm giá' : 'Chỉnh sửa mã giảm giá'}"></h2>
 
-        <form th:with="actionUrl=${voucher.id != null} ? '/manager/vouchers/' + voucher.id + '/edit' : '/manager/vouchers/create'"
+        <form th:with="actionUrl=${voucher.id != null} ? '/manager/vouchers/' + ${voucher.id} + '/edit' : '/manager/vouchers/create'"
               th:action="@{${actionUrl}}"
-              th:object="${voucher}" method="post" novalidate>
+              th:object="${voucher}" method="post" enctype="multipart/form-data" novalidate>
+
+            <!-- Mã giảm giá -->
             <div class="mb-3">
                 <label class="form-label fw-semibold">Mã giảm giá</label>
                 <input type="text" class="form-control" th:field="*{code}" placeholder="Nhập mã giảm giá">
                 <div class="text-danger small" th:if="${#fields.hasErrors('code')}" th:errors="*{code}"></div>
             </div>
 
+            <!-- Mô tả -->
             <div class="mb-3">
                 <label class="form-label fw-semibold">Mô tả</label>
                 <textarea class="form-control" th:field="*{description}" rows="3" placeholder="Nhập mô tả"></textarea>
                 <div class="text-danger small" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
             </div>
 
+            <!-- Phần trăm giảm -->
             <div class="mb-3">
                 <label class="form-label fw-semibold">Phần trăm giảm giá (%)</label>
                 <input type="number" min="1" max="100" class="form-control" th:field="*{discountPercent}" placeholder="Nhập phần trăm giảm giá">
                 <div class="text-danger small" th:if="${#fields.hasErrors('discountPercent')}" th:errors="*{discountPercent}"></div>
             </div>
 
+            <!-- Thời gian hiệu lực -->
             <div class="mb-3">
                 <label class="form-label fw-semibold">Hiệu lực từ ngày</label>
                 <input type="datetime-local" class="form-control" th:field="*{validFrom}">
@@ -62,11 +75,26 @@
                 <div class="text-danger small" th:if="${#fields.hasErrors('validTo')}" th:errors="*{validTo}"></div>
             </div>
 
+            <!-- Ảnh đại diện -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Ảnh đại diện</label>
+                <input type="file" class="form-control" th:field="*{imageFile}">
+                <div class="text-danger small" th:if="${#fields.hasErrors('imageFile')}" th:errors="*{imageFile}"></div>
+            </div>
+
+            <!-- Hiển thị ảnh hiện tại (nếu có) -->
+            <div class="mb-3" th:if="${voucher.image != null}">
+                <label class="form-label fw-semibold">Ảnh hiện tại</label><br/>
+                <img th:src="${voucher.image}" alt="Ảnh mã giảm giá" class="thumbnail"/>
+            </div>
+
+            <!-- Trạng thái -->
             <div class="form-check form-switch mb-4">
                 <input class="form-check-input" type="checkbox" role="switch" th:field="*{isActive}" id="isActive">
                 <label class="form-check-label" for="isActive">Đang hoạt động</label>
             </div>
 
+            <!-- Nút -->
             <div class="d-flex justify-content-between">
                 <a class="btn btn-secondary" th:href="@{/manager/vouchers}">Quay lại</a>
                 <button class="btn btn-primary" type="submit" th:text="${voucher.id == null ? 'Thêm mới' : 'Lưu'}"></button>
@@ -75,6 +103,3 @@
     </div>
 </div>
 </html>
-
-
-

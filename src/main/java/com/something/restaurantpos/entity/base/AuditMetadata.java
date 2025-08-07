@@ -3,6 +3,7 @@ package com.something.restaurantpos.entity.base;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.PrePersist;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -24,7 +25,7 @@ public abstract class AuditMetadata {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "BIT(1) DEFAULT 0")
     private boolean deleted = false;
 
     public void markDeleted() {

@@ -22,6 +22,8 @@ public class Voucher extends AuditMetadata {
     private String code;
     @Column(columnDefinition = "TEXT")
     private String description;
+    @Column(length = 255)
+    private String image;
     private Integer discountPercent;
     private LocalDateTime validFrom;
     private LocalDateTime validTo;

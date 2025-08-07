@@ -66,6 +66,11 @@ public class MenuItemService implements IMenuItemService {
     }
 
     @Override
+    public List<MenuItem> findMenuItemOrderByTotalQuantityDesc() {
+        return menuItemRepository.findMenuItemOrderByTotalQuantityDesc();
+    }
+
+    @Override
     public void restore(Integer id) {
         MenuItem menuItem = findByIdOrThrow(id);
         menuItem.restore();
@@ -86,5 +91,10 @@ public class MenuItemService implements IMenuItemService {
     public MenuItem getById(Integer id) {
         return menuItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy món ăn"));
+    }
+
+    @Override
+    public long countSellingItems() {
+        return menuItemRepository.countSellingItems();
     }
 }

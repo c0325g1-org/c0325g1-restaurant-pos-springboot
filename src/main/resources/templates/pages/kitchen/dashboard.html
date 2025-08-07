@@ -8,6 +8,7 @@
             padding: 1rem;
             margin-bottom: 1rem;
         }
+
         .badge-status {
             font-size: 0.9rem;
         }
@@ -15,18 +16,22 @@
         .list-group-item-new {
             background-color: white;
         }
+
         .list-group-item-cooking {
             background-color: gold;
         }
+
         .list-group-item-ready {
             background-color: springgreen;
         }
+
         .list-group-item-served {
             background-color: #e2e3e5;
         }
+
         .item-canceled {
-            background-color: #f8d7da !important;  /* nền đỏ nhạt */
-            color: #842029 !important;             /* chữ đỏ đậm */
+            background-color: #f8d7da !important; /* nền đỏ nhạt */
+            color: #842029 !important; /* chữ đỏ đậm */
             font-style: italic;
         }
 
@@ -43,24 +48,27 @@
         }
 
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
 </head>
 <div layout:fragment="content">
     <h2 class="mb-4">Món cần chế biến</h2>
     <div th:if="${undoItemId != null}" class="alert alert-info alert-dismissible fade show" role="alert" id="undoAlert">
         Đã thay đổi trạng thái món.
         <form th:action="@{'/kitchen/dashboard/item/' + ${undoItemId} + '/undo'}" method="post" style="display:inline;">
-            <input type="hidden" name="status" th:value="${undoOldStatus}" />
-            <input type="hidden" name="filter" th:value="${undoFilter}" />
-            <input type="hidden" name="date" th:value="${undoDate}" />
+            <input type="hidden" name="status" th:value="${undoOldStatus}"/>
+            <input type="hidden" name="filter" th:value="${undoFilter}"/>
+            <input type="hidden" name="date" th:value="${undoDate}"/>
             <button type="submit" class="btn btn-link p-0 m-0 align-baseline">Hoàn tác</button>
         </form>
     </div>
 
     <form class="mb-3 d-flex align-items-center gap-2" method="get" th:action="@{/kitchen/dashboard}">
-        <input type="hidden" name="filter" th:value="${currentFilter}" />
+        <input type="hidden" name="filter" th:value="${currentFilter}"/>
         <label for="date" class="form-label mb-0">Ngày:</label>
         <input type="date" id="date" name="date"
-               th:value="${selectedDate}" class="form-control" style="max-width: 200px;" onchange="this.form.submit()" />
+               th:value="${selectedDate}" class="form-control" style="max-width: 200px;" onchange="this.form.submit()"/>
 
     </form>
 
@@ -97,7 +105,7 @@
         </li>
     </ul>
     <!-- Giao diện các nhóm đơn hàng -->
-    <div class="row">
+    <div class="row" id="order-container">
         <div class="col-12 col-md-6 mb-4" th:each="group : ${groupedOrders}" th:if="${group.hasUnservedItems()}">
             <div class="order-card bg-white d-flex flex-column justify-content-between">
                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -108,15 +116,15 @@
                 </div>
 
                 <!-- Danh sách món -->
-                <ul class="list-group"  >
+                <ul class="list-group">
                     <li class="list-group-item"
                         th:each="item : ${group.orderItems}"
                         th:if="${item.deleted == false}"
-                        th:classappend="' list-group-item-' + ${item.status.name().toLowerCase()} + (${item.status.name() == 'CANCELED'} ? ' item-canceled' : '')">
+                        th:classappend="'list-group-item-' + ${item.status.name().toLowerCase()} + (${item.status.name() == 'CANCELED'} ? ' item-canceled' : '')"
+                        th:attr="data-item-id=${item.id}">
 
 
-
-                    <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between">
                             <div>
                                 <strong>
                                     <span th:text="${item.menuItem.name}"></span>
@@ -125,22 +133,52 @@
 
                                 <span class="badge bg-primary rounded-pill" th:text="'x' + ${item.quantity}">x1</span>
                             </div>
-                            <form th:action="@{'/kitchen/dashboard/item/' + ${item.id} + '/status'}" method="post" onsubmit="playNotify()">
-                                <input type="hidden" name="date" th:value="${currentDate}" />
-                                <input type="hidden" name="filter" th:value="${currentFilter}" />
+<!--                            <form th:action="@{'/kitchen/dashboard/item/' + ${item.id} + '/status'}" method="post"-->
+<!--                                  onsubmit="playNotify()">-->
+<!--                                <input type="hidden" name="date" th:value="${currentDate}"/>-->
+<!--                                <input type="hidden" name="filter" th:value="${currentFilter}"/>-->
 
-                                <input type="hidden" name="status" th:if="${item.status.name() == 'NEW'}" value="COOKING"/>
-                                <input type="hidden" name="status" th:if="${item.status.name() == 'COOKING'}" value="READY"/>
-                                <input type="hidden" name="status" th:if="${item.status.name() == 'READY'}" value="SERVED"/>
+<!--                                <input type="hidden" name="status" th:if="${item.status.name() == 'NEW'}"-->
+<!--                                       value="COOKING"/>-->
+<!--                                <input type="hidden" name="status" th:if="${item.status.name() == 'COOKING'}"-->
+<!--                                       value="READY"/>-->
+<!--                                <input type="hidden" name="status" th:if="${item.status.name() == 'READY'}"-->
+<!--                                       value="SERVED"/>-->
 
-                                <button type="submit" th:if="${item.status.name() == 'NEW'}" class="btn btn-outline-warning btn-sm">Bắt đầu</button>
-                                <button type="submit" th:if="${item.status.name() == 'COOKING'}" class="btn btn-outline-success btn-sm">Sẵn sàng</button>
-                                <button type="submit" th:if="${item.status.name() == 'READY'}" class="btn btn-success btn-sm">Đã sẵn sàng</button>
+<!--                                <button type="submit" th:if="${item.status.name() == 'NEW'}"-->
+<!--                                        class="btn btn-outline-warning btn-sm">Bắt đầu-->
+<!--                                </button>-->
+<!--                                <button type="submit" th:if="${item.status.name() == 'COOKING'}"-->
+<!--                                        class="btn btn-outline-success btn-sm">Sẵn sàng-->
+<!--                                </button>-->
+<!--                                <button type="submit" th:if="${item.status.name() == 'READY'}"-->
+<!--                                        class="btn btn-success btn-sm">Đã sẵn sàng-->
+<!--                                </button>-->
+<!--                            </form>-->
+                            <form onsubmit="return false;">
+                                <input type="hidden" name="status" th:if="${item.status.name() == 'NEW'}" value="COOKING" />
+                                <input type="hidden" name="status" th:if="${item.status.name() == 'COOKING'}" value="READY" />
+                                <input type="hidden" name="status" th:if="${item.status.name() == 'READY'}" value="SERVED" />
+
+                                <button type="button" th:if="${item.status.name() == 'NEW'}"
+                                        class="btn btn-outline-warning btn-sm"
+                                        th:attr="onclick='updateItemStatus(' + ${item.id} + ', \'COOKING\')'">Bắt đầu</button>
+
+                                <button type="button" th:if="${item.status.name() == 'COOKING'}"
+                                        class="btn btn-outline-success btn-sm"
+                                        th:attr="onclick='updateItemStatus(' + ${item.id} + ', \'READY\')'">Sẵn sàng</button>
+
+                                <button type="button" th:if="${item.status.name() == 'READY'}"
+                                        class="btn btn-success btn-sm"
+                                        th:attr="onclick='updateItemStatus(' + ${item.id} + ', \'SERVED\')'">Đã sẵn sàng</button>
                             </form>
-                            <form th:action="@{'/kitchen/hide/orderItem'}" method="post" th:if="${item.deleted == false and item.status.name() == 'CANCELED'}">
-                                <input type="hidden" name="orderId" th:value="${item.id}" />
-                                <input type="hidden" name="date" th:value="${currentDate}" />
-                                <input type="hidden" name="filter" th:value="${currentFilter}" />
+
+
+                            <form th:action="@{'/kitchen/hide/orderItem'}" method="post"
+                                  th:if="${item.deleted == false and item.status.name() == 'CANCELED'}">
+                                <input type="hidden" name="orderId" th:value="${item.id}"/>
+                                <input type="hidden" name="date" th:value="${currentDate}"/>
+                                <input type="hidden" name="filter" th:value="${currentFilter}"/>
                                 <input type="submit" value="Ẩn" class="btn btn-cancel btn-sm">
                             </form>
                         </div>
@@ -160,6 +198,7 @@
         function playNotify() {
             document.getElementById("notifySound").play();
         }
+
         setTimeout(() => {
             const alert = document.getElementById("undoAlert");
             if (alert) {
@@ -168,5 +207,374 @@
             }
         }, 3000);
     </script>
+    <script>
+        const socket = new SockJS('/ws');
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function () {
+            stompClient.subscribe(`/topic/user.${empId}`, function (message) {
+                let data = JSON.parse(message.body);
+                console.log("📩 Notification nhận:", data);
+                if (data.newOrder) {
+                    appendNewOrderToDOM(data);
+                } else {
+                    const item = data.orderItem;
+                    if (item && item.status === "CANCELED") {
+                        updateCanceledItem(item);
+                    } else if (item.status === "SERVED") {
+                        updateServedItem(item);
+                    }
+                }
+            });
+        });
+
+        function appendNewOrderToDOM(data) {
+            const container = document.getElementById("order-container");
+            const order = data.order;
+            const tableName = order.table.name; // Ví dụ: "Bàn 7"
+            const createdAt = new Date(order.createdAt);
+
+            // Tạo cột ngoài
+            const col = document.createElement("div");
+            col.className = "col-12 col-md-6 mb-4";
+
+            // Tạo khối order-card
+            const card = document.createElement("div");
+            card.className = "order-card bg-white d-flex flex-column justify-content-between";
+
+            // Phần header (tên bàn + thời gian)
+            const headerDiv = document.createElement("div");
+            headerDiv.className = "d-flex justify-content-between align-items-center mb-2";
+
+            const infoDiv = document.createElement("div");
+            const strong = document.createElement("strong");
+            strong.textContent = tableName;
+
+            const small = document.createElement("small");
+            small.textContent = createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " " +
+                createdAt.toLocaleDateString("vi-VN");
+
+            infoDiv.appendChild(strong);
+            infoDiv.appendChild(document.createTextNode(" | "));
+            infoDiv.appendChild(small);
+            headerDiv.appendChild(infoDiv);
+
+            card.appendChild(headerDiv);
+
+            // Danh sách món ăn
+            const ul = document.createElement("ul");
+            ul.className = "list-group";
+
+            data.orderItems.forEach(item => {
+                const li = document.createElement("li");
+                li.className = `list-group-item list-group-item-${item.status.toLowerCase()}`;
+                if (item.status === "CANCELED") {
+                    li.classList.add("item-canceled");
+                }
+                li.setAttribute("data-item-id", item.id);
+
+                const contentDiv = document.createElement("div");
+                contentDiv.className = "d-flex justify-content-between";
+
+                const leftDiv = document.createElement("div");
+                const itemName = document.createElement("strong");
+                itemName.textContent = item.menuItem.name;
+                if (item.status === "CANCELED") {
+                    itemName.textContent += " (Đã huỷ)";
+                }
+
+                const badge = document.createElement("span");
+                badge.className = "badge bg-primary rounded-pill";
+                badge.textContent = "x" + item.quantity;
+
+                leftDiv.appendChild(itemName);
+                leftDiv.appendChild(document.createTextNode(" "));
+                leftDiv.appendChild(badge);
+
+                const form = document.createElement("form");
+                form.method = "post";
+                form.action = `/kitchen/dashboard/item/${item.id}/status`;
+                form.onsubmit = () => { playNotify(); };
+
+                const hiddenDate = document.createElement("input");
+                hiddenDate.type = "hidden";
+                hiddenDate.name = "date";
+                hiddenDate.value = new Date().toISOString().split("T")[0]; // hoặc giá trị bạn cần
+
+                const hiddenFilter = document.createElement("input");
+                hiddenFilter.type = "hidden";
+                hiddenFilter.name = "filter";
+                hiddenFilter.value = ""; // Cập nhật nếu có giá trị filter hiện tại
+
+                const hiddenStatus = document.createElement("input");
+                hiddenStatus.type = "hidden";
+                hiddenStatus.name = "status";
+
+                let button;
+                if (item.status === "NEW") {
+                    hiddenStatus.value = "COOKING";
+                    button = createStatusButton("Bắt đầu", "btn-outline-warning");
+                } else if (item.status === "COOKING") {
+                    hiddenStatus.value = "READY";
+                    button = createStatusButton("Sẵn sàng", "btn-outline-success");
+                } else if (item.status === "READY") {
+                    hiddenStatus.value = "SERVED";
+                    button = createStatusButton("Đã sẵn sàng", "btn-success");
+                }
+
+                form.appendChild(hiddenDate);
+                form.appendChild(hiddenFilter);
+                form.appendChild(hiddenStatus);
+                if (button) form.appendChild(button);
+
+                contentDiv.appendChild(leftDiv);
+                contentDiv.appendChild(form);
+
+                li.appendChild(contentDiv);
+                ul.appendChild(li);
+            });
+
+            card.appendChild(ul);
+            col.appendChild(card);
+            container.appendChild(col); // chèn vào cuối
+        }
+
+        function createStatusButton(text, btnClass) {
+            const button = document.createElement("button");
+            button.type = "submit";
+            button.className = `btn ${btnClass} btn-sm`;
+            button.textContent = text;
+            return button;
+        }
+
+        function updateCanceledItem(orderItem) {
+            const itemId = orderItem.id;
+            const listItem = document.querySelector(`li[data-item-id="${itemId}"]`);
+
+            if (!listItem) {
+                console.warn(`Item ${itemId} not found in DOM.`);
+                return;
+            }
+
+            // 1. Cập nhật class trạng thái
+            listItem.classList.remove(
+                "list-group-item-new",
+                "list-group-item-warning",
+                "list-group-item-success",
+                "list-group-item-info"
+            );
+            listItem.classList.add("list-group-item-canceled", "item-canceled");
+
+            // 2. Cập nhật nội dung món ăn với (Đã huỷ)
+            const strongEl = listItem.querySelector("strong");
+            if (strongEl) {
+                const spanEls = strongEl.querySelectorAll("span");
+                const nameSpan = spanEls[0];
+
+                // Kiểm tra và thêm "(Đã huỷ)" nếu chưa có
+                if (!strongEl.innerHTML.includes("(Đã huỷ)")) {
+                    const canceledSpan = document.createElement("span");
+                    canceledSpan.textContent = " (Đã huỷ)";
+                    strongEl.appendChild(canceledSpan);
+                }
+            }
+
+            // 3. Xoá form thay đổi trạng thái (nút Bắt đầu, Hoàn tất...)
+            const statusForms = listItem.querySelectorAll("form");
+            statusForms.forEach(form => {
+                const hasStatusInput = form.querySelector('input[name="status"]');
+                if (hasStatusInput) {
+                    form.remove(); // chỉ xoá form thay đổi trạng thái
+                }
+            });
+
+            // 4. Thêm form Ẩn nếu chưa có
+            const hasHideForm = Array.from(listItem.querySelectorAll("form")).some(
+                form => form.action.includes("/hide/orderItem")
+            );
+
+            if (!hasHideForm) {
+                const hideForm = document.createElement("form");
+                hideForm.action = "/kitchen/hide/orderItem";
+                hideForm.method = "post";
+
+                const today = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
+
+                hideForm.innerHTML = `
+                    <input type="hidden" name="orderId" value="${orderItem.id}">
+                    <input type="hidden" name="date" value="${today}">
+                    <input type="hidden" name="filter" value="ALL">
+                    <input type="submit" value="Ẩn" class="btn btn-cancel btn-sm">
+                `;
+
+                const flexContainer = listItem.querySelector(".d-flex");
+                if (flexContainer) {
+                    flexContainer.appendChild(hideForm);
+                }
+            }
+        }
+
+        function updateServedItem(orderItem) {
+            const itemId = orderItem.id;
+            const listItem = document.querySelector(`li[data-item-id="${itemId}"]`);
+
+            if (!listItem) {
+                console.warn(`Item ${itemId} not found in DOM.`);
+                return;
+            }
+
+            // 1. Cập nhật class trạng thái
+            listItem.classList.remove(
+                "list-group-item-new",
+                "list-group-item-warning",
+                "list-group-item-success",
+                "list-group-item-info",
+                "list-group-item-canceled"
+            );
+            listItem.classList.add("list-group-item-served");
+
+            // 3. Cập nhật số lượng món (badge)
+            const badge = listItem.querySelector(".badge");
+            if (badge) {
+                badge.textContent = `x${orderItem.quantity}`;
+            }
+
+            // 4. Làm rỗng và reset lại <form> (ẩn các nút thao tác)
+            const form = listItem.querySelector("form");
+            if (form) {
+                form.innerHTML = "";
+
+                // Giữ lại action và method
+                form.setAttribute("action", `/kitchen/dashboard/item/${itemId}/status`);
+                form.setAttribute("method", "post");
+
+                // Hidden input date và filter (giá trị có thể lấy từ biến toàn cục nếu cần)
+                const today = new Date().toISOString().slice(0, 10);
+                form.innerHTML += `
+            <input type="hidden" name="date" value="${today}">
+            <input type="hidden" name="filter" value="ALL">
+        `;
+            }
+        }
+
+
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".update-status-btn").forEach(button => {
+                button.addEventListener("click", function (event) {
+                    event.preventDefault(); // Ngăn chặn hành vi mặc định
+                    const itemId = this.dataset.id;
+                    const nextStatus = this.dataset.status;
+
+                    fetch(`/kitchen/dashboard/item/${itemId}/status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: `status=${nextStatus}`
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log("✅ AJAX cập nhật thành công:", data);
+
+                            const li = document.querySelector(`li[data-item-id="${itemId}"]`);
+                            if (!li) return;
+
+                            // Cập nhật class hiển thị màu nền
+                            li.className = "list-group-item list-group-item-" + data.orderItem.status.toLowerCase();
+
+                            // Cập nhật nội dung nút tiếp theo (nếu còn)
+                            const btn = li.querySelector(".update-status-btn");
+                            if (btn) {
+                                if (data.orderItem.status === 'COOKING') {
+                                    btn.textContent = "Sẵn sàng";
+                                    btn.className = "btn btn-outline-success btn-sm update-status-btn";
+                                    btn.dataset.status = "READY";
+                                } else if (data.orderItem.status === 'READY') {
+                                    btn.textContent = "Đã sẵn sàng";
+                                    btn.className = "btn btn-success btn-sm update-status-btn";
+                                    btn.dataset.status = "SERVED";
+                                } else if (data.orderItem.status === 'SERVED') {
+                                    btn.remove(); // Ẩn nút khi hoàn thành
+                                }
+                            }
+
+                            playNotify(); // phát âm thanh
+                        })
+                        .catch(error => {
+                            console.error("❌ Lỗi khi cập nhật món:", error);
+                            alert("Không thể cập nhật trạng thái món.");
+                        });
+                });
+            });
+
+        });
+        function updateItemStatus(itemId, newStatus) {
+            fetch(`/kitchen/dashboard/item/${itemId}/status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ status: newStatus })
+            })
+                // .then(response => response.json())
+                .then(data => {
+                    console.log('Cập nhật thành công:', data);
+
+                    const listItem = document.querySelector(`li[data-item-id="${itemId}"]`);
+                    if (!listItem) return;
+
+                    // Xóa các class trạng thái cũ
+                    listItem.classList.remove('list-group-item-new', 'list-group-item-cooking', 'list-group-item-ready', 'list-group-item-served');
+
+                    // Thêm class mới
+                    const statusClass = `list-group-item-${newStatus.toLowerCase()}`;
+                    listItem.classList.add(statusClass);
+
+                    // Cập nhật nút bấm tương ứng
+                    let buttonHtml = '';
+                    if (newStatus === 'NEW') {
+                        buttonHtml = `<button class="btn btn-outline-warning btn-sm" onclick="updateItemStatus(${itemId}, 'COOKING')">Bắt đầu</button>`;
+                    } else if (newStatus === 'COOKING') {
+                        buttonHtml = `<button class="btn btn-outline-success btn-sm" onclick="updateItemStatus(${itemId}, 'READY')">Sẵn sàng</button>`;
+                    } else if (newStatus === 'READY') {
+                        buttonHtml = `<button class="btn btn-success btn-sm" onclick="updateItemStatus(${itemId}, 'SERVED')">Đã sẵn sàng</button>`;
+                    }
+
+                    listItem.querySelector('form').innerHTML = buttonHtml;
+                })
+                .catch(error => {
+                    console.error('Lỗi khi cập nhật:', error);
+                });
+        }
+
+        function showUndoAlert(itemId, oldStatus) {
+            const undoDiv = document.createElement("div");
+            undoDiv.className = "alert alert-info alert-dismissible fade show";
+            undoDiv.setAttribute("role", "alert");
+            undoDiv.innerHTML = `
+        Đã thay đổi trạng thái món.
+        <form method="post" action="/kitchen/dashboard/item/${itemId}/undo" style="display:inline;">
+            <input type="hidden" name="status" value="${oldStatus}">
+            <input type="hidden" name="date" value="${new Date().toISOString().split("T")[0]}">
+            <input type="hidden" name="filter" value="ALL">
+            <button type="submit" class="btn btn-link p-0 m-0 align-baseline">Hoàn tác</button>
+        </form>
+    `;
+
+            const contentDiv = document.querySelector("div[layout\\:fragment='content']");
+            contentDiv.insertBefore(undoDiv, contentDiv.firstChild);
+
+            setTimeout(() => {
+                undoDiv.classList.remove("show");
+                undoDiv.classList.add("hide");
+            }, 3000);
+        }
+
+
+    </script>
+
 </th:block>
 </html>

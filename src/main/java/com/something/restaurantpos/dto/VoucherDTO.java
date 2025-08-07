@@ -5,6 +5,7 @@ import com.something.restaurantpos.validator.annotation.DateRangeValid;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -39,4 +40,7 @@ public class VoucherDTO extends BaseDTO {
 
     @NotNull(message = "Trạng thái không được để trống")
     private Boolean isActive = true;
+    @Size(max = 255, message = "Đường dẫn ảnh tối đa 255 ký tự")
+    private String image;
+    private MultipartFile imageFile;
 }

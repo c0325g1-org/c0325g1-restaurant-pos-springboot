@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Responsive Nav với Dropdown</title>
+    <style>
+        :root {
+            --bg: #fff;
+            --text: #222;
+            --accent: #002aff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .navbar {
+            position: relative;
+            background-color: #ea5f1f !important; /* cam sáng */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            gap: 1rem;
+            z-index: 999;
+        }
+
+        #carouselExampleFade {
+            position: relative;
+        }
+
+        #carouselExampleFade .carousel-item {
+            height: 100vh; /* chiếm toàn bộ chiều cao viewport nếu muốn full-screen */
+        }
+
+        #carouselExampleFade .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* giữ tỉ lệ, cắt phần thừa */
+            display: block;
+        }
+
+
+        .hamburger {
+            position: absolute;
+            left: 1rem;
+            width: 30px;
+            height: 24px;
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            display: block;
+            height: 4px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: transform .3s ease, opacity .3s ease;
+        }
+
+        .nav-items {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+            align-items: center;
+            position: relative;
+        }
+
+        .nav-items li {
+            position: relative;
+        }
+
+        .nav-items li a {
+            text-decoration: none;
+            position: relative;
+            padding: 4px 0;
+            font-weight: 700;
+            font-size: 22px; /* to hơn mặc định */
+            cursor: pointer;
+            transition: color .2s ease;
+            display: inline-block;
+            color: var(--accent);
+
+
+        }
+
+        .nav-link {
+            text-decoration: none;
+            position: relative;
+            padding: 4px 0;
+            font-weight: 700;
+            font-size: 22px; /* to hơn mặc định */
+            cursor: pointer;
+            transition: color .2s ease;
+            display: inline-block;
+            color: white;
+        }
+
+        .nav-link:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+            outline: none;
+        }
+
+
+        .nav-items li a::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            height: 2px;
+            width: 0%;
+            background: var(--accent);
+            transition: width .25s ease;
+        }
+
+        .nav-items li a:hover::before {
+            width: 100%;
+        }
+
+        .nav-items li a:hover::after {
+            width: 100%;
+        }
+
+        .nav-items li a:hover {
+            color: var(--accent);
+        }
+
+        @media (min-width: 769px) {
+            .nav-items li.has-dropdown:hover > .dropdown-menu {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+        }
+
+        /* Favorite section */
+        .favorites-section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            margin-top: 40px; /* tạo khoảng cách phía trên */
+        }
+
+        .favorite-title {
+            text-align: center;
+            font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+            margin: 2rem 0;
+            font-weight: 600;
+            color: var(--accent); /* màu chữ xanh */
+            position: relative;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+        }
+
+        .favorite-title::before,
+        .favorite-title::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 1.5px; /* mảnh hơn */
+            width: 100%; /* dài hơn chữ */
+            background: var(--accent);
+        }
+
+        .favorite-title::before {
+            top: -8px; /* khoảng cách đường trên */
+        }
+
+        .favorite-title::after {
+            bottom: -8px; /* khoảng cách đường dưới */
+        }
+
+        .favorites-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(1, 1fr);
+            margin: 1.5rem 0 2rem;
+        }
+
+        @media (min-width: 769px) {
+            .favorites-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .favorites-grid .card {
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform .25s ease, box-shadow .25s ease;
+            box-shadow: 0 6px 28px rgba(0, 0, 0, 0.08);
+        }
+
+        .favorites-grid .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 38px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Feedback slider (auto) */
+        .feedback-slider-wrapper {
+            /*margin: 1rem 0 2rem;*/
+            position: relative;
+            overflow: hidden;
+
+            max-width: 1200px;
+            margin: auto;
+            padding: 10px 0;
+        }
+
+
+        /*feedback-slider {*/
+        /*    display: flex;*/
+        /*    gap: 1rem;*/
+        /*    scroll-behavior: smooth;*/
+        /*    padding: 12px 0;*/
+        /*}*/
+        .feedback-slider {
+            /*overflow-x: auto;*/
+            /*scroll-behavior: smooth;*/
+            /*padding-bottom: 8px;*/
+            /*display: flex;*/
+            /*gap: 1rem;*/
+            /*scroll-snap-type: x mandatory;*/
+            /*padding: 12px 0;*/
+            display: flex;
+            gap: 1rem;
+            overflow-x: hidden; /* Ẩn cuộn ngang */
+            overflow-y: hidden; /* Ẩn cuộn dọc */
+            scrollbar-width: none; /* Ẩn trên Firefox */
+        }
+
+        .slide {
+            flex: 0 0 calc((100% - 2rem) / 3); /* desktop */
+            transition: transform 0.3s ease;
+            scroll-snap-align: start;
+        }
+
+        .slide .card {
+            height: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 100vh; /* Chiều cao bằng màn hình */
+            object-fit: cover; /* Giữ tỉ lệ, cắt phần thừa */
+        }
+
+        .feedback-slider .slide {
+            padding: 0.5rem; /* khoảng cách giữa các slide */
+            box-sizing: border-box;
+        }
+
+        .feedback-slider .slide .card {
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* để card chiếm đầy chiều cao của slide */
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .feedback-slider .slide .card .card-body {
+            flex: 1; /* đẩy phần nội dung giãn ra để bằng nhau */
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .feedback-slider .slide .card .card-body p {
+            margin-bottom: auto; /* đẩy nội dung text lên trên, thời gian xuống dưới */
+        }
+
+        .feedback-slider .slide .card img.card-img-bottom {
+            width: 100%;
+            object-fit: cover;
+            aspect-ratio: 16/9; /* giữ tỉ lệ đồng đều */
+            flex-shrink: 0;
+        }
+
+
+        @media (max-width: 992px) {
+            .slide-container {
+                flex: 0 0 calc((100% - 1rem) / 2);
+                max-width: calc((100% - 1rem) / 2);
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .slide-container .card {
+                border-radius: 12px;
+                overflow: hidden;
+                height: 100%;
+            }
+
+            .slide-container {
+                /*flex: 0 0 auto;*/
+                width: calc(100% - 40px);
+                /*max-width: 300px;*/
+                margin-right: 1rem;
+                scroll-snap-align: start;
+                display: inline-block;
+                vertical-align: top;
+                /*flex: 0 0 calc((100% - 2rem) / 3); !* desktop: 3 card *!*/
+                /*max-width: calc((100% - 2rem) / 3);*/
+                transition: transform .25s ease;
+                flex: 0 0 90%;
+                max-width: 90%;
+
+            }
+
+            @media (min-width: 768px) {
+                .slide-container {
+                    width: 300px;
+                }
+
+                .favorites-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+
+                /* Mobile menu */
+                @media (max-width: 768px) {
+                    .hamburger {
+                        display: flex;
+                    }
+
+                    .nav-items {
+                        position: absolute;
+                        top: 100%;
+                        left: 0;
+                        right: 0;
+                        background: #f9f9f9;
+                        flex-direction: column;
+                        gap: 0;
+                        overflow: hidden;
+                        max-height: 0;
+                        transition: max-height .35s ease;
+                        border-bottom: 1px solid #ddd;
+                        align-items: flex-start;
+                    }
+
+                    .nav-items.show {
+                        max-height: 1000px;
+                    }
+
+                    .nav-items li {
+                        border-top: 1px solid #e5e5e5;
+                    }
+
+                    .nav-items li a {
+                        display: block;
+                        padding: 12px 1rem;
+                    }
+
+                    .dropdown-menu {
+
+                        position: static;
+                        box-shadow: none;
+                        background: #fff;
+                        padding-left: 0;
+                        border-radius: 0;
+                        transform: none;
+                        visibility: visible;
+                        opacity: 1;
+                        max-height: 0;
+                        overflow: hidden;
+                        transition: max-height .3s ease;
+                    }
+
+                    .dropdown-menu.expanded {
+                        max-height: 500px;
+                    }
+
+                    .nav-items li.has-dropdown > a .arrow {
+                        float: right;
+                        transition: transform .3s ease;
+                    }
+
+                    .nav-items li.has-dropdown.open > a .arrow {
+                        transform: rotate(180deg);
+                    }
+
+                    .feedback-slider-wrapper {
+                        margin: 1rem 0 2rem;
+                        position: relative;
+                        overflow: hidden; /* ẩn 2 bên */
+                    }
+
+                    .feedback-slider {
+                        display: flex;
+                        gap: 1rem;
+                        scroll-behavior: smooth;
+                        padding: 12px 0;
+                    }
+
+                    .slide-container {
+                        flex: 0 0 calc((100% - 2rem) / 3); /* 3 card desktop */
+                        max-width: calc((100% - 2rem) / 3);
+                        transition: transform .25s ease;
+                    }
+
+                    .slide-container:hover {
+                        transform: scale(1.08);
+                        z-index: 2;
+                    }
+
+                    .slide-container .card {
+                        border-radius: 12px;
+                        overflow: hidden;
+                        height: 100%;
+                    }
+
+                    @media (max-width: 992px) {
+                        .slide-container {
+                            flex: 0 0 calc((100% - 1rem) / 2); /* tablet 2 card */
+                            max-width: calc((100% - 1rem) / 2);
+                        }
+                    }
+                    @media (max-width: 768px) {
+                        .slide-container {
+                            flex: 0 0 90%; /* mobile 1 card */
+                            max-width: 90%;
+                        }
+                    }
+                }
+
+
+            }
+
+            .feedback-slider-wrapper {
+                overflow: hidden;
+                max-width: 1200px;
+                margin: auto;
+            }
+
+            .feedback-slider {
+                display: flex;
+                gap: 1rem;
+            }
+
+            .slide {
+                flex: 0 0 calc((100% - 2rem) / 3); /* desktop 3 items */
+                transition: transform 0.3s ease;
+            }
+
+            .slide:hover {
+                transform: scale(1.05);
+                z-index: 2;
+            }
+
+            .slide .card {
+                height: 100%;
+                border-radius: 12px;
+                overflow: hidden;
+            }
+
+            @media (max-width: 991px) {
+                .slide {
+                    flex: 0 0 calc((100% - 1rem) / 2);
+                }
+
+                /* tablet 2 items */
+            }
+            @media (max-width: 767px) {
+                .slide {
+                    flex: 0 0 100%;
+                }
+
+                /* mobile 1 item */
+            }
+            .card-img-overlay {
+                background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent 60%);
+            }
+
+            .card-title, .card-text {
+                font-size: 1.2rem; /* chữ to hơn */
+            }
+        }
+
+
+        .accent-btn {
+            margin: 60px 40px;
+            font-weight: bold;
+            border: none;
+            background: #ea5f1f;
+            color: white;
+            padding: 14px 22px;
+            border-radius: 30px;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: transform .25s ease, opacity .25s ease;
+            position: relative;
+            z-index: 2;
+            white-space: nowrap;
+        }
+
+        button.place-btn {
+            background-color: #ea5f1f;
+        }
+
+        .place-btn {
+            margin: 60px 40px;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            padding: 14px 22px;
+            background: #ea5f1f;
+            color: #fff;
+            cursor: pointer;
+            position: absolute;
+            right: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transform: translateX(120%); /* ẩn ngoài phải */
+            opacity: 0;
+            transition: transform .35s ease, opacity .35s ease;
+            z-index: 1;
+            white-space: nowrap;
+        }
+
+        /* Khi active: trượt vào đúng chỗ icon (vị trí tự nhiên) */
+        .place-btn.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Ẩn icon mượt */
+        .icon-btn.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-10px);
+            transition: transform .25s ease, opacity .25s ease;
+        }
+
+
+        /*đặt bàn*/
+        /* overlay mờ */
+        #backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 10000;
+            display: none;
+        }
+
+        /* modal đơn giản */
+        #bookingModal {
+            position: fixed;
+            top: 50%;
+            left: 48%;
+            transform: translate(-50%, -50%) scale(.9);
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem 1.25rem;
+            width: 320px;
+
+            /* Giới hạn chiều rộng tối đa */
+            /* Giới hạn chiều cao tối đa */
+            max-width: 80%;
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.3);
+            z-index: 10001;
+            display: none;
+            transition: transform .25s ease, opacity .25s ease;
+        }
+
+        #bookingModal.show {
+            display: block;
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        #bookingModal .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        #bookingModal h3 {
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        #bookingModal .form-group {
+            margin-bottom: 0.75rem;
+        }
+
+        #bookingModal input, #bookingModal select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        #bookingModal button.submit {
+            width: 100%;
+            padding: 10px;
+            background: #ea5f1f;
+            border: none;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 90%;
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #6c63ff;
+            box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
+            outline: none;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+            max-height: 200px;
+            line-height: 1.5;
+        }
+
+        .navbar-brand {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+<th:block th:replace="~{fragments/shared/toast :: toast}"></th:block>
+<nav class="navbar navbar-expand-lg ">
+    <div class="container-fluid">
+        <img th:src="@{'/img/logo.png'}" class="navbar-brand" width="120px">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">TRANG CHỦ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">GIỚI THIỆU</a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        THỰC ĐƠN
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Khuyến mãi hôm nay</a></li>
+                        <li><a class="dropdown-item" href="#">Đề xuất hôm nay</a></li>
+                        <li><a class="dropdown-item" href="#">Combo ngon - giá tốt</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">ƯU ĐÃI</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">LIÊN HỆ</a>
+                </li>
+
+            </ul>
+        </div>
+        <!--        <div class="d-flex justify-content-end">-->
+        <!--            <button type="button" class="btn btn-light grow-on-hover accent-btn" style="font-weight: bold">-->
+        <!--                <i class="fa-solid fa-utensils"></i>-->
+        <!--            </button>-->
+        <!--        </div>-->
+
+
+    </div>
+</nav>
+
+<!--<div id="carouselExampleFade" class="carousel slide carousel-fade" data-bs-ride="carousel"-->
+<!--     data-bs-interval="2000" data-bs-pause="false">-->
+<!--    <div class="carousel-inner">-->
+<!--        <div class="carousel-item active">-->
+<!--            <img th:src="@{'/img/vocher.png'}" class="d-block w-100" alt="...">-->
+<!--        </div>-->
+<!--        <div class="carousel-item">-->
+<!--            <img th:src="@{'/img/vocher1.png'}" class="d-block w-100" alt="...">-->
+<!--        </div>-->
+<!--        <div class="carousel-item">-->
+<!--            <img th:src="@{'/img/vocher2.png'}" class="d-block w-100" alt="...">-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleFade"-->
+<!--            data-bs-slide="prev">-->
+<!--        <span class="carousel-control-prev-icon" aria-hidden="true"></span>-->
+<!--        <span class="visually-hidden">Previous</span>-->
+<!--    </button>-->
+<!--    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleFade"-->
+<!--            data-bs-slide="next">-->
+<!--        <span class="carousel-control-next-icon" aria-hidden="true"></span>-->
+<!--        <span class="visually-hidden">Next</span>-->
+<!--    </button>-->
+<!--</div>-->
+
+<div class="feedback-carousel slick-fade" id="voucherSlider">
+    <div class="slide" th:each="voucher, status : ${vouchers}">
+        <img th:src="${voucher.image}" class="d-block w-100" alt="Voucher 1">
+    </div>
+    <!--    <div class="slide">-->
+    <!--        <img th:src="@{'/img/vocher1.jpg'}" class="d-block w-100" alt="Voucher 2">-->
+    <!--    </div>-->
+    <!--    <div class="slide">-->
+    <!--        <img th:src="@{'/img/vocher2.png'}" class="d-block w-100" alt="Voucher 3">-->
+    <!--    </div>-->
+</div>
+
+<div class="favorites-section">
+    <h2 class="favorite-title">Món ăn được yêu thích</h2>
+    <div class="favorites-grid">
+        <div class="card text-bg-dark" th:each="menu, status : ${menuItems}">
+            <img th:src="${menu.imageUrl}" class="card-img" alt="..." style="object-fit: cover; height: 320px;">
+            <div class="card-img-overlay d-flex flex-column justify-content-end"
+                 style="background: linear-gradient(to top, rgba(0,0,0,.6), transparent 60%);">
+                <h5 class="card-title mb-1" th:text="${menu.name}"></h5>
+                <p class="card-text mb-1" th:text="${menu.description}"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HTML phần nhận xét từ khách -->
+<div class="favorites-section">
+    <h2 class="favorite-title">Nhận xét từ khách</h2>
+    <div th:if="${#lists.isEmpty(feedbacks)}" class="text-center py-3">
+        Chưa có nhận xét nào.
+    </div>
+    <div class="feedback-slider-wrapper">
+        <div class="feedback-slider" id="feedbackSlider">
+            <div class="slide" th:each="feedback : ${feedbacks}">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-1" th:text="${feedback.customerName}">Tên khách</h5>
+                        <div class="mb-2">
+                        <span th:if="${feedback.rating != null}"
+                              th:utext="${#strings.repeat('<i class=&quot;bi bi-star-fill text-warning me-1&quot;></i>', feedback.rating)}"></span>
+                            <span th:if="${feedback.rating != null and feedback.rating < 5}"
+                                  th:utext="${#strings.repeat('<i class=&quot;bi bi-star text-muted me-1&quot;></i>', 5 - feedback.rating)}"></span>
+                        </div>
+                        <p class="card-text" th:text="${feedback.content}"></p>
+                        <small class="text-muted"
+                               th:text="${#temporals.format(feedback.createdAt, 'dd/MM/yyyy HH:mm')}"></small>
+                    </div>
+                    <img th:if="${feedback.imagePath}" th:src="${feedback.imagePath}"
+                         class="card-img-bottom" alt="Ảnh khách"
+                         style="object-fit: cover; width: 100%">
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="dropdown-wrapper" style="position: fixed; bottom:20px; right:20px; z-index:9999; overflow: visible;">
+        <!-- nút "Đặt bàn" -->
+        <button id="placeBtn" type="button" class="place-btn" aria-label="Đặt bàn">
+            Đặt bàn
+        </button>
+
+        <!-- nút icon -->
+        <button id="toggleBtn" type="button" class="accent-btn grow-on-hover icon-btn" aria-label="Đặt bàn">
+            <i class="fa-solid fa-utensils"></i>
+        </button>
+    </div>
+</div>
+<!-- overlay mờ -->
+<div id="backdrop"></div>
+
+<!-- modal đặt bàn -->
+<div id="bookingModal" aria-label="Form đặt bàn">
+    <button class="close-btn" aria-label="Đóng">&times;</button>
+    <h3>Đặt bàn</h3>
+    <div th:object="${bookingDTO}">
+
+        <div class="form-group">
+            <label for="name" class="form-label">Họ tên</label>
+            <input type="text" id="name" th:field="*{name}" placeholder="Nhập tên">
+            <!--            <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>-->
+            <div class="text-danger small"></div>
+        </div>
+        <div class="form-group">
+            <label for="phone" class="form-label">Số điện thoại</label>
+            <input type="tel" id="phone" th:field="*{phone}" placeholder="0987xxxxxx">
+            <!--            <div class="text-danger small" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>-->
+            <div class="text-danger small"></div>
+
+        </div>
+        <div class="form-group">
+            <label for="email" class="form-label">Địa chỉ email </label>
+            <input type="email" id="email" th:field="*{email}" placeholder="Nhập địa chỉ email">
+            <!--            <div class="text-danger small" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>-->
+            <div class="text-danger small"></div>
+
+        </div>
+        <div class="form-group">
+            <label for="dateTime" class="form-label">Ngày & giờ</label>
+            <input type="datetime-local" th:field="*{dateTime}" id="dateTime">
+            <!--            <div class="text-danger small" th:if="${#fields.hasErrors('dateTime')}" th:errors="*{dateTime}"></div>-->
+            <div class="text-danger small"></div>
+
+        </div>
+        <div class="form-group">
+            <label for="people" class="form-label">Số khách</label>
+            <input type="number" th:field="*{people}" id="people">
+            <!--            <div class="text-danger small" th:if="${#fields.hasErrors('people')}" th:errors="*{people}"></div>-->
+            <div class="text-danger small"></div>
+
+        </div>
+        <div class="form-group">
+            <label for="note" class="form-label">Ghi chú</label>
+            <textarea id="note" th:field="*{note}" placeholder="Nhập ghi chú" rows="3"
+                      style="resize: vertical;"></textarea>
+            <!--            <div class="text-danger small" th:if="${#fields.hasErrors('note')}" th:errors="*{note}"></div>-->
+            <div class="text-danger small"></div>
+
+        </div>
+
+        <button class="submit" id="submitBooking" type="submit">Xác nhận</button>
+    </div>
+</div>
+<footer class="bg-dark text-white mt-5">
+    <div class="container py-4">
+        <div class="row" style="display: flex">
+            <!-- Thông tin liên hệ -->
+            <div class="col-md-6">
+                <h2>Nhà Hàng LEON</h2>
+                <p><i class="fas fa-map-marker-alt text-danger"></i> 123 Đường Nguyễn Tất Thành,Đà Nẵng</p>
+                <p><i class="fas fa-phone text-danger"></i> 0123 456 789</p>
+                <p><i class="fas fa-envelope text-danger"></i> nhahangleon@gmail.com</p>
+            </div>
+
+            <!-- Google Map -->
+            <div class="col-md-6">
+                <div style="border-radius: 8px; overflow: hidden;">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3833.7517910224838!2d108.20716137460022!3d16.078364939194337!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31421846431fd0fd%3A0x780138ba60fa3aa6!2zMjk1IE5ndXnhu4VuIFThuqV0IFRow6BuaCwgVGhhbmggQsOsbmgsIEjhuqNpIENow6J1LCDEkMOgIE7hurVuZyA1NTAwMDAsIFZp4buHdCBOYW0!5e0!3m2!1svi!2s!4v1754275438345!5m2!1svi!2s"
+                            width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <small>© 2025 Hệ thống POS nhà hàng</small>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+
+
+<script>
+    $('#submitBooking').click(function (e) {
+
+        const bookingData = {
+            name: $('#name').val(),
+            phone: $('#phone').val(),
+            email: $('#email').val(),
+            dateTime: $('#dateTime').val(),
+            people: $('#people').val(),
+            note: $('#note').val(),
+        };
+        $('.text-danger').text('');
+        $.ajax({
+            url: 'http://localhost:8080/home/booking',
+            type: 'post',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(bookingData),
+            success: function (response) {
+                if (response === "success") {
+                    window.location.href = "/home/homeSuccess";
+                }
+
+            },
+            error: function (xhr) {
+                if (xhr.status === 400) {
+                    const errors = xhr.responseJSON;
+                    for (const field in errors) {
+                        $(`#${field}`).next('.text-danger').text(errors[field]);
+                    }
+                } else {
+                    alert("đã xảy ra lỗi hệ thống");
+                }
+            }
+        });
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const showToast = (id) => {
+            const toastEl = document.getElementById(id);
+            if (toastEl) {
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+        };
+        showToast('successToast');
+        showToast('errorToast');
+
+        const btnIcon = document.getElementById('toggleBtn');
+        const placeBtn = document.getElementById('placeBtn');
+        let visible = false;
+
+        btnIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!visible) {
+                placeBtn.classList.add('show');
+                btnIcon.classList.add('hidden');
+            } else {
+                placeBtn.classList.remove('show');
+                btnIcon.classList.remove('hidden');
+            }
+            visible = !visible;
+        });
+
+        document.addEventListener('click', (e) => {
+            if (visible && !btnIcon.contains(e.target) && !placeBtn.contains(e.target)) {
+                // ẩn placeBtn, hiện icon ngay
+                placeBtn.classList.remove('show');
+                btnIcon.classList.remove('hidden');
+                visible = false;
+            }
+        });
+    });
+    const btnIcon = document.getElementById('toggleBtn');
+    const placeBtn = document.getElementById('placeBtn');
+    const backdrop = document.getElementById('backdrop');
+    const modal = document.getElementById('bookingModal');
+    const closeBtn = modal.querySelector('.close-btn');
+
+    let state = 0; // 0=icon,1=placeBtn visible,2=modal open
+
+    function showPlaceBtn() {
+        placeBtn.classList.add('show');
+        btnIcon.classList.add('hidden');
+        state = 1;
+    }
+
+    function openModal() {
+        backdrop.style.display = 'block';
+        modal.classList.add('show');
+        state = 2;
+    }
+
+    function resetAll() {
+        placeBtn.classList.remove('show');
+        btnIcon.classList.remove('hidden');
+        backdrop.style.display = 'none';
+        modal.classList.remove('show');
+        state = 0;
+    }
+
+    btnIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (state === 0) {
+            showPlaceBtn();
+        } else if (state === 1) {
+            openModal();
+        } else {
+            resetAll();
+        }
+    });
+
+    placeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (state === 1) openModal();
+    });
+
+    backdrop.addEventListener('click', resetAll);
+    closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        resetAll();
+    });
+
+    document.addEventListener('click', (e) => {
+        if (state !== 0 && !modal.contains(e.target) && !placeBtn.contains(e.target) && !btnIcon.contains(e.target)) {
+            resetAll();
+        }
+    });
+
+    $(function () {
+        $('#feedbackSlider').slick({
+            slidesToShow: 3,               // desktop mặc định
+            slidesToScroll: 1,
+            autoplay: true,
+            speed: 2000,
+            autoplaySpeed: 2000,           // 3s mỗi lần chuyển
+            pauseOnHover: true,
+            arrows: true,
+            dots: false,
+            infinite: true,
+            responsive: [
+                {
+                    breakpoint: 992,           // dưới desktop (tablet lớn)
+                    settings: {
+                        slidesToShow: 2
+                    }
+                },
+                {
+                    breakpoint: 768,           // mobile
+                    settings: {
+                        slidesToShow: 1
+                    }
+                }
+            ]
+        });
+    });
+
+    $(function () {
+        $('#voucherSlider').slick({
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            fade: true,               // hiệu ứng fade giống carousel-fade
+            cssEase: 'linear',
+            autoplay: true,
+            autoplaySpeed: 2000,      // tương đương data-bs-interval="2000"
+            pauseOnHover: false,      // không dừng khi hover
+            arrows: true,             // nút prev/next
+            dots: false,
+            infinite: true
+        });
+
+    });
+    // AJAX
+
+
+</script>
+
+</body>
+</html>

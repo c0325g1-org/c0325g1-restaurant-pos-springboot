@@ -25,7 +25,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(config -> config
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/img/**", "/uploads/feedbacks/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/img/**","/home/**", "/uploads/feedbacks/**", "/home/booking","/home/homeSuccess").permitAll()
                         .requestMatchers("/login", "/register", "/forgot-password", "/reset-password").permitAll()
                         .requestMatchers("/feedback/verify", "/feedback/submit", "/feedback/success").permitAll()
                         .requestMatchers("/feedback/**").permitAll()
@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/cashier/**").hasAnyRole("THU_NGÂN", "QUẢN_LÝ", "QUẢN_TRỊ")
                         .requestMatchers("/waiter/**").hasAnyRole("PHỤC_VỤ", "QUẢN_TRỊ")
                         .requestMatchers("/kitchen/**").hasAnyRole("BẾP", "QUẢN_TRỊ")
+                        .requestMatchers("/host/**").hasAnyRole("LỄ_TÂN", "QUẢN_LÝ")
 
                         .anyRequest().authenticated()
                 )
