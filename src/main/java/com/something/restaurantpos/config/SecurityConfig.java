@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/register", "/forgot-password", "/reset-password").permitAll()
                         .requestMatchers("/feedback/verify", "/feedback/submit", "/feedback/success").permitAll()
                         .requestMatchers("/feedback/**").permitAll()
+                        .requestMatchers("/activate-account").permitAll()
                         .requestMatchers("/profile/**").authenticated()
                         // PHÂN QUYỀN
                         .requestMatchers("/admin/**").hasRole("QUẢN_TRỊ")

@@ -1,6 +1,6 @@
 <html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.thymeleaf.org">
-<head>
-    <title>Nhân viên - Admin</title>
+    <head>
+        <title>Nhân viên - Admin</title>
     <style>
         .invalid-feedback {
             display: block !important;
@@ -108,6 +108,8 @@
                 modal.show();
             }
         }
+        
+
 
 
 
@@ -138,14 +140,14 @@
                 }, 5000);
             });
             
-            // Frontend validation
+            // AJAX validation
             const addForm = document.getElementById('addEmployeeForm');
             const editForm = document.getElementById('editEmployeeForm');
             
             // Validation cho form thêm mới
             if (addForm) {
                 addForm.addEventListener('submit', function(e) {
-                    if (!validateForm(addForm)) {
+                    if (!validateFormWithAjax(addForm)) {
                         e.preventDefault();
                     }
                 });
@@ -153,7 +155,7 @@
                 // Validation real-time khi blur
                 addForm.querySelectorAll('input, select').forEach(function(field) {
                     field.addEventListener('blur', function() {
-                        validateField(this);
+                        validateFieldWithAjax(this, 'add');
                     });
                 });
             }
@@ -161,7 +163,7 @@
             // Validation cho form chỉnh sửa
             if (editForm) {
                 editForm.addEventListener('submit', function(e) {
-                    if (!validateForm(editForm)) {
+                    if (!validateFormWithAjax(editForm)) {
                         e.preventDefault();
                     }
                 });
@@ -169,16 +171,69 @@
                 // Validation real-time khi blur
                 editForm.querySelectorAll('input, select').forEach(function(field) {
                     field.addEventListener('blur', function() {
-                        validateField(this);
+                        const employeeId = document.getElementById('editEmployeeId').value;
+                        validateFieldWithAjax(this, 'edit', employeeId);
                     });
                 });
             }
             
-            function validateField(field) {
+            function validateFieldWithAjax(field, formType, employeeId = null) {
                 const fieldName = field.name;
                 const value = field.value.trim();
                 
-                // Validate name
+                // Bỏ qua các field không cần validate
+                if (fieldName === 'id' || field.type === 'hidden') {
+                    return;
+                }
+                
+                // Nếu field trống, validate cơ bản trước
+                if (!value && fieldName !== 'password') {
+                    showFieldError(field, getFieldRequiredMessage(fieldName));
+                    return;
+                }
+                
+                // Nếu password trống trong form edit, không cần validate
+                if (fieldName === 'password' && !value && formType === 'edit') {
+                    clearFieldError(field);
+                    return;
+                }
+                
+                // Tạo data để gửi AJAX
+                const data = {
+                    fieldName: fieldName,
+                    value: value,
+                    formType: formType
+                };
+                
+                if (employeeId) {
+                    data.employeeId = employeeId;
+                }
+                
+                // Gửi AJAX request
+                fetch('/admin/employees/validate-field', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.valid) {
+                        clearFieldError(field);
+                    } else {
+                        showFieldError(field, result.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Validation error:', error);
+                    // Fallback to basic validation
+                    validateFieldBasic(field, fieldName, value, formType);
+                });
+            }
+            
+            function validateFieldBasic(field, fieldName, value, formType) {
+                // Basic validation fallback
                 if (fieldName === 'name') {
                     if (!value) {
                         showFieldError(field, 'Họ tên không được để trống');
@@ -189,10 +244,7 @@
                     } else {
                         clearFieldError(field);
                     }
-                }
-                
-                // Validate Tên đăng nhập
-                else if (fieldName === 'username') {
+                } else if (fieldName === 'username') {
                     if (!value) {
                         showFieldError(field, 'Tên đăng nhập không được để trống');
                     } else if (value.length < 3 || value.length > 50) {
@@ -202,10 +254,7 @@
                     } else {
                         clearFieldError(field);
                     }
-                }
-                
-                // Validate email
-                else if (fieldName === 'email') {
+                } else if (fieldName === 'email') {
                     if (!value) {
                         showFieldError(field, 'Email không được để trống');
                     } else if (!/^\w+@[a-z]{5,7}(\.[a-z]{2,3}){1,2}$/.test(value)) {
@@ -213,32 +262,17 @@
                     } else {
                         clearFieldError(field);
                     }
-                }
-                
-                // Validate password
-                else if (fieldName === 'password') {
-                    // Kiểm tra xem có phải form edit không (có field id)
-                    const isEditForm = field.closest('form').querySelector('input[name="id"]');
-                    
-                    if (!value) {
-                        if (isEditForm) {
-                            // Trong form edit, password có thể để trống
-                            clearFieldError(field);
-                        } else {
-                            // Trong form add, password bắt buộc
-                            showFieldError(field, 'Mật khẩu không được để trống');
-                        }
-                    } else if (value.length < 3 || value.length > 50) {
+                } else if (fieldName === 'password') {
+                    if (!value && formType === 'add') {
+                        showFieldError(field, 'Mật khẩu không được để trống');
+                    } else if (value && (value.length < 3 || value.length > 50)) {
                         showFieldError(field, 'Mật khẩu phải từ 3-50 ký tự');
-                    } else if (!/^[a-z0-9]+$/.test(value)) {
+                    } else if (value && !/^[a-z0-9]+$/.test(value)) {
                         showFieldError(field, 'Mật khẩu chỉ được chứa chữ thường và số');
                     } else {
                         clearFieldError(field);
                     }
-                }
-                
-                // Validate role
-                else if (fieldName === 'roleId') {
+                } else if (fieldName === 'roleId') {
                     if (!value) {
                         showFieldError(field, 'Vui lòng chọn vai trò');
                     } else {
@@ -247,18 +281,58 @@
                 }
             }
             
-            function validateForm(form) {
+            function getFieldRequiredMessage(fieldName) {
+                const messages = {
+                    'name': 'Họ tên không được để trống',
+                    'username': 'Tên đăng nhập không được để trống',
+                    'email': 'Email không được để trống',
+                    'password': 'Mật khẩu không được để trống',
+                    'roleId': 'Vui lòng chọn vai trò'
+                };
+                return messages[fieldName] || 'Trường này không được để trống';
+            }
+            
+            function validateFormWithAjax(form) {
                 let isValid = true;
+                const formType = form.id === 'addEmployeeForm' ? 'add' : 'edit';
+                const employeeId = formType === 'edit' ? document.getElementById('editEmployeeId').value : null;
                 
                 // Validate tất cả các field
-                form.querySelectorAll('input, select').forEach(function(field) {
-                    validateField(field);
-                    if (field.classList.contains('is-invalid')) {
-                        isValid = false;
+                const fields = form.querySelectorAll('input, select');
+                let validationPromises = [];
+                
+                fields.forEach(function(field) {
+                    const fieldName = field.name;
+                    const value = field.value.trim();
+                    
+                    // Skip empty password in edit form
+                    if (fieldName === 'password' && !value && formType === 'edit') {
+                        return;
+                    }
+                    
+                    // Create validation promise
+                    const promise = validateFieldAsync(field, formType, employeeId);
+                    validationPromises.push(promise);
+                });
+                
+                // Wait for all validations to complete
+                Promise.all(validationPromises).then(() => {
+                    // Check if any field has errors
+                    const hasErrors = form.querySelectorAll('.is-invalid').length > 0;
+                    if (!hasErrors) {
+                        form.submit();
                     }
                 });
                 
-                return isValid;
+                return false; // Prevent default submit, let AJAX handle it
+            }
+            
+            function validateFieldAsync(field, formType, employeeId) {
+                return new Promise((resolve) => {
+                    validateFieldWithAjax(field, formType, employeeId);
+                    // Add a small delay to allow AJAX to complete
+                    setTimeout(() => resolve(), 100);
+                });
             }
             
             function showFieldError(field, message) {
@@ -327,6 +401,7 @@
                                         th:onclick="'editEmployee(' + ${employee.id} + ')'">
                                     <i class="bi bi-pencil"></i>
                                 </button>
+
                                 <button class="btn btn-sm" 
                                         th:classappend="${employee.enable ? 'btn-outline-warning' : 'btn-outline-success'}"
                                         th:onclick="'toggleEmployeeStatus(' + ${employee.id} + ')'"
@@ -380,7 +455,7 @@
                             <label for="roleId" class="form-label">Vai trò</label>
                             <select class="form-select" id="roleId" name="roleId" th:field="*{roleId}">
                                 <option value="">Chọn vai trò</option>
-                                <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.name}">Vai trò</option>
+                                <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.name}" th:if="${role.name != 'QUẢN_TRỊ'}">Vai trò</option>
                             </select>
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('roleId')}" th:errors="*{roleId}"></div>
                         </div>
@@ -430,7 +505,7 @@
                             <label for="editRoleId" class="form-label">Vai trò</label>
                             <select class="form-select" id="editRoleId" name="roleId">
                                 <option value="">Chọn vai trò</option>
-                                <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.name}">Vai trò</option>
+                                <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.name}" th:if="${role.name != 'QUẢN_TRỊ'}">Vai trò</option>
                             </select>
                             <div class="invalid-feedback" id="editRoleIdError"></div>
                         </div>
