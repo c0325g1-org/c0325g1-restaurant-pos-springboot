@@ -42,6 +42,8 @@ public class AccountActivationController {
             String token = (String) session.getAttribute("activationToken");
             if (token != null) {
                 dto.setToken(token);
+            } else {
+                return "redirect:/login";
             }
             model.addAttribute("changePasswordDTO", dto);
         }

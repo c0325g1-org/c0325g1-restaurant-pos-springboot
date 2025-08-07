@@ -458,7 +458,7 @@ public class AdminController {
                     if (value == null || value.trim().isEmpty()) {
                         isValid = false;
                         message = "Email không được để trống";
-                    } else if (!value.matches("^\\w+@[a-z]{5,7}(\\.[a-z]{2,3}){1,2}$")) {
+                    } else if (!value.matches("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")) {
                         isValid = false;
                         message = "Email không đúng định dạng";
                     } else {
