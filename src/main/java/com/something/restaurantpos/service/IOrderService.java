@@ -20,7 +20,7 @@ public interface IOrderService extends IService<Order>{
 
     List<OrderItem> getItemsByOrder(Order order);
 
-    List<OrderItem> getOrderItemsByTableAndStatuses(Integer tableId, List<OrderItem.ItemStatus> statuses);
+    List<OrderItem> getOrderItemsByOrderAndStatuses(Integer tableId, List<OrderItem.ItemStatus> statuses);
 
     void updateItemStatus(Integer id, OrderItem.ItemStatus itemStatus);
 

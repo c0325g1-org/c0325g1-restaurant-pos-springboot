@@ -62,6 +62,7 @@ public class HomeController {
         NotificationDTO notificationDTO = new NotificationDTO();
         String message = bookingDTO.getName() + " đã đặt bàn mới!";
         notificationDTO.setMessage(message);
+        notificationDTO.setSpeak(true);
         Booking booking = new Booking();
         BeanUtils.copyProperties(bookingDTO, booking);
         bookingService.save(booking);

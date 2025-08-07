@@ -34,6 +34,7 @@ public class BookingReminderTask {
             NotificationDTO notificationDTO = new NotificationDTO();
             String message = "Booking của khách " + booking.getName() + " (" + booking.getTable().getName() + ") sắp diễn ra lúc " + booking.getDateTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "!";
             notificationDTO.setMessage(message);
+            notificationDTO.setSpeak(true);
             booking.setReminded(true);
             bookingService.save(booking);
             notificationService.create(message, Notification.NotificationType.INFO, Role.UserRole.ROLE_AGENT);

@@ -62,7 +62,7 @@
                 }
             }
         }
-        @Scheduled(cron = "0 00 10 * * ?")
+//        @Scheduled(cron = "0 00 10 * * ?")
         public void autoSendVoucherEmail() {
             System.out.println("Bắt đầu gửi tự động voucher đến khách hàng...");
             sendVoucherToAllBookings("🎁 Ưu đãi đặc biệt từ Nhà hàng LEON");

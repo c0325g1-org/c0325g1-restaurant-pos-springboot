@@ -338,7 +338,9 @@
                     const noti = JSON.parse(message.body);
                     console.log("📩 Notification nhận:", noti);
                     showNotificationToast(noti);
-                    enqueueNotificationSpeech(noti.message);
+                    if (noti.speak) {
+                        enqueueNotificationSpeech(noti.message);
+                    }
                     reloadNotificationList();
                 });
             });

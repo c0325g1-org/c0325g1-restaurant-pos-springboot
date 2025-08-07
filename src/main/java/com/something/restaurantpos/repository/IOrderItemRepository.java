@@ -18,7 +18,7 @@ import java.util.List;
 public interface IOrderItemRepository extends JpaRepository<OrderItem, Integer> {
     List<OrderItem> findAllByOrder(Order order);
 
-    List<OrderItem> findAllByOrder_Table_IdAndStatusIn(Integer tableId, List<OrderItem.ItemStatus> statuses);
+    List<OrderItem> findAllByOrder_IdAndStatusIn(Integer orderId, List<OrderItem.ItemStatus> statuses);
 
     boolean existsOrderItemByOrderIdAndOrder_Table_Id(Integer orderId, Integer tableId);
 
