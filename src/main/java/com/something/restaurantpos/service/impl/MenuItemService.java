@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -98,10 +99,13 @@ public class MenuItemService implements IMenuItemService {
     public long countSellingItems() {
         return menuItemRepository.countSellingItems();
     }
-    
+
     @Override
     public List<Object[]> getTopSellingItemsThisMonth(LocalDateTime start, LocalDateTime end) {
-        return menuItemRepository.getTopSellingItemsThisMonth(start, end);
+        List<Object[]> allItems = menuItemRepository.getTopSellingItemsThisMonth(start, end);
+        // Giới hạn lấy 5 món đầu
+        return allItems.stream().limit(5).collect(Collectors.toList());
     }
+
 
 }
