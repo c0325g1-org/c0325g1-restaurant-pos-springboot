@@ -116,8 +116,8 @@
         </p>
     </div>
 
-    <table class="table table-bordered m-0">
-        <thead class="table-light">
+    <table class="table table-borderless">
+        <thead class="border-bottom border-black">
         <tr>
             <th class="col-item-name">Tên món</th>
             <th class="col-qty">SL</th>
@@ -127,7 +127,7 @@
         </thead>
         <tbody>
         <tr th:each="item : ${invoice.orderItems}">
-            <td class="col-item-name" th:text="${item.menuItemName}"></td>
+            <td class="col-item-name" style="text-align: left" th:text="${item.menuItemName}"></td>
             <td class="col-qty" th:text="${item.quantity}"></td>
             <td class="col-price" th:text="${#numbers.formatDecimal(item.price, 1, 'COMMA', 0, 'POINT')}"></td>
             <td class="col-total" th:text="${#numbers.formatDecimal(item.price * item.quantity, 1, 'COMMA', 0, 'POINT')}"></td>
@@ -158,7 +158,7 @@
     </div>
     <div class="text-center mt-2">
         <p class="m-0">Quét mã QR để thanh toán:</p>
-        <img src="https://img.vietqr.io/image/mbbank-615892-compact2.jpg?amount=123000&addInfo=Thanh%20toan%20hoa%20don%20123&accountName=Nguyen%20Tien%20Quan"
+        <img th:src="@{'https://img.vietqr.io/image/mbbank-615892-compact2.jpg?amount='+${invoice.totalAmount}+'&addInfo=Thanh%20toan%20hoa%20don%20'+${invoice.getId()}+'&accountName=Nguyen%20Tien%20Quan'}"
              alt="QR Thanh toán" class="qr-code"/>
     </div>
 
