@@ -37,13 +37,8 @@ public interface IInvoiceRepository extends JpaRepository<Invoice, Integer> {
             "AND DATE(i.createdAt) = CURRENT_DATE")
     BigDecimal sumRevenueToday();
 
-    @Query("SELECT DATE(i.createdAt) AS date, SUM(i.totalAmount) AS total " +
-            "FROM Invoice i " +
-            "WHERE i.paid = true AND i.deleted = false " +
-            "AND i.createdAt BETWEEN :startDate AND :endDate " +
-            "GROUP BY DATE(i.createdAt) " +
-            "ORDER BY DATE(i.createdAt)")
-    List<Object[]> getRevenueBetweenDates(@Param("startDate") LocalDateTime startDate,
-                                          @Param("endDate") LocalDateTime endDate);
-
+    @Query("SELECT DATE(i.createdAt), SUM(i.totalAmount) FROM Invoice i " +
+            "WHERE i.paid = true AND i.deleted = false AND DATE(i.createdAt) BETWEEN :start AND :end " +
+            "GROUP BY DATE(i.createdAt) ORDER BY DATE(i.createdAt)")
+    List<Object[]> sumRevenueByDateRange(@Param("start") LocalDate start, @Param("end") LocalDate end);
 }

@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface IInvoiceService  extends IService<Invoice> {
     Invoice findByOrderId(Integer orderId);
@@ -27,6 +28,5 @@ public interface IInvoiceService  extends IService<Invoice> {
     Invoice createInvoiceFromOrder(Order order);
     long countPaidInvoicesToday();
     BigDecimal sumRevenueToday();
-    List<Object[]> getRevenueBetweenDates(LocalDateTime start, LocalDateTime end);
-
+    Map<String, BigDecimal> getRevenueByDateRange(LocalDate start, LocalDate end);
 }
