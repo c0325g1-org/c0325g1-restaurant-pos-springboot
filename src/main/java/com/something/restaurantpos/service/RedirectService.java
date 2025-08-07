@@ -16,7 +16,7 @@ public class RedirectService {
                 case "ROLE_THU_NGÂN" -> "redirect:/cashier/dashboard";
                 case "ROLE_PHỤC_VỤ" -> "redirect:/waiter/dashboard";
                 case "ROLE_BẾP" -> "redirect:/kitchen/dashboard";
-                case "ROLE_LỄ_TÂN" -> "redirect:/host/dashboard";
+                case "ROLE_TỔNG_ĐÀI_VIÊN" -> "redirect:/agent/dashboard";
                 default -> "redirect:/login";
             };
         }

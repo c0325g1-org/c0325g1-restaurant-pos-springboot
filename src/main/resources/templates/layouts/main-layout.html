@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.w3.org/1999/xhtml">
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -231,8 +231,8 @@
     <a sec:authorize="hasRole('PHỤC_VỤ')" th:href="@{/waiter/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
     <a sec:authorize="hasRole('PHỤC_VỤ')" th:href="@{/feedback}" class="nav-link"><i class="bi bi-bag"></i> <span>Phản hồi KH</span></a>
 
-    <a sec:authorize="hasAnyRole('LỄ_TÂN', 'QUẢN_LÝ')" th:href="@{/host/dashboard}" class="nav-link"><i class="bi bi-table"></i> <span>Tổng quan</span></a>
-    <a sec:authorize="hasAnyRole('LỄ_TÂN', 'QUẢN_LÝ')" th:href="@{/host/booking-list}" class="nav-link"><i class="bi bi-card-list"></i> <span>Đặt bàn</span></a>
+    <a sec:authorize="hasAnyRole('TỔNG_ĐÀI_VIÊN', 'QUẢN_LÝ')" th:href="@{/agent/dashboard}" class="nav-link"><i class="bi bi-table"></i> <span>Tổng quan</span></a>
+    <a sec:authorize="hasAnyRole('TỔNG_ĐÀI_VIÊN', 'QUẢN_LÝ')" th:href="@{/agent/booking-list}" class="nav-link"><i class="bi bi-card-list"></i> <span>Đặt bàn</span></a>
 </div>
 
 <!-- MAIN CONTENT -->
