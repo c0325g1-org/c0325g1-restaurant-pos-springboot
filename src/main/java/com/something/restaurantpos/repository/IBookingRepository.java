@@ -13,7 +13,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import java.util.List;
+
 public interface IBookingRepository extends JpaRepository<Booking,Integer> {
+    List<Booking> findAllByEmailIsNotNull();
 
     Page<Booking> findByDeletedFalse(Pageable pageable);
 
