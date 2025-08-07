@@ -22,6 +22,6 @@ public class Role extends AuditMetadata {
     private UserRole userRole;
 
     public enum UserRole {
-        ROLE_WAITER, ROLE_KITCHEN, ROLE_CASHIER, ROLE_MANAGER, ROLE_ADMIN
+        ROLE_WAITER, ROLE_KITCHEN, ROLE_CASHIER, ROLE_MANAGER, ROLE_ADMIN, ROLE_HOST
     }
 }

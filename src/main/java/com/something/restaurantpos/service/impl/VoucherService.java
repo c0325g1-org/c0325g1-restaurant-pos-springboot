@@ -9,12 +9,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class VoucherService implements IVoucherService {
-
     private final IVoucherRepository voucherRepository;
 
     @Override
@@ -70,6 +71,18 @@ public class VoucherService implements IVoucherService {
     public Page<Voucher> search(String keyword, Boolean status, Integer percent, Pageable pageable) {
         return voucherRepository.filter(keyword, status, percent, pageable);
     }
+
+    @Override
+    public List<Voucher> findAllValid() {
+        return voucherRepository.findAllValid(LocalDateTime.now());
+    }
+
+    @Override
+    public Page<Voucher> findByValidToAfter(LocalDateTime now, Pageable pageable) {
+        return voucherRepository.findByValidToAfter(now,pageable);
+    }
+
+
 
     @Override
     public long countDeleted() {

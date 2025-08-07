@@ -1,0 +1,46 @@
+<html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Sơ đồ bàn</title>
+</head>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h2 class="fw-bold mb-0">Sơ đồ bàn</h2>
+
+        <form method="get" class="d-flex align-items-center gap-2">
+            <label class="fw-semibold mb-0" for="datePicker">Chọn ngày:</label>
+            <input type="date" id="datePicker" class="form-control"
+                   name="date" th:value="${selectedDate}" onchange="this.form.submit()"
+                   style="width: 160px;">
+        </form>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-md-3 d-flex flex-wrap gap-3 mb-3" th:each="table : ${tables}">
+            <div class="card border shadow-sm w-100" style="min-height: 150px;">
+                <div class="card-body p-3 text-center">
+                    <h5 class="card-title mb-1" th:text="${table.name}">Bàn 01</h5>
+                    <span class="badge"
+                          th:class="${'badge ' +  (table.status.name() == 'EMPTY' ? 'bg-success' :
+                          table.status.name() == 'RESERVED' ? 'bg-warning text-dark' : 'bg-danger')}"
+                          th:text="${table.status}">
+                    </span>
+                </div>
+
+                <!-- Lịch đặt của bàn này trong ngày -->
+                <th:block th:with="hasBooking=${bookings.?[table != null and table.id == table.id].size() > 0}">
+                    <ul class="list-group list-group-flush small" th:if="${hasBooking}">
+                        <th:block th:each="b : ${bookings}">
+                            <li class="list-group-item"
+                                th:if="${b.table != null and b.table.id == table.id}">
+                                <i class="bi bi-clock"></i> <span th:text="${#temporals.format(b.dateTime, 'HH:mm')}">18:00</span>
+                                - <span th:text="${b.name}">Nguyễn Văn A</span>
+                                (<span th:text="${b.people} + ' người'">4</span>)
+                            </li>
+                        </th:block>
+                    </ul>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

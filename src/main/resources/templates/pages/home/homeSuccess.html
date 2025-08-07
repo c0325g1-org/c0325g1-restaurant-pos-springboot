@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Cảm ơn quý khách</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+
+      margin: 0;
+      padding: 0;
+      font-family: 'Quicksand', sans-serif;
+      background: #fff5e6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .thank-you-container {
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+      animation: popIn 0.4s ease;
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .thank-you-container h1 {
+      font-size: 2rem;
+      color: #ff6600;
+      margin-bottom: 10px;
+    }
+
+    .thank-you-container p {
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .back-home {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #ff6600;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-home:hover {
+      background-color: #e65c00;
+    }
+
+    .emoji {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+<div class="thank-you-container">
+  <div class="emoji">🎉</div>
+  <h1>Cảm ơn quý khách!</h1>
+  <p>Chúng tôi đã nhận được yêu cầu đặt bàn của bạn.<br>
+    Một email xác nhận sẽ được gửi sớm.</p>
+  <a href="/home" class="back-home">Quay lại trang chủ</a>
+</div>
+</body>
+</html>

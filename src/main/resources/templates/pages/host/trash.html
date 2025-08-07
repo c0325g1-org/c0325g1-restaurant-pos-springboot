@@ -1,0 +1,109 @@
+<html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Thùng rác booking - Lễ tân</title>
+</head>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Thùng rác</h2>
+        <a class="btn btn-outline-primary" th:href="@{/host/booking-list}">
+            <i class="bi bi-arrow-left-circle"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    <div th:if="${bookings.content.size() == 0}" class="alert alert-info text-center">
+        Hiện không có booking nào trong thùng rác.
+    </div>
+
+    <table th:if="${bookings.content.size() > 0}" class="table table-hover table-striped shadow-sm rounded bg-white">
+        <thead class="table-dark text-center">
+        <tr>
+            <th>STT</th>
+            <th>Tên KH</th>
+            <th>Số điện thoại</th>
+            <th>Email</th>
+            <th>Số người</th>
+            <th>Ngày & giờ hẹn</th>
+            <th>Thời gian booking</th>
+            <th>Ghi chú</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody class="align-middle text-center">
+        <tr th:each="b, status : ${bookings}">
+            <td th:text="${status.count}">1</td>
+            <td th:text="${b.name}"></td>
+            <td th:text="${b.phone}"></td>
+            <td th:text="${b.email}"></td>
+            <td th:text="${b.people}"></td>
+            <td th:text="${#temporals.format(b.dateTime, 'dd/MM/yyyy HH:mm')}"></td>
+            <td th:text="${#temporals.format(b.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+            <td th:text="${b.note}"></td>
+            <td>
+                <span class="badge"
+                      th:text="${b.status.label}"
+                      th:classappend="${b.status.badgeClass}">
+                </span>
+            </td>
+            <td>
+                <form th:action="@{/host/{id}/restore(id=${b.id})}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-success btn-sm me-1"
+                            title="Khôi phục"
+                            th:attr="data-bs-title='Khôi phục booking ' + ${b.id}"
+                    >
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                </form>
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal"
+                        title="Xoá vĩnh viễn"
+                        th:attr="data-id=${b.id}, data-title=${b.id}, data-bs-title='Xóa vĩnh viễn booking ' + ${b.id}">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <nav th:if="${bookings.totalPages > 1}" aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${bookings.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/host/trash(page=${bookings.number - 1})}">Trước</a>
+            </li>
+            <li th:each="pageNum : ${#numbers.sequence(0, bookings.totalPages - 1)}"
+                class="page-item"
+                th:classappend="${pageNum == bookings.number} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/host/trash(page=${pageNum})}"
+                   th:text="${pageNum + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${bookings.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/host/trash(page=${bookings.number + 1})}">Sau</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<th:block layout:fragment="modal">
+    <div th:replace="~{fragments/shared/delete_modal :: deleteModal ('booking')}"></div>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteModal = document.getElementById('deleteModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                const title = button.getAttribute('data-title');
+                deleteModal.querySelector('#modalTitle').textContent = title;
+                deleteModal.querySelector('#deleteForm').setAttribute('action', '/host/' + id + '/destroy');
+            });
+        });
+    </script>
+</th:block>
+</html>
+
+

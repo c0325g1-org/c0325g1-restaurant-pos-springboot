@@ -18,7 +18,8 @@ public class Feedback extends AuditMetadata {
 
     @Column(nullable = false)
     private Integer rating;
-
+    @Column(nullable = false, length = 100)
+    private String customerEmail;
     @Column(columnDefinition = "TEXT")
     private String content;
 

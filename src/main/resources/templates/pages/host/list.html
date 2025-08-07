@@ -1,0 +1,394 @@
+<html layout:decorate="~{layouts/main-layout}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Đặt bàn - Lễ tân</title>
+</head>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold">Danh sách đặt bàn</h2>
+        <div>
+            <a class="btn btn-danger me-2" th:href="@{/host/trash}">
+                <i class="bi bi-trash"></i>
+                Thùng rác
+                <span th:if="${trashCount > 0}">(<span th:text="${trashCount}">1</span>)</span>
+            </a>
+        </div>
+    </div>
+
+    <form class="row g-2 mb-3" method="get" th:action="@{/host/booking-list}">
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="keyword" placeholder="Tìm theo tên, số điện hoặc email"
+                   th:value="${keyword}">
+        </div>
+
+        <div class="col-md-2">
+            <select class="form-select" name="status">
+                <option value="">-- Trạng thái --</option>
+                <option value="NEW" th:selected="${status != null and status.name() == 'NEW'}">Mới đặt</option>
+                <option value="CONFIRMED" th:selected="${status != null and status.name() == 'CONFIRMED'}">Đã xác nhận</option>
+                <option value="CANCELLED" th:selected="${status != null and status.name() == 'CANCELLED'}">Đã huỷ</option>
+                <option value="SERVED" th:selected="${status != null and status.name() == 'SERVED'}">Đã phục vụ</option>
+                <option value="NOSHOW" th:selected="${status != null and status.name() == 'NOSHOW'}">Không tới</option>
+            </select>
+        </div>
+
+
+        <div class="col-md-2">
+            <select class="form-select" name="sort">
+                <option value="">-- Sắp xếp --</option>
+                <option value="oldest" th:selected="${sort == 'oldest'}">Cũ nhất</option>
+                <option value="newest" th:selected="${sort == 'newest'}">Mới nhất</option>
+            </select>
+        </div>
+
+        <div class="col-md-3 d-flex">
+            <button type="submit" class="btn btn-outline-primary me-2">
+                <i class="bi bi-filter"></i> Lọc
+            </button>
+            <a th:href="@{/host/booking-list}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-lg"></i> Xóa lọc
+            </a>
+        </div>
+    </form>
+
+    <div th:if="${bookings.content.size() == 0}" class="alert alert-info text-center">
+            <span th:if="${keyword != null or status != null or percent != null or sort != null}">
+                Không tìm thấy booking phù hợp với bộ lọc hiện tại.
+            </span>
+        <span th:unless="${keyword != null or status != null or percent != null or sort != null}">
+                Hiện chưa có booking nào được thêm.
+            </span>
+    </div>
+
+    <table th:if="${bookings.content.size() > 0}"
+           class="table table-hover table-striped shadow-sm rounded bg-white">
+        <thead class="table-dark text-center">
+        <tr>
+            <th>STT</th>
+            <th>Tên KH</th>
+            <th>Số điện thoại</th>
+            <th>Email</th>
+            <th>Số người</th>
+            <th>Ngày & giờ hẹn</th>
+            <th>Thời gian booking</th>
+            <th>Ghi chú</th>
+            <th>Bàn</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody class="align-middle text-center">
+        <tr th:each="b, status : ${bookings}">
+            <td th:text="${status.count}">1</td>
+            <td th:text="${b.name}"></td>
+            <td th:text="${b.phone}"></td>
+            <td th:text="${b.email}"></td>
+            <td th:text="${b.people}"></td>
+            <td th:text="${#temporals.format(b.dateTime, 'dd/MM/yyyy HH:mm')}"></td>
+            <td th:text="${#temporals.format(b.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+            <td th:text="${b.note}"></td>
+            <td th:text="${b.table != null ? b.table.name : '----'}"></td>
+            <td>
+                <span class="badge"
+                      th:text="${b.status.label}"
+                      th:classappend="${b.status.badgeClass}">
+                </span>
+            </td>
+            <td>
+                <button type="button"
+                        class="btn btn-outline-warning btn-sm"
+                        th:if="${b.table == null}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editBookingModal"
+                        th:attr="data-id=${b.id},
+                             data-name=${b.name},
+                             data-people=${b.people},
+                             data-datetime=${#temporals.format(b.dateTime, 'yyyy-MM-dd HH:mm')},
+                             data-note=${b.note}"
+                        title="Cập nhật"
+                        data-bs-title="Cập nhật"
+                >
+                    <i class="bi bi-pencil-square"></i>
+                </button>
+                <button type="button"
+                        class="btn btn-outline-success btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#assignTableModal"
+                        th:attr="data-id=${b.id},
+                            data-date=${#temporals.format(b.dateTime, 'yyyy-MM-dd')},
+                            data-datetime=${#temporals.format(b.dateTime, 'dd/MM/yyy HH:mm')}"
+                        title="Gán bàn"
+                        data-bs-title="Gán bàn"
+                >
+                    <i class="bi bi-table"></i>
+                </button>
+                <button type="button"
+                        class="btn btn-outline-primary btn-sm me-1"
+                        data-bs-toggle="modal"
+                        data-bs-target="#updateStatusModal"
+                        th:attr="data-id=${b.id}, data-status=${b.status.name()}"
+                        title="Thay đổi trạng thái"
+                        data-bs-title="Thay đổi trạng thái"
+                >
+                    <i class="bi bi-arrow-repeat"></i>
+                </button>
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteModal"
+                        th:attr="data-id=${b.id}, data-title=${b.id}, data-bs-title='Xóa booking ' + ${b.id}"
+                        title="Xoá"
+                        data-bs-title="Xoá"
+                >
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <nav th:if="${bookings.totalPages > 1}" aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${bookings.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/host/booking-list(page=${bookings.number - 1},
+                  keyword=${param.keyword}, status=${param.status}, sort=${param.sort})}">Trước</a>
+            </li>
+            <li th:each="pageNum : ${#numbers.sequence(0, bookings.totalPages - 1)}"
+                class="page-item"
+                th:classappend="${pageNum == bookings.number} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/host/booking-list(page=${pageNum}, keyword=${param.keyword}, status=${param.status}, sort=${param.sort})}"
+                   th:text="${pageNum + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${bookings.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/host/booking-list(page=${bookings.number + 1},
+                  keyword=${param.keyword}, status=${param.status}, sort=${param.sort})}">Sau</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<th:block layout:fragment="modal">
+    <div th:replace="~{fragments/shared/delete_modal :: deleteModal ('booking')}"></div>
+    <!-- Modal cập nhật trạng thái -->
+    <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post" th:action="@{/host/updateStatus}" id="updateStatusForm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cập nhật trạng thái đặt bàn</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="updateBookingId">
+                        <div class="alert alert-warning d-none" id="statusWarning">
+                            ⚠️ Nếu thay đổi khỏi trạng thái <strong>Đã xác nhận</strong>, bàn đã gán sẽ bị huỷ!
+                        </div>
+                        <div class="mb-3">
+                            <label for="newStatus" class="form-label">Trạng thái mới</label>
+                            <select class="form-select" name="status" id="newStatus" required>
+                                <option value="NEW">Mới đặt</option>
+                                <option value="CANCELLED">Đã huỷ</option>
+                                <option value="SERVED">Đã phục vụ</option>
+                                <option value="NOSHOW">Không tới</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Cập nhật</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Modal chọn bàn -->
+    <div class="modal fade" id="assignTableModal" tabindex="-1" aria-labelledby="assignTableModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post" th:action="@{/host/assignTable}" id="assignTableForm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Chọn bàn cho khách</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="assignBookingId">
+                        <input type="hidden" name="date" id="bookingDate">
+
+                        <label class="form-label">Chọn bàn</label>
+                        <select class="form-select" name="tableId" id="tableSelect" required>
+                            <!-- option sẽ được load qua JS -->
+                        </select>
+                        <div class="mt-3">Ngày & giờ khách mong muốn đặt: <strong id="request-datetime"></strong></div>
+
+                        <div id="tableBookingInfo" class="mt-3"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Gán bàn</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal fade" id="editBookingModal" tabindex="-1" aria-labelledby="editBookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post" th:action="@{/host/editBooking}" id="editBookingForm"
+                  class="needs-validation" novalidate>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cập nhật thông tin đặt bàn</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="editBookingId">
+
+                        <div class="mb-3">
+                            <label for="editBookingName" class="form-label">Tên khách</label>
+                            <input type="text" class="form-control" id="editBookingName" name="name" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editBookingPeople" class="form-label">Số người</label>
+                            <input type="number" class="form-control" id="editBookingPeople" name="people" min="1" required>
+                            <div class="invalid-feedback">Vui lòng nhập số người hợp lệ.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editBookingDatetime" class="form-label">Ngày & giờ hẹn</label>
+                            <input type="datetime-local" class="form-control" id="editBookingDatetime" name="dateTime" required>
+                            <div class="invalid-feedback">Vui lòng chọn ngày giờ hợp lệ.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editBookingNote" class="form-label">Ghi chú</label>
+                            <textarea class="form-control" id="editBookingNote" name="note" maxlength="200"></textarea>
+                            <div class="invalid-feedback">Ghi chú không vượt quá 200 ký tự.</div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+</th:block>
+
+<th:block layout:fragment="script">
+    <script>
+        (() => {
+            'use strict';
+            const form = document.getElementById('editBookingForm');
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        })();
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteModal = document.getElementById('deleteModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                const title = button.getAttribute('data-title');
+                deleteModal.querySelector('#modalTitle').textContent = title;
+                deleteModal.querySelector('#deleteForm').setAttribute('action', '/host/' + id + '/delete');
+            });
+
+            const updateStatusModal = document.getElementById('updateStatusModal');
+            updateStatusModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                const currentStatus = button.getAttribute('data-status');
+
+                document.getElementById('updateBookingId').value = id;
+                document.getElementById('newStatus').value = currentStatus;
+
+                const warning = document.getElementById('statusWarning');
+                if (currentStatus === 'CONFIRMED') {
+                    warning.classList.remove('d-none');
+                } else {
+                    warning.classList.add('d-none');
+                }
+            });
+
+            let bookingMap = {}; // lưu lịch đặt theo tableId
+
+            const assignTableModal = document.getElementById('assignTableModal');
+
+            assignTableModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const bookingId = button.getAttribute('data-id');
+                const bookingDate = button.getAttribute('data-date');
+                const bookingDateTime = button.getAttribute('data-datetime');
+
+                document.getElementById('assignBookingId').value = bookingId;
+                document.getElementById('bookingDate').value = bookingDate;
+                document.getElementById('request-datetime').innerText = bookingDateTime;
+
+                fetch(`/host/api/available-tables?date=${bookingDate}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const tableSelect = document.getElementById('tableSelect');
+                        const tableInfoDiv = document.getElementById('tableBookingInfo');
+
+                        bookingMap = data.bookings || {};
+
+                        // Đổ dropdown bàn
+                        tableSelect.innerHTML = '';
+                        data.tables.forEach(table => {
+                            const option = document.createElement("option");
+                            option.value = table.id;
+                            option.text = table.name;
+                            tableSelect.appendChild(option);
+                        });
+
+                        // Gắn onchange
+                        tableSelect.onchange = () => {
+                            renderTableInfo(tableSelect.value);
+                        };
+
+                        // Render mặc định bàn đầu tiên
+                        renderTableInfo(tableSelect.value);
+                    });
+            });
+
+            function renderTableInfo(tableId) {
+                const list = bookingMap[tableId] || [];
+                const div = document.getElementById("tableBookingInfo");
+
+                if (list.length === 0) {
+                    div.innerHTML = `<em>Không có lịch đặt cho bàn này trong ngày.</em>`;
+                    return;
+                }
+
+                div.innerHTML = `<strong>Bàn đã đặt trong ngày:</strong><ul class="ps-3 mb-0">`;
+                list.forEach(b => {
+                    div.innerHTML += `
+                        <p class="mb-0">
+                            <i class="bi bi-clock"></i> ${b.time} - ${b.tableName} - ${b.name}
+                        </p>
+                    `;
+                });
+                div.innerHTML += `</ul>`;
+            }
+
+            const editBookingModal = document.getElementById('editBookingModal');
+            editBookingModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                console.log(button)
+                document.getElementById('editBookingId').value = button.getAttribute('data-id');
+                document.getElementById('editBookingName').value = button.getAttribute('data-name');
+                document.getElementById('editBookingPeople').value = button.getAttribute('data-people');
+                document.getElementById('editBookingDatetime').value = button.getAttribute('data-datetime');
+                document.getElementById('editBookingNote').value = button.getAttribute('data-note');
+            });
+        });
+    </script>
+</th:block>
+</html>
+
+

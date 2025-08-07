@@ -1,9 +1,11 @@
 package com.something.restaurantpos.controller.waiter;
 
 import com.something.restaurantpos.entity.DiningTable;
+import com.something.restaurantpos.entity.Employee;
 import com.something.restaurantpos.entity.Order;
 import com.something.restaurantpos.service.IDiningTableService;
 import com.something.restaurantpos.service.IOrderService;
+import com.something.restaurantpos.util.CurrentUserUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -62,7 +64,8 @@ public class DiningTableController {
 
         Optional<Order> openOrder = orderService.findLastedOpenOrderByTableId(id);
         if (openOrder.isEmpty()) {
-            orderService.createNewOrderForTable(table);
+            Employee employee = CurrentUserUtil.getCurrentEmployee();
+            orderService.createNewOrderForTable(table, employee);
         }
 
         return "redirect:/waiter/order?tableId=" + id;
@@ -82,7 +85,8 @@ public class DiningTableController {
 
         Optional<Order> openOrder = orderService.findLastedOpenOrderByTableId(tableId);
         if (openOrder.isEmpty()) {
-            orderService.createNewOrderForTable(table);
+            Employee employee = CurrentUserUtil.getCurrentEmployee();
+            orderService.createNewOrderForTable(table, employee);
         }
 
         return "redirect:/waiter/order?tableId=" + tableId;

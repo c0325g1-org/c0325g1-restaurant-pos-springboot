@@ -9,17 +9,20 @@
             padding: 15px;
             cursor: pointer;
             background-color: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
             transition: all 0.2s ease-in-out;
         }
+
         .menu-item:hover {
             background-color: #e9f5ff;
             transform: translateY(-2px);
         }
+
         .order-summary {
             max-height: 500px;
             overflow-y: auto;
         }
+
         .category-filter button.active {
             background-color: #6c757d !important;
             color: white !important;
@@ -29,29 +32,36 @@
             .order-summary {
                 max-height: unset;
             }
+
             #tab-menu[data-tab]:not([data-tab="menu"]) {
                 display: none !important;
                 padding-bottom: 80px;
             }
+
             #tab-menu[data-tab]:not([data-tab="menu"]).active {
                 display: block !important;
                 opacity: 1 !important;
             }
+
             #mobile-view-tabs {
                 z-index: 1030;
             }
-            [data-tab="menu"].active .content{
+
+            [data-tab="menu"].active .content {
                 display: block !important;
                 opacity: 1 !important;
             }
-            [data-tab="menu"] .content{
+
+            [data-tab="menu"] .content {
                 display: none !important;
                 padding-bottom: 80px;
             }
+
             #mobile-view-tabs button.active {
                 color: #0d6efd;
                 font-weight: 600;
             }
+
             #mobile-view-tabs button.active i {
                 color: #0d6efd;
             }
@@ -68,7 +78,8 @@
     <div class="row" data-tab="menu">
         <div class="col-12 col-lg-8 content">
             <div class="mb-3">
-                <input type="text" class="form-control" placeholder="Tìm món..." style="max-width: 375px;" oninput="filterMenu(this.value)">
+                <input type="text" class="form-control" placeholder="Tìm món..." style="max-width: 375px;"
+                       oninput="filterMenu(this.value)">
             </div>
             <div class="category-filter mb-3 d-flex flex-wrap">
                 <button class="btn btn-outline-secondary btn-sm mb-2 me-2 active" data-category="">Tất cả</button>
@@ -83,11 +94,13 @@
                     <div class="menu-item card h-100"
                          th:attr="data-menu-id=${m.id}, data-menu-name=${m.name}, data-menu-price=${m.price}">
                         <div class="position-relative w-100 h-0" style="padding-bottom: 100%;">
-                            <img th:src="${m.imageUrl}" class="object-fit-cover position-absolute h-100 w-100" alt="...">
+                            <img th:src="${m.imageUrl}" class="object-fit-cover position-absolute h-100 w-100"
+                                 alt="...">
                         </div>
                         <div class="card-body">
                             <h5 class="card-title" th:text="${m.name}"></h5>
-                            <small class="text-muted" th:text="${#numbers.formatDecimal(m.price, 0, 'COMMA', 0, 'POINT')} + 'đ'"></small>
+                            <small class="text-muted"
+                                   th:text="${#numbers.formatDecimal(m.price, 0, 'COMMA', 0, 'POINT')} + 'đ'"></small>
                         </div>
                     </div>
                 </div>
@@ -97,13 +110,26 @@
         <div class="col-lg-4">
             <!-- Bootstrap tabs for desktop -->
             <ul class="nav nav-tabs d-none d-lg-flex" id="orderTab" role="tablist">
-                <li class="nav-item"><button class="nav-link" th:classappend="${successMessage == null} ? 'active' : ''" id="cart-tab" data-bs-toggle="tab" data-bs-target="#cart-tab-pane" type="button">Giỏ hàng</button></li>
-                <li class="nav-item"><button class="nav-link" th:classappend="${successMessage != null} ? 'active' : ''" id="called-tab" data-bs-toggle="tab" data-bs-target="#called-tab-pane" type="button">Đã gọi</button></li>
-                <li class="nav-item"><button class="nav-link" id="served-tab" data-bs-toggle="tab" data-bs-target="#served-tab-pane" type="button">Đã phục vụ</button></li>
+                <li class="nav-item">
+                    <button class="nav-link" th:classappend="${successMessage == null} ? 'active' : ''" id="cart-tab"
+                            data-bs-toggle="tab" data-bs-target="#cart-tab-pane" type="button">Giỏ hàng
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" th:classappend="${successMessage != null} ? 'active' : ''" id="called-tab"
+                            data-bs-toggle="tab" data-bs-target="#called-tab-pane" type="button">Đã gọi
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="served-tab" data-bs-toggle="tab" data-bs-target="#served-tab-pane"
+                            type="button">Đã phục vụ
+                    </button>
+                </li>
             </ul>
 
             <div class="tab-content mt-3">
-                <div class="tab-pane fade" th:classappend="${successMessage == null} ? 'show active' : ''" id="cart-tab-pane" data-tab="cart">
+                <div class="tab-pane fade" th:classappend="${successMessage == null} ? 'show active' : ''"
+                     id="cart-tab-pane" data-tab="cart">
                     <h5>Tóm tắt đơn hàng</h5>
                     <div class="order-summary" id="cart-items"></div>
                     <hr>
@@ -116,7 +142,8 @@
                     </form>
                 </div>
 
-                <div class="tab-pane fade" th:classappend="${successMessage != null} ? 'show active' : ''" id="called-tab-pane" data-tab="called">
+                <div class="tab-pane fade" th:classappend="${successMessage != null} ? 'show active' : ''"
+                     id="called-tab-pane" data-tab="called">
                     <h5>Đã gọi</h5>
                     <div class="order-summary" id="called-items"></div>
                 </div>
@@ -124,6 +151,7 @@
                 <div class="tab-pane fade" id="served-tab-pane" data-tab="served">
                     <h5>Đã phục vụ</h5>
                     <div class="order-summary" id="served-items"></div>
+                    <div id="served-actions" class="mt-2"></div>
                 </div>
             </div>
         </div>
@@ -133,10 +161,12 @@
             <button id="tab-menu" class="btn btn-link text-decoration-none" onclick="switchMobileTab('menu')">
                 <i class="bi bi-list-ul"></i><br><small>Món</small>
             </button>
-            <button id="tab-cart" class="btn btn-link text-decoration-none" th:classappend="${successMessage == null} ? 'active' : ''" onclick="switchMobileTab('cart')">
+            <button id="tab-cart" class="btn btn-link text-decoration-none"
+                    th:classappend="${successMessage == null} ? 'active' : ''" onclick="switchMobileTab('cart')">
                 <i class="bi bi-cart"></i><br><small>Giỏ</small>
             </button>
-            <button id="tab-called" class="btn btn-link text-decoration-none" th:classappend="${successMessage != null} ? 'active' : ''" onclick="switchMobileTab('called')">
+            <button id="tab-called" class="btn btn-link text-decoration-none"
+                    th:classappend="${successMessage != null} ? 'active' : ''" onclick="switchMobileTab('called')">
                 <i class="bi bi-receipt"></i><br><small>Đã gọi</small>
             </button>
             <button id="tab-served" class="btn btn-link text-decoration-none" onclick="switchMobileTab('served')">
@@ -148,6 +178,27 @@
 
 <th:block layout:fragment="modal">
     <div th:replace="fragments/waiter/modal-cancel :: confirmCancelModal"></div>
+
+    <!-- Modal chọn loại hóa đơn -->
+    <div class="modal fade" id="billTypeModal" tabindex="-1" aria-labelledby="billTypeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="billTypeModalLabel">Chọn loại hóa đơn</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <select id="billTypeSelect" class="form-select">
+                        <option value="hóa đơn điện tử">Hóa đơn điện tử</option>
+                        <option value="hóa đơn giấy">Hóa đơn giấy</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button id="confirmBillTypeBtn" type="button" class="btn btn-success">Gửi yêu cầu</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </th:block>
 
 <th:block layout:fragment="script">
@@ -173,6 +224,39 @@
             if (activeBtn) activeBtn.classList.add('active');
             if (activePanel) activePanel.classList.add('active');
         }
+
+        document.getElementById("confirmBillTypeBtn").addEventListener("click", function () {
+            const tableId = this.dataset.tableId;
+            const billType = document.getElementById("billTypeSelect").value;
+
+            fetch('/notifications/request-bill', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({tableId, billType})
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("Gửi yêu cầu thất bại");
+                    return res.json();
+                })
+                .then(data => {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById("billTypeModal"));
+                    modal.hide();
+
+                    const toast = document.createElement("div");
+                    toast.className = "toast align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-3 show";
+                    toast.setAttribute("role", "alert");
+                    toast.innerHTML = `<div class="d-flex">
+                        <div class="toast-body">Gửi yêu cầu thanh toán thành công!</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>`;
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 4000);
+                })
+                .catch(err => {
+                    alert("Lỗi khi gửi yêu cầu: " + err.message);
+                });
+        });
+
     </script>
 </th:block>
 </html>

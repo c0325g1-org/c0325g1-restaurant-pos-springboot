@@ -21,4 +21,7 @@ public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
     
     @Query("SELECT e FROM Employee e JOIN FETCH e.role")
     List<Employee> findAllWithRole();
+
+    long countByDeletedFalse();
+    long countByDeletedFalseAndEnableTrue();
 }

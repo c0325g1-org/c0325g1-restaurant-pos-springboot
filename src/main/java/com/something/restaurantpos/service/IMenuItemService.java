@@ -10,4 +10,7 @@ public interface IMenuItemService extends IService<MenuItem> {
     List<MenuItem> getAvailableItems();
     MenuItem getById(Integer id);
     Page<MenuItem> search(String name, Integer idCategory, Pageable pageable);
+    List<MenuItem> findMenuItemOrderByTotalQuantityDesc();
+    long countSellingItems();
 }
+

@@ -7,15 +7,21 @@ import com.something.restaurantpos.entity.Role;
 import com.something.restaurantpos.mapper.EmployeeMapper;
 import com.something.restaurantpos.repository.IEmployeeRepository;
 import com.something.restaurantpos.repository.IRoleRepository;
+
 import com.something.restaurantpos.repository.IAccountActivationTokenRepository;
 import com.something.restaurantpos.entity.AccountActivationToken;
 import com.something.restaurantpos.service.IAccountActivationService;
+
+import com.something.restaurantpos.service.IInvoiceService;
+import com.something.restaurantpos.service.IMenuItemService;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -27,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
+
 import java.util.Set;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,9 +41,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+    @Autowired
+    private IMenuItemService menuItemService;
 
     @Autowired
     private IEmployeeRepository employeeRepository;
@@ -56,6 +72,9 @@ public class AdminController {
     @Autowired
     private IAccountActivationService activationService;
 
+    @Autowired
+    private IInvoiceService invoiceService;
+
     @GetMapping("")
     public String adminHome() {
         return "redirect:/admin/dashboard";
@@ -64,8 +83,9 @@ public class AdminController {
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         // Thống kê cơ bản
-        long totalEmployees = employeeRepository.count();
-        long enabledEmployees = employeeRepository.countByEnableTrue();
+        long totalEmployees = employeeRepository.countByDeletedFalse(); // tất cả nhân viên chưa xóa
+        long enabledEmployees = employeeRepository.countByDeletedFalseAndEnableTrue();
+        
         long totalManagers = employeeRepository.countByRoleId(1); // QUẢN_LÝ
         long totalCashiers = employeeRepository.countByRoleId(2); // THU_NGÂN
         long totalWaiters = employeeRepository.countByRoleId(3); // PHỤC_VỤ
@@ -74,14 +94,21 @@ public class AdminController {
 
         model.addAttribute("pageTitle", "Admin Dashboard");
         model.addAttribute("employeeName", "Admin");
+
         model.addAttribute("totalEmployees", totalEmployees);
         model.addAttribute("enabledEmployees", enabledEmployees);
+        
         model.addAttribute("totalManagers", totalManagers);
         model.addAttribute("totalCashiers", totalCashiers);
         model.addAttribute("totalWaiters", totalWaiters);
         model.addAttribute("totalKitchen", totalKitchen);
         model.addAttribute("totalAdmins", totalAdmins);
-
+        long invoiceToday = invoiceService.countPaidInvoicesToday();
+        model.addAttribute("invoiceToday", invoiceToday);
+        BigDecimal revenueToday = invoiceService.sumRevenueToday();
+        model.addAttribute("revenueToday", revenueToday);
+        long sellingItems = menuItemService.countSellingItems();
+        model.addAttribute("sellingItems", sellingItems);
         return "pages/admin/dashboard";
     }
 
@@ -522,4 +549,28 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+
+    @GetMapping("/revenue-chart-data")
+    @ResponseBody
+    public Map<String, Object> getRevenueChartData(@RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+                                                   @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+        LocalDateTime startDateTime = start.atStartOfDay();
+        LocalDateTime endDateTime = end.atTime(23, 59, 59);
+        List<Object[]> data = invoiceService.getRevenueBetweenDates(startDateTime, endDateTime);
+
+        List<String> dates = new ArrayList<>();
+        List<BigDecimal> revenues = new ArrayList<>();
+
+        for (Object[] row : data) {
+            dates.add(row[0].toString()); // yyyy-MM-dd
+            revenues.add((BigDecimal) row[1]);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("dates", dates);
+        result.put("revenues", revenues);
+        return result;
+    }
+    
 } 
