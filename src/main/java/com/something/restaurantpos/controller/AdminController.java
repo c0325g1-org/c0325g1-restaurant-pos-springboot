@@ -16,6 +16,7 @@ import com.something.restaurantpos.service.IAccountActivationService;
 import com.something.restaurantpos.service.IInvoiceService;
 import com.something.restaurantpos.service.IMenuItemService;
 
+import com.something.restaurantpos.service.INotificationReceiverService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 import jakarta.validation.Validation;
@@ -80,6 +81,10 @@ public class AdminController {
 
     @Autowired
     private IInvoiceRepository invoiceRepository;
+
+    @Autowired
+    private INotificationReceiverService notificationReceiverService;
+
 
     @GetMapping("")
     public String adminHome() {
@@ -390,6 +395,12 @@ public class AdminController {
             } catch (Exception e) {
                 // Log lỗi nhưng không dừng quá trình xóa
                 System.err.println("Lỗi khi xóa token kích hoạt: " + e.getMessage());
+            }
+
+            try {
+                notificationReceiverService.deleteByEmployeeId(id);
+            } catch (Exception e) {
+                System.err.println("Lỗi khi xóa notification: " + e.getMessage());
             }
             
             // Xóa nhân viên

@@ -36,4 +36,9 @@ public class NotificationReceiverService implements INotificationReceiverService
         }
         return false;
     }
+
+    @Override
+    public void deleteByEmployeeId(Integer id) {
+        notificationReceiverRepository.deleteByEmployee_Id(id);
+    }
 }

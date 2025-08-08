@@ -82,7 +82,7 @@ public class CashierController {
             voucherId = null;
         }
         invoiceService.applyVoucher(id, voucherId);
-        redirectAttributes.addFlashAttribute("success", "Áp dụng voucher thành công");
+        redirectAttributes.addFlashAttribute("successMessage", "Áp dụng voucher thành công");
         return "redirect:/cashier/invoices/" + id + "/checkout";
     }
 
@@ -126,7 +126,7 @@ public class CashierController {
                                   HttpServletRequest request) throws UnsupportedEncodingException {
         paymentDto.setInvoiceId(id);
         invoiceService.processPayment(paymentDto);
-        redirectAttributes.addFlashAttribute("success", "Thanh toán thành công!");
+        redirectAttributes.addFlashAttribute("successMessage", "Thanh toán thành công!");
         return "redirect:/cashier/invoices";
     }
 

@@ -9,4 +9,5 @@ public interface INotificationReceiverService {
     List<NotificationReceiver> findAllByEmployeeOrderByCreatedAtDesc(Employee employee);
     List<NotificationReceiver> findTop10ByEmployeeOrderByCreatedAtDesc(Employee employee);
     boolean markOneAsRead(Employee employee, Integer id);
+    void deleteByEmployeeId(Integer id);
 }
