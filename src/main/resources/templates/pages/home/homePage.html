@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -11,12 +12,15 @@
           integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer"/>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-    <title>Responsive Nav với Dropdown</title>
+    <title>Nhà hàng LEON</title>
     <style>
         :root {
             --bg: #fff;
             --text: #222;
             --accent: #002aff;
+        }
+        html {
+            overflow-x: hidden;
         }
 
         * {
@@ -29,17 +33,23 @@
             font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg);
             color: var(--text);
+            overflow-x: hidden;
         }
 
         .navbar {
             position: relative;
-            background-color: #ea5f1f !important; /* cam sáng */
+            background-color: #F57C00 !important; /* cam sáng */
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0;
             gap: 1rem;
             z-index: 999;
+        }
+
+        .navbar-toggler:focus {
+            outline: none !important;
+            box-shadow: none !important;
         }
 
         #carouselExampleFade {
@@ -166,7 +176,7 @@
             font-size: clamp(1.5rem, 2.5vw, 2.25rem);
             margin: 2rem 0;
             font-weight: 600;
-            color: var(--accent); /* màu chữ xanh */
+            color: #F57C00;
             position: relative;
             display: inline-block;
             padding: 0.5rem 1rem;
@@ -178,9 +188,9 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            height: 1.5px; /* mảnh hơn */
+            height: 2px; /* mảnh hơn */
             width: 100%; /* dài hơn chữ */
-            background: var(--accent);
+            background: #F57C00;
         }
 
         .favorite-title::before {
@@ -216,9 +226,7 @@
             box-shadow: 0 12px 38px rgba(0, 0, 0, 0.12);
         }
 
-        /* Feedback slider (auto) */
         .feedback-slider-wrapper {
-            /*margin: 1rem 0 2rem;*/
             position: relative;
             overflow: hidden;
 
@@ -227,30 +235,16 @@
             padding: 10px 0;
         }
 
-
-        /*feedback-slider {*/
-        /*    display: flex;*/
-        /*    gap: 1rem;*/
-        /*    scroll-behavior: smooth;*/
-        /*    padding: 12px 0;*/
-        /*}*/
         .feedback-slider {
-            /*overflow-x: auto;*/
-            /*scroll-behavior: smooth;*/
-            /*padding-bottom: 8px;*/
-            /*display: flex;*/
-            /*gap: 1rem;*/
-            /*scroll-snap-type: x mandatory;*/
-            /*padding: 12px 0;*/
             display: flex;
             gap: 1rem;
-            overflow-x: hidden; /* Ẩn cuộn ngang */
-            overflow-y: hidden; /* Ẩn cuộn dọc */
-            scrollbar-width: none; /* Ẩn trên Firefox */
+            overflow-x: hidden;
+            overflow-y: hidden;
+            scrollbar-width: none;
         }
 
         .slide {
-            flex: 0 0 calc((100% - 2rem) / 3); /* desktop */
+            flex: 0 0 calc((100% - 2rem) / 3);
             transition: transform 0.3s ease;
             scroll-snap-align: start;
         }
@@ -500,10 +494,10 @@
 
 
         .accent-btn {
-            margin: 60px 40px;
+            margin: 40px 10px;
             font-weight: bold;
             border: none;
-            background: #ea5f1f;
+            background: #F57C00;
             color: white;
             padding: 14px 22px;
             border-radius: 30px;
@@ -520,16 +514,16 @@
         }
 
         button.place-btn {
-            background-color: #ea5f1f;
+            background-color: #F57C00;
         }
 
         .place-btn {
-            margin: 60px 40px;
+            margin: 40px 10px;
             font-weight: bold;
             border: none;
             border-radius: 30px;
             padding: 14px 22px;
-            background: #ea5f1f;
+            background: #F57C00;
             color: #fff;
             cursor: pointer;
             position: absolute;
@@ -627,7 +621,7 @@
         #bookingModal button.submit {
             width: 100%;
             padding: 10px;
-            background: #ea5f1f;
+            background: #F57C00;
             border: none;
             color: white;
             font-weight: 600;
@@ -648,7 +642,7 @@
 
         .form-group input,
         .form-group textarea {
-            width: 90%;
+            width: 100%;
             padding: 10px 14px;
             border: 1px solid #ccc;
             border-radius: 8px;
@@ -673,6 +667,20 @@
         .navbar-brand {
             padding: 20px;
         }
+
+        input[type="datetime-local"] {
+            -webkit-appearance: none;
+            appearance: none;
+
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            height: 45px;
+            box-sizing: border-box;
+            background-color: white;
+        }
     </style>
 </head>
 <body>
@@ -680,9 +688,9 @@
 <nav class="navbar navbar-expand-lg ">
     <div class="container-fluid">
         <img th:src="@{'/img/logo.png'}" class="navbar-brand" width="120px">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
                 aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+            <i class="bi bi-list text-white" style="font-size: 36px"></i>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav">
@@ -713,51 +721,13 @@
 
             </ul>
         </div>
-        <!--        <div class="d-flex justify-content-end">-->
-        <!--            <button type="button" class="btn btn-light grow-on-hover accent-btn" style="font-weight: bold">-->
-        <!--                <i class="fa-solid fa-utensils"></i>-->
-        <!--            </button>-->
-        <!--        </div>-->
-
-
     </div>
 </nav>
-
-<!--<div id="carouselExampleFade" class="carousel slide carousel-fade" data-bs-ride="carousel"-->
-<!--     data-bs-interval="2000" data-bs-pause="false">-->
-<!--    <div class="carousel-inner">-->
-<!--        <div class="carousel-item active">-->
-<!--            <img th:src="@{'/img/vocher.png'}" class="d-block w-100" alt="...">-->
-<!--        </div>-->
-<!--        <div class="carousel-item">-->
-<!--            <img th:src="@{'/img/vocher1.png'}" class="d-block w-100" alt="...">-->
-<!--        </div>-->
-<!--        <div class="carousel-item">-->
-<!--            <img th:src="@{'/img/vocher2.png'}" class="d-block w-100" alt="...">-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleFade"-->
-<!--            data-bs-slide="prev">-->
-<!--        <span class="carousel-control-prev-icon" aria-hidden="true"></span>-->
-<!--        <span class="visually-hidden">Previous</span>-->
-<!--    </button>-->
-<!--    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleFade"-->
-<!--            data-bs-slide="next">-->
-<!--        <span class="carousel-control-next-icon" aria-hidden="true"></span>-->
-<!--        <span class="visually-hidden">Next</span>-->
-<!--    </button>-->
-<!--</div>-->
 
 <div class="feedback-carousel slick-fade" id="voucherSlider">
     <div class="slide" th:each="voucher, status : ${vouchers}">
         <img th:src="${voucher.image}" class="d-block w-100" alt="Voucher 1">
     </div>
-    <!--    <div class="slide">-->
-    <!--        <img th:src="@{'/img/vocher1.jpg'}" class="d-block w-100" alt="Voucher 2">-->
-    <!--    </div>-->
-    <!--    <div class="slide">-->
-    <!--        <img th:src="@{'/img/vocher2.png'}" class="d-block w-100" alt="Voucher 3">-->
-    <!--    </div>-->
 </div>
 
 <div class="favorites-section">
@@ -877,9 +847,9 @@
             <!-- Thông tin liên hệ -->
             <div class="col-md-6">
                 <h2>Nhà Hàng LEON</h2>
-                <p><i class="fas fa-map-marker-alt text-danger"></i> 123 Đường Nguyễn Tất Thành,Đà Nẵng</p>
-                <p><i class="fas fa-phone text-danger"></i> 0123 456 789</p>
-                <p><i class="fas fa-envelope text-danger"></i> nhahangleon@gmail.com</p>
+                <p><i class="fas fa-map-marker-alt me-1" style="color: #F57C00"></i> 123 Đường Nguyễn Tất Thành,Đà Nẵng</p>
+                <p><i class="fas fa-phone me-1" style="color: #F57C00"></i> 0123 456 789</p>
+                <p><i class="fas fa-envelope me-1" style="color: #F57C00"></i> nhahangleon@gmail.com</p>
             </div>
 
             <!-- Google Map -->
@@ -905,178 +875,178 @@
 
 
 <script>
-    $('#submitBooking').click(function (e) {
-
-        const bookingData = {
-            name: $('#name').val(),
-            phone: $('#phone').val(),
-            email: $('#email').val(),
-            dateTime: $('#dateTime').val(),
-            people: $('#people').val(),
-            note: $('#note').val(),
-        };
-        $('.text-danger').text('');
-        $.ajax({
-            url: 'http://localhost:8080/home/booking',
-            type: 'post',
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify(bookingData),
-            success: function (response) {
-                if (response === "success") {
-                    window.location.href = "/home/homeSuccess";
-                }
-
-            },
-            error: function (xhr) {
-                if (xhr.status === 400) {
-                    const errors = xhr.responseJSON;
-                    for (const field in errors) {
-                        $(`#${field}`).next('.text-danger').text(errors[field]);
-                    }
-                } else {
-                    alert("đã xảy ra lỗi hệ thống");
-                }
-            }
-        });
-    });
     document.addEventListener('DOMContentLoaded', () => {
+        $('#submitBooking').click(function (e) {
 
-        const showToast = (id) => {
-            const toastEl = document.getElementById(id);
-            if (toastEl) {
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-            }
-        };
-        // Toast chỉ hiển thị khi có message cụ thể
+            const bookingData = {
+                name: $('#name').val(),
+                phone: $('#phone').val(),
+                email: $('#email').val(),
+                dateTime: $('#dateTime').val(),
+                people: $('#people').val(),
+                note: $('#note').val(),
+            };
+            $('.text-danger').text('');
+            $.ajax({
+                url: 'http://localhost:8080/home/booking',
+                type: 'post',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(bookingData),
+                success: function (response) {
+                    if (response === "success") {
+                        window.location.href = "/home/homeSuccess";
+                    }
 
+                },
+                error: function (xhr) {
+                    if (xhr.status === 400) {
+                        const errors = xhr.responseJSON;
+                        for (const field in errors) {
+                            $(`#${field}`).next('.text-danger').text(errors[field]);
+                        }
+                    } else {
+                        alert("đã xảy ra lỗi hệ thống");
+                    }
+                }
+            });
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const showToast = (id) => {
+                const toastEl = document.getElementById(id);
+                if (toastEl) {
+                    const toast = new bootstrap.Toast(toastEl);
+                    toast.show();
+                }
+            };
+            showToast('successToast');
+            showToast('errorToast');
+
+            const btnIcon = document.getElementById('toggleBtn');
+            const placeBtn = document.getElementById('placeBtn');
+            let visible = false;
+
+            btnIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!visible) {
+                    placeBtn.classList.add('show');
+                    btnIcon.classList.add('hidden');
+                } else {
+                    placeBtn.classList.remove('show');
+                    btnIcon.classList.remove('hidden');
+                }
+                visible = !visible;
+            });
+
+            document.addEventListener('click', (e) => {
+                if (visible && !btnIcon.contains(e.target) && !placeBtn.contains(e.target)) {
+                    // ẩn placeBtn, hiện icon ngay
+                    placeBtn.classList.remove('show');
+                    btnIcon.classList.remove('hidden');
+                    visible = false;
+                }
+            });
+        });
         const btnIcon = document.getElementById('toggleBtn');
         const placeBtn = document.getElementById('placeBtn');
-        let visible = false;
+        const backdrop = document.getElementById('backdrop');
+        const modal = document.getElementById('bookingModal');
+        const closeBtn = modal.querySelector('.close-btn');
+
+        let state = 0; // 0=icon,1=placeBtn visible,2=modal open
+
+        function showPlaceBtn() {
+            placeBtn.classList.add('show');
+            btnIcon.classList.add('hidden');
+            state = 1;
+        }
+
+        function openModal() {
+            backdrop.style.display = 'block';
+            modal.classList.add('show');
+            state = 2;
+        }
+
+        function resetAll() {
+            placeBtn.classList.remove('show');
+            btnIcon.classList.remove('hidden');
+            backdrop.style.display = 'none';
+            modal.classList.remove('show');
+            state = 0;
+        }
 
         btnIcon.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (!visible) {
-                placeBtn.classList.add('show');
-                btnIcon.classList.add('hidden');
+            if (state === 0) {
+                showPlaceBtn();
+            } else if (state === 1) {
+                openModal();
             } else {
-                placeBtn.classList.remove('show');
-                btnIcon.classList.remove('hidden');
+                resetAll();
             }
-            visible = !visible;
+        });
+
+        placeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (state === 1) openModal();
+        });
+
+        backdrop.addEventListener('click', resetAll);
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            resetAll();
         });
 
         document.addEventListener('click', (e) => {
-            if (visible && !btnIcon.contains(e.target) && !placeBtn.contains(e.target)) {
-                // ẩn placeBtn, hiện icon ngay
-                placeBtn.classList.remove('show');
-                btnIcon.classList.remove('hidden');
-                visible = false;
+            if (state !== 0 && !modal.contains(e.target) && !placeBtn.contains(e.target) && !btnIcon.contains(e.target)) {
+                resetAll();
             }
         });
-    });
-    const btnIcon = document.getElementById('toggleBtn');
-    const placeBtn = document.getElementById('placeBtn');
-    const backdrop = document.getElementById('backdrop');
-    const modal = document.getElementById('bookingModal');
-    const closeBtn = modal.querySelector('.close-btn');
 
-    let state = 0; // 0=icon,1=placeBtn visible,2=modal open
-
-    function showPlaceBtn() {
-        placeBtn.classList.add('show');
-        btnIcon.classList.add('hidden');
-        state = 1;
-    }
-
-    function openModal() {
-        backdrop.style.display = 'block';
-        modal.classList.add('show');
-        state = 2;
-    }
-
-    function resetAll() {
-        placeBtn.classList.remove('show');
-        btnIcon.classList.remove('hidden');
-        backdrop.style.display = 'none';
-        modal.classList.remove('show');
-        state = 0;
-    }
-
-    btnIcon.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (state === 0) {
-            showPlaceBtn();
-        } else if (state === 1) {
-            openModal();
-        } else {
-            resetAll();
-        }
-    });
-
-    placeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (state === 1) openModal();
-    });
-
-    backdrop.addEventListener('click', resetAll);
-    closeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        resetAll();
-    });
-
-    document.addEventListener('click', (e) => {
-        if (state !== 0 && !modal.contains(e.target) && !placeBtn.contains(e.target) && !btnIcon.contains(e.target)) {
-            resetAll();
-        }
-    });
-
-    $(function () {
-        $('#feedbackSlider').slick({
-            slidesToShow: 3,               // desktop mặc định
-            slidesToScroll: 1,
-            autoplay: true,
-            speed: 2000,
-            autoplaySpeed: 2000,           // 3s mỗi lần chuyển
-            pauseOnHover: true,
-            arrows: true,
-            dots: false,
-            infinite: true,
-            responsive: [
-                {
-                    breakpoint: 992,           // dưới desktop (tablet lớn)
-                    settings: {
-                        slidesToShow: 2
+        $(function () {
+            $('#feedbackSlider').slick({
+                slidesToShow: 3,               // desktop mặc định
+                slidesToScroll: 1,
+                autoplay: true,
+                speed: 2000,
+                autoplaySpeed: 2000,           // 3s mỗi lần chuyển
+                pauseOnHover: true,
+                arrows: true,
+                dots: false,
+                infinite: true,
+                responsive: [
+                    {
+                        breakpoint: 992,           // dưới desktop (tablet lớn)
+                        settings: {
+                            slidesToShow: 2
+                        }
+                    },
+                    {
+                        breakpoint: 768,           // mobile
+                        settings: {
+                            slidesToShow: 1
+                        }
                     }
-                },
-                {
-                    breakpoint: 768,           // mobile
-                    settings: {
-                        slidesToShow: 1
-                    }
-                }
-            ]
-        });
-    });
-
-    $(function () {
-        $('#voucherSlider').slick({
-            slidesToShow: 1,
-            slidesToScroll: 1,
-            fade: true,               // hiệu ứng fade giống carousel-fade
-            cssEase: 'linear',
-            autoplay: true,
-            autoplaySpeed: 2000,      // tương đương data-bs-interval="2000"
-            pauseOnHover: false,      // không dừng khi hover
-            arrows: true,             // nút prev/next
-            dots: false,
-            infinite: true
+                ]
+            });
         });
 
-    });
-    // AJAX
+        $(function () {
+            $('#voucherSlider').slick({
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                fade: true,               // hiệu ứng fade giống carousel-fade
+                cssEase: 'linear',
+                autoplay: true,
+                autoplaySpeed: 2000,      // tương đương data-bs-interval="2000"
+                pauseOnHover: false,      // không dừng khi hover
+                arrows: true,             // nút prev/next
+                dots: false,
+                infinite: true
+            });
 
-
+        });
+    })
 </script>
 
 </body>
