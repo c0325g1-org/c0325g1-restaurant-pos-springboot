@@ -6,6 +6,8 @@ import com.something.restaurantpos.entity.NotificationReceiver;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,4 +18,10 @@ public interface INotificationReceiverRepository extends JpaRepository<Notificat
     List<NotificationReceiver> findTop10ByEmployeeOrderByCreatedAtDesc(Employee employee);
 
     Optional<NotificationReceiver> findByIdAndEmployee(Integer id, Employee employee);
+
+    boolean removeAllByEmployee(Employee employee);
+
+    @Modifying
+    @Transactional
+    void deleteByEmployee_Id(Integer employeeId);
 }
