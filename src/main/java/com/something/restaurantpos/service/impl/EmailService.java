@@ -57,12 +57,16 @@
             Set<String> sentEmails = new HashSet<>();// check trùng lặp email
             for (Booking booking : bookings) {
                 String email = booking.getEmail();
+                // Skip mail của dữ liệu mẫu
+                if (email != null && email.contains("@example.com")) {
+                    continue;
+                }
                 if (email != null && !email.trim().isEmpty() && sentEmails.add(email)) {
                     sendEmailWithVoucher(email, subject,booking.getName());
                 }
             }
         }
-//        @Scheduled(cron = "0 00 10 * * ?")
+        @Scheduled(cron = "0 00 10 * * ?")
         public void autoSendVoucherEmail() {
             System.out.println("Bắt đầu gửi tự động voucher đến khách hàng...");
             sendVoucherToAllBookings("🎁 Ưu đãi đặc biệt từ Nhà hàng LEON");

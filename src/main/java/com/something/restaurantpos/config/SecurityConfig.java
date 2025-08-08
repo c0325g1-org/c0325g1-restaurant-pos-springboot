@@ -37,7 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/cashier/**").hasAnyRole("THU_NGÂN", "QUẢN_LÝ", "QUẢN_TRỊ")
                         .requestMatchers("/waiter/**").hasAnyRole("PHỤC_VỤ", "QUẢN_TRỊ")
                         .requestMatchers("/kitchen/**").hasAnyRole("BẾP", "QUẢN_TRỊ")
-                        .requestMatchers("/agent/**").hasAnyRole("TỔNG_ĐÀI_VIÊN", "QUẢN_LÝ")
+                        .requestMatchers("/agent/**").hasRole("TỔNG_ĐÀI_VIÊN")
 
                         .anyRequest().authenticated()
                 )

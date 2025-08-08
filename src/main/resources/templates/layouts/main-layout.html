@@ -233,8 +233,8 @@
     <a sec:authorize="hasAnyRole('THU_NGÂN', 'QUẢN_LÝ')" th:href="@{/cashier/tables}" class="nav-link"><i class="bi bi-table"></i> <span>Bàn ăn</span></a>
     <a sec:authorize="hasAnyRole('THU_NGÂN', 'QUẢN_LÝ')" th:href="@{/cashier/invoices}" class="nav-link"><i class="bi bi-receipt"></i> <span>Hoá đơn</span></a>
 
-    <a sec:authorize="hasAnyRole('TỔNG_ĐÀI_VIÊN', 'QUẢN_LÝ')" th:href="@{/agent/dashboard}" class="nav-link"><i class="bi bi-table"></i> <span>Tổng quan</span></a>
-    <a sec:authorize="hasAnyRole('TỔNG_ĐÀI_VIÊN', 'QUẢN_LÝ')" th:href="@{/agent/booking-list}" class="nav-link"><i class="bi bi-card-list"></i> <span>Đặt bàn</span></a>
+    <a sec:authorize="hasRole('TỔNG_ĐÀI_VIÊN')" th:href="@{/agent/dashboard}" class="nav-link"><i class="bi bi-table"></i> <span>Tổng quan</span></a>
+    <a sec:authorize="hasRole('TỔNG_ĐÀI_VIÊN')" th:href="@{/agent/booking-list}" class="nav-link"><i class="bi bi-card-list"></i> <span>Đặt bàn</span></a>
 </div>
 
 <!-- MAIN CONTENT -->

@@ -30,6 +30,7 @@ import java.util.Map;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/home")
+@CrossOrigin(origins = "http://10.10.8.21:8080")
 public class HomeController {
     private final IMenuItemService menuItemService;
     private final INotificationService notificationService;
